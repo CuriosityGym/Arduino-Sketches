@@ -7,26 +7,31 @@
   can sense the position of the knob, and use that value to
   control whatever you wish.
   
-  In this example we are going to Turn ON sequence of 12 LEDs 
+  In this example we are going to Turn ON and OFF sequence of 12 LEDs 
   depending upon the position of the knob of potentiometer.
   As we turn potentiometer from initial position to final position,
-  12 LEDs will glow one by one according to value of potentiometer.
+  12 LEDs will glow one by one depending to value of potentiometer.
+  If we turn knob in reverse direction then LEDs will turn OFF one by 
+  one depending upon the value of potentiometer
   
 */  
   
 
-int potentiometer = 2;    // The potentiometer is connected to
-                          // analog pin 2
-int led_Pins[] = {0,1,2,3,4,5,6,7,8,9,10,11};   //all LED pins are stored in array
+int potentiometer = 2;    // The potentiometer is connected to analog pin 2
+                          
+int led_Pins[] = {1,0,2,3,4,5,6,7,8,9,10,11};   //an array of pin numbers to which LEDs are attached
 
-int pin_Count = 12;       // total number of LEDs
+int pin_Count = 12;   // the number of pins (i.e. the length of the array)
 
 void setup() 
    {
      // put your setup code here, to run once:
-     for ( int i = 0; i > pin_Count; i++) // set all LEDs to output
+
+    // the array elements are numbered from 0 to (pinCount - 1).
+    // use a for loop to initialize each pin as an output:
+     for ( int thisPin = 0; thisPin < pin_Count; thisPin++) // set all LEDs to output
         {
-          pinMode(led_Pins[i],OUTPUT);
+          pinMode(led_Pins[thisPin],OUTPUT);
         }
    }
 
@@ -37,9 +42,16 @@ void loop()
      int potentiometer_Value;   //this variable will store the potentometer value
      potentiometer_Value = analogRead(potentiometer); // reads the value of the potentiometer (value between 0 and 1023) 
      potentiometer_Value = map(potentiometer_Value, 0, 1023, 0, 11); // map() function Re-maps a number from one range to another
-                                                                     // maps 10 bit potentiometer value (0 to 1023) to 0 to 12
-     for(int i = 0; i <= potentiometer_Value; i++)   // this loop will Turn ON  LEDs depending upon 
-        {                                            // the mapped value of potentiometer_value and
-         digitalWrite(led_Pins[i], HIGH);            // rest of the LEDs will remain OFF.
-        }  
-   }
+                                                                     // maps 10 bit potentiometer value (0 to 1023) to 0 to 11
+     // this for loop will iterate from 0 to 11 and will turn ON and OFF LEDs according to value of potentiometer                                                         
+     for (int i = 0; i<= potentiometer_Value;i++)
+        {
+         for (int j = 11; j>=potentiometer_Value;j--) 
+            {
+              digitalWrite(led_Pins[j],LOW);
+              digitalWrite(led_Pins[i],HIGH);
+            }
+        }
+   }          
+  
+

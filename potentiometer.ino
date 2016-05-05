@@ -19,7 +19,7 @@
 
 int potentiometer = 2;    // The potentiometer is connected to analog pin 2
                           
-int led_Pins[] = {1,0,2,3,4,5,6,7,8,9,10,11};   //an array of pin numbers to which LEDs are attached
+int led_Pins[] = {1,2,3,4,5,6,7,8,9,10,11,12};   //an array of pin numbers to which LEDs are attached
 
 int pin_Count = 12;   // the number of pins (i.e. the length of the array)
 
@@ -43,15 +43,14 @@ void loop()
      potentiometer_Value = analogRead(potentiometer); // reads the value of the potentiometer (value between 0 and 1023) 
      potentiometer_Value = map(potentiometer_Value, 0, 1023, 0, 11); // map() function Re-maps a number from one range to another
                                                                      // maps 10 bit potentiometer value (0 to 1023) to 0 to 11
-     // this for loop will iterate from 0 to 11 and will turn ON and OFF LEDs according to value of potentiometer                                                         
+     //  for loop will iterate from 0 to 11 and will turn ON and OFF LEDs according to value of potentiometer                                                         
      for (int i = 0; i<= potentiometer_Value;i++)
         {
-         for (int j = 11; j>=potentiometer_Value;j--) 
-            {
-              digitalWrite(led_Pins[j],LOW);
-              digitalWrite(led_Pins[i],HIGH);
-            }
+          digitalWrite(led_Pins[i],HIGH);
+         }
+         
+     for (int j = 11; j>=potentiometer_Value;j--) 
+        {
+          digitalWrite(led_Pins[j],LOW);
         }
    }          
-  
-

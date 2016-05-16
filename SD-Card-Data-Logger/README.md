@@ -8,9 +8,10 @@
  
   
  The circuit:
- * LM35 sensor on analog pin A3
- * SD card attached to SPI bus as follows:
- ** MOSI - pin 11
- ** MISO - pin 12
- ** CLK - pin 13
- ** CS - pin 4
+ LM35 sensor on analog pin A3
+ 
+ SD card attached to SPI bus as follows:
+ MOSI - pin 11
+ MISO - pin 12
+ CLK - pin 13
+ CS - pin 4

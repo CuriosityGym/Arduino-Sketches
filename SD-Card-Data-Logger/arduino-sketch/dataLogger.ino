@@ -188,7 +188,7 @@ void LogToSDcard()
       //if the file isn't open, pop up an error:
      else 
         {
-          Serial.println("error opening datalog.txt");
+          Serial.println("error opening Temp000.CSV");
           delay(2000);
         }
    }   

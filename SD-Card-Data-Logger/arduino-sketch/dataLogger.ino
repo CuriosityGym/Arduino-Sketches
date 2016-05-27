@@ -13,17 +13,17 @@
  ** MOSI - pin 11
  ** MISO - pin 12
  ** CLK - pin 13
- ** CS - pin 4
+ ** CS - pin 6
  */
 
 #include <SPI.h>
 #include <SdFat.h>
 SdFat sd;
-const uint8_t chipSelect = 4;
+const uint8_t chipSelect = 6;
 
 //const int chipSelect = 4;   //cs pin of SD card shield
-int tempPin = A3;      // LM 35 is connected to A3 pin.
-int buzzerPin = A2;    // buzzer is connected to A2 pin
+int tempPin = A0;      // LM 35 is connected to A3 pin.
+int buzzerPin = A1;    // buzzer is connected to A2 pin
 
 File dataFile;   // the logging file
 char filename[] = "Temp000.CSV";
@@ -80,7 +80,7 @@ void setup()
                // Duration = 1 second / note type
                // e.g. quarter note = 1000 / 4, eighth note = 1000/8, etc.
                int noteDuration = 2500 / noteDurations[thisNote];
-               tone(A2,alertAlarm1[thisNote], noteDuration);
+               tone(A1,alertAlarm1[thisNote], noteDuration);
                //pause for the note's duration plus 100 ms:
                delay(noteDuration + 100);
              }
@@ -122,7 +122,7 @@ void setup()
                // Duration = 1 second / note type
                // e.g. quarter note = 1000 / 4, eighth note = 1000/8, etc.
                int noteDuration = 2500 / noteDurations[thisNote];
-               tone(A2,alertAlarm2[thisNote], noteDuration);
+               tone(A1,alertAlarm2[thisNote], noteDuration);
                //pause for the note's duration plus 50 ms:
                delay(noteDuration + 50);
              }

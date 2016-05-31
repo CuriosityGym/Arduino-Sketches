@@ -49,12 +49,12 @@ void wifiCb(void *response)
 
            if(status == STATION_GOT_IP) 
              {
-               Serial.println("WIFI CONNECTED");
+               Serial.println("WIFI CONNECTED");  //Wifi gets connected at this place
                wifiConnected = true;
              } 
            else 
              {
-               Serial.print("WIFI NOT READY: ");
+               Serial.print("WIFI NOT READY: ");//Wifi not connected,check connection
                Serial.println(status);
                wifiConnected = false;
              }
@@ -153,7 +153,7 @@ void logToThingspeak()
 
           char response[266];
           uint16_t code = rest.waitResponse(response, 266);
-          if(code == HTTP_STATUS_OK)
+          if(code == HTTP_STATUS_OK)     //check for response for HTTP request  
             {
              Serial.println("ARDUINO: GET successful:");
              Serial.println(response);
@@ -167,6 +167,9 @@ void logToThingspeak()
         }
         
     }   
+    
+   
+     
     
    
    

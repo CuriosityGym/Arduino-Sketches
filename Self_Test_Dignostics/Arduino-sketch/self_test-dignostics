@@ -1,0 +1,522 @@
+#include <Adafruit_NeoPixel.h>
+#include "U8glib.h"
+#include <SPI.h>
+#include <SD.h>
+//#include <IRremote.h>
+
+//#include <CGShield.h>
+//#include <Wire.h>         // Require for I2C communication
+//CGShield fs;             // Instanciate CGShield instance
+#define PIN 6
+U8GLIB_SSD1306_128X64 u8g(U8G_I2C_OPT_NONE|U8G_I2C_OPT_DEV_0);	// I2C / TWI
+int led_Pins[] = {1,2,3,4,5,6,7,8,9,10,11,12};   //an array of pin numbers to which LEDs are attached
+int pin_Count = 12;   // the number of pins (i.e. the length of the array)
+byte led13 = 13;
+
+int led_delay= 1000;
+int ws2812_delay =1000;
+int sd_delay = 3000;
+
+const byte potentiometer = A1;    // The potentiometer is connected to analog pin 2
+const byte temperaturePin = A3;      // LM 35 is connected to A3 pin.
+const byte ldrPin = A0;
+
+byte Button1 = 7;
+byte Button1Pressed = 0;
+int Button1LastState = LOW;
+
+
+byte touchpadPin = 4;
+byte touched = 0;
+int touchPadLastState=LOW;
+
+//int RECV_PIN = 3;
+//IRrecv irrecv(RECV_PIN);
+//decode_results results;
+//const unsigned long IR_CODE1 = /*0xFFFFFFFF; */0xF20AC837;
+//const unsigned long IR_CODE2 = /*0x7200000;   */0xF20AA857;
+//const unsigned long IR_CODE3 = /*0x897580E3;   */0xF20A28D7;
+//const unsigned long IR_CODE4 = /*0x6C042472;   */0xF20A6897;
+//byte recieved_code = 0;
+
+
+Adafruit_NeoPixel strip = Adafruit_NeoPixel(1, PIN, NEO_GRB + NEO_KHZ800);
+void setup()
+    { Serial.begin(9600);
+    u8g.setFont(u8g_font_timB14);
+     // u8g.setFont(u8g_font_unifont);
+      u8g.setColorIndex(1); // Instructs the display to draw with a pixel on. 
+
+
+         
+     // pinMode(Button1, INPUT); 
+     // pinMode(Button2, INPUT); 
+    // pinMode(touchpadPin,INPUT);
+    // irrecv.enableIRIn(); // Start the receiver 
+        strip.begin();
+  strip.show(); // Initialize all pixels to 'off'                                       //
+     
+     LED_TEST();
+     WS2812_TEST();
+     buzzer_TEST();
+     sdCard_TEST();
+     
+     button1_TEST(); 
+   //  button2_TEST();
+     touchPad_TEST(); 
+     // IR_TEST();
+     ldr_TEST();
+     potentiometer_TEST();
+     LM35_TEST();
+    }
+void loop()
+    {
+   
+    
+    }
+
+void showMessageOnLcd(int x,int y, const char* message1,int a,int b, const char* message2)
+    {u8g.firstPage();
+      do { //u8g.setFont(u8g_font_timB14);
+           u8g.drawStr( x, y, message1);
+          u8g.drawStr( a, b, message2);    
+         } while( u8g.nextPage() );
+    }
+  
+void LED_TEST()
+    {      for( int thisPin = 0; thisPin < pin_Count; thisPin++) // set all LEDs to output
+         {
+           pinMode(led_Pins[thisPin],OUTPUT);
+         } 
+      Serial.println("LED TEST IS STARTED");
+      showMessageOnLcd(5,17,"LED TEST IS",22,45,"STARTED");
+      delay(3000);   
+      for(int i=0; i<12; i++)
+         {
+           digitalWrite(led_Pins[i],HIGH);
+           Serial.print("LED: ");
+           Serial.print(i+1);
+           Serial.println(" ON");
+           u8g.firstPage();
+           do {  
+                u8g.drawStr( 10, 30, "LED ");
+                u8g.setPrintPos(58, 30);
+                u8g.print(i+1);
+                u8g.drawStr( 90, 30, "ON");
+              } while( u8g.nextPage() );
+           delay(led_delay);
+         }
+      delay(3000);
+      for(int j=11; j>=0; j--)
+         {
+           digitalWrite(led_Pins[j],LOW);
+           Serial.print("LED: ");
+           Serial.print(j+1);
+           Serial.println(" OFF");
+           u8g.firstPage();
+           do {  
+               u8g.drawStr( 10, 30, "LED ");
+               u8g.setPrintPos(58, 30);
+               u8g.print(j+1);
+               u8g.drawStr( 90, 30, "OFF");
+              } while( u8g.nextPage() );
+           delay(led_delay);
+         }
+      delay(3000);   
+      Serial.println("LED TEST IS FINISHED");
+       showMessageOnLcd(5,17,"LED TEST IS",18,45,"FINISHED");
+      delay(3000); 
+    }
+  
+void WS2812_TEST()
+   { 
+     Serial.println("WS2812 TEST IS STARTED");
+     showMessageOnLcd(1,17,"WS2812 TEST",5,45,"IS STARTED");
+     delay(3000);
+     for(int i=0; i<3; i++)
+        {
+          switch(i)
+               { 
+                case 0: strip.setPixelColor(0,255,0,0);strip.show();
+                Serial.println("Pure Red Color");
+                showMessageOnLcd(18,17,"Pure RED",35,45,"Color");
+                delay(ws2812_delay);break;
+                case 1: strip.setPixelColor(0,0,255,0);strip.show();
+                Serial.println("Pure Green Color");
+                showMessageOnLcd(5,17,"Pure GREEN",35,45,"Color");
+                delay(ws2812_delay);break;
+                case 2: strip.setPixelColor(0,0,0,255);strip.show();
+                Serial.println("Pure Blue Color");
+                showMessageOnLcd(12,17,"Pure BLUE",35,45,"Color");
+                delay(ws2812_delay); break;
+               }
+         } 
+    delay(3000);
+    Serial.println("Rainbow Colors");
+    showMessageOnLcd(25,17,"Rainbow",35,45,"Colors");
+    delay(3000); 
+
+     for(int j=0; j<256; j++) 
+        {
+          for(byte i=0; i<strip.numPixels(); i++) 
+             {
+               strip.setPixelColor(i, Wheel((i+j) & 255));
+             }
+          strip.show();
+          delay(20);
+        } 
+      delay(1000);  
+  
+    Serial.println("FADE IN FADE OUT EFFECT");
+    showMessageOnLcd(1,17,"Fade In Fade ",15,45,"Out Effect");
+    delay(3000);
+    for(int j = 0; j < 3; j++ ) 
+       { // Fade IN
+       for(int k = 0; k < 256; k++)
+          { 
+           switch(j)  
+                 { 
+                   case 0: strip.setPixelColor(0,k,0,0);strip.show(); break;
+                   case 1: strip.setPixelColor(0,0,k,0);strip.show(); break;
+                   case 2: strip.setPixelColor(0,0,0,k);strip.show(); break; 
+                  }
+           delay(3);
+          }
+         // Fade OUT
+       for(int k = 255; k >= 0; k--) 
+          { 
+           switch(j) 
+                 { 
+                   case 0: strip.setPixelColor(0,k,0,0);strip.show(); break;
+                   case 1: strip.setPixelColor(0,0,k,0);strip.show(); break;
+                   case 2: strip.setPixelColor(0,0,0,k);strip.show(); break;
+                  }
+           delay(3);  
+           }
+           
+       }
+     delay(3000);  
+     Serial.println("WS2812 TEST IS FINISHED");
+     showMessageOnLcd(1,17,"WS2812 TEST",1,45,"IS FINISHED");
+     delay(3000); 
+   } 
+   
+   void buzzer_TEST()
+    { Serial.println("BUZZER TEST IS STARTED");
+      showMessageOnLcd(0,17,"BUZZER TEST",10,45,"Is STARTED");
+      delay(1000);
+     // notes in the melody:
+     int melody[]= {196, 196, 220, 196, 262, 247, 196, 196, 220, 196, 294, 262, 
+                    196, 196, 392, 330, 262, 247, 220, 349, 349, 330, 262, 294, 262, 
+                    196, 196, 220, 196, 262, 247, 196, 196, 220, 196, 294, 262, 
+                    196, 196, 392, 330, 262, 247, 220, 349, 349, 330, 262, 294, 262 };
+     // note durations: 4 = quarter note, 8 = eighth note, etc.:
+     int noteDurations[] = { 8,8,4,4,4,2,8,8,4,4,4,2,8,8,4,4,4,4,3,8,8,4,4,4,2,  
+                             8,8,4,4,4,2,8,8,4,4,4,2,8,8,4,4,4,4,3,8,8,4,4,4,2 };
+
+     // iterate over the notes of the melody: 
+     for(int thisNote = 0; thisNote < 52; thisNote++) 
+        {
+         // to calculate the note duration, take one second 
+         // divided by the note type.
+         //e.g. quarter note = 1000 / 4, eighth note = 1000/8, etc.
+         int noteDuration = 1000/noteDurations[thisNote];
+         tone(A2, melody[thisNote],noteDuration);
+         // to distinguish the notes, set a minimum time between them.
+         // the note's duration + 30% seems to work well:
+         int pauseBetweenNotes = noteDuration * 1.60;
+         delay(pauseBetweenNotes);
+         // stop the tone playing:
+         noTone(8);
+        }
+      Serial.println("BUZZER TEST IS FINISHED"); 
+      showMessageOnLcd(0,17,"BUZZER TEST",5,45,"IS FINISHED");
+      delay(2000); 
+    }
+   
+void sdCard_TEST()
+    {  byte chipSelect = 6;   //cs pin of SD card shield       
+      // Open serial communications and wait for port to open:
+     
+      Serial.println("SD CARD TEST IS STARTED");
+      showMessageOnLcd(1,17,"SDCARD TEST",5,45,"IS STARTED");
+      //delay(sd_delay);
+      while (!Serial)
+          {
+            ; // wait for serial port to connect. Needed for native USB port only
+          }
+       
+      Serial.print("Initializing SD card...");
+      showMessageOnLcd(1,17,"Initializing",5,45,"SD Card...");
+     // see if the card is present and can be initialized:
+     if (!SD.begin(chipSelect)) 
+        {
+          Serial.println("Card failed, or not present");
+          showMessageOnLcd(1,17,"Card Failed",1,45,"or not present");
+          // don't do anything more:
+          return;
+        }
+     Serial.println("card initialized.");
+     showMessageOnLcd(30,17,"Card ",1,45,"Initialized");
+     delay(sd_delay);
+     File dataFile = SD.open("sdTest.txt", FILE_WRITE);
+     if(dataFile) 
+       {
+         Serial.print("Writing to sdTest.txt...");
+         showMessageOnLcd(1,17,"Writing to",1,45,"sdTest.txt...");
+         dataFile.println("The quick brown fox jumps over the lazy dog");
+         // close the file:
+         dataFile.close();
+         Serial.println("done.");
+         showMessageOnLcd(1,17,"Writing to.",1,45,"sdTest.txt DONE");
+         delay(sd_delay);
+       } 
+     else 
+       {
+         // if the file didn't open, print an error:
+         Serial.println("error opening sdTest.txt");
+         showMessageOnLcd(1,17,"Error opening",1,45,"sdTest.txt");
+         delay(sd_delay);
+       }
+
+     // re-open the file for reading:
+     dataFile = SD.open("sdTest.txt");
+     if(dataFile)
+       {
+        Serial.println("sdTest.txt:");
+        showMessageOnLcd(1,17,"reading ",1,45,"from sdCard");
+        // read from the file until there's nothing else in it:
+        while(dataFile.available()) 
+             {
+               Serial.write(dataFile.read());
+               showMessageOnLcd(1,17,"successfully",1,45,"read from sdCard");
+             }
+        // close the file:
+        dataFile.close();
+        delay(sd_delay);
+       } 
+     else 
+       {
+        // if the file didn't open, print an error:
+        Serial.println("error opening sdTest.txt");
+        showMessageOnLcd(1,17,"error opening",1,45,"sdText.txt");
+        delay(sd_delay);
+       } 
+    Serial.println("SD CARD TEST IS FINISHED"); 
+    showMessageOnLcd(1,17,"SDCard Test",1,45,"IS FINISHED");    
+  }    
+    
+ void ldr_TEST()
+    {  
+      Serial.println("LDR TEST IS STARTED");
+      showMessageOnLcd(22,17,"LDR TEST",5,45,"IS STARTED");
+      delay(2000);
+      Serial.println("SHINE LIGHT ON LDR");
+      showMessageOnLcd(22,17,"Shine light",30,45,"ON LDR");
+      delay(2000);
+      //unsigned int time = millis();
+      while(250000 > millis())
+           {
+             int ldr_Value = analogRead(ldrPin);
+             Serial.print("LDR Value: ");
+             Serial.println(ldr_Value);
+             u8g.firstPage();
+           do {  
+                u8g.drawStr( 20, 30, "LDR Value");
+                u8g.setPrintPos(50, 55);
+                u8g.print(ldr_Value);
+              } while( u8g.nextPage() );
+           delay(led_delay);
+             
+           }
+      //Serial.print(time);     
+      Serial.println("LDR TEST IS FINISHED"); 
+      showMessageOnLcd(5,17,"LDR TEST IS",18,45,"FINISHED");
+      delay(2000);
+     
+    } 
+void potentiometer_TEST()
+    { unsigned long potTestDelay= 310000; 
+      Serial.println("POTENTIOMETER TEST IS STARTED");
+      showMessageOnLcd(1,17,"Potentiometer",1,45,"Test Is Started");
+      delay(2000);  
+      Serial.println("Turn the Potentiometer Knob");
+      showMessageOnLcd(1,20,"Turn knob of",1,40,"Potentiometer");
+      delay(2000);
+      
+      while(potTestDelay > millis())
+          {
+            int pot_Value = analogRead(potentiometer);
+            Serial.print("Potentiometer Value: ");
+            Serial.println(pot_Value);
+            u8g.firstPage();
+           do {  
+                u8g.drawStr( 30, 30, "Pot Value");
+                u8g.setPrintPos(50, 55);
+                u8g.print(pot_Value);
+              } while( u8g.nextPage() );
+            
+           }
+       Serial.println("POTENTIOMETER TEST IS FINISHED");
+       showMessageOnLcd(5,17,"Potentiometer",1,45,"test is finished");
+       delay(2000);
+      
+     
+    } 
+
+void button1_TEST()
+    {
+      Serial.println("BUTTON 1 TEST IS STARTED");
+      showMessageOnLcd(1,17,"Button 1 Test",5,45,"Is Started");
+      delay(2000);
+      Serial.println("Press BUTTON1  3 Times");
+      showMessageOnLcd(1,17,"Press Button1",5,45,"3 Times");
+      delay(2000);
+      while(210000>millis())
+           {
+            int Button1State = digitalRead(Button1);
+     
+            if(Button1State==HIGH && Button1LastState==LOW)
+              {
+               Button1Pressed++;
+               Serial.print("button1 pressed:");
+               Serial.println(Button1Pressed);
+               u8g.firstPage();
+           do {  
+                u8g.drawStr( 5, 30, "button1 pressed");
+                u8g.setPrintPos(50, 55);
+                u8g.print(Button1Pressed);
+              } while( u8g.nextPage() );
+              } 
+            if(Button1Pressed == 3)
+              {  
+               Button1Pressed =0;
+               Serial.println("BUTTON 1 TESTED SUUCCESFULLY");
+               showMessageOnLcd(1,17,"button 1 tested",5,45,"Successfully!");
+               delay(2000);
+              }
+        
+            Button1LastState=Button1State;
+
+            Button1State= digitalRead(Button1);    
+          } 
+        Serial.println("Button 1 TEST IS FINISHED");
+        showMessageOnLcd(1,17,"Button 1 Test",5,45,"Is Finished");
+        delay(2000); 
+       
+        
+    }  
+
+void touchPad_TEST()
+    { unsigned long touchpadDelay = 230000;
+      Serial.println("TOUCHPAD TEST IS STARTED");
+      showMessageOnLcd(1,17,"Touchpad Test",5,45,"Is Started");
+      delay(2000);
+      Serial.println("Press TOUCHPAD 3 Times");
+      showMessageOnLcd(1,17,"Touch Touchpad",5,45,"3 Times");
+      delay(2000);
+      while(touchpadDelay >millis())
+           {
+             int touchPadState = digitalRead(touchpadPin);
+             if(touchPadState == HIGH && touchPadLastState == LOW)
+               { 
+                 touched++;
+                 Serial.print("touchPad Touched:");
+                 Serial.println(touched);
+                 u8g.firstPage();
+                 do {  
+                     u8g.drawStr( 5, 30, "touchpad touched");
+                     u8g.setPrintPos(50, 55);
+                     u8g.print(touched);
+                    } while( u8g.nextPage() );
+	        }
+              if(touched == 3)
+                {
+                  touched = 0;
+                  Serial.println("TOUCHPAD IS TESTED SUCCESSFULLY");
+                  showMessageOnLcd(1,17,"Touchpad tested",5,45,"Successfully!");
+                  delay(2000);
+                 } 
+        
+               touchPadLastState=touchPadState;
+ 
+               touchPadState= digitalRead(touchpadPin);    
+              }
+     
+       Serial.println("TOUCHPAD TEST IS FINISHED"); 
+       showMessageOnLcd(1,17,"Touchpad Test",5,45,"Is Finished");
+    }     
+ /*   
+void IR_TEST() 
+    {
+      Serial.println("IR RECIEVER TEST IS STARTED");
+      showMessageOnLcd(1,17,"IR RECIEVER",1,45,"Test Is Started");
+      delay(2000);
+      Serial.println("PRESS REMOTE BUTTONS 1,2,3,4");
+      showMessageOnLcd(1,17,"Press remote ",1,45,"Buttons 1,2,3,4");
+      delay(2000);
+      while(20000>millis()) 
+           {
+             if(irrecv.decode(&results)) 
+               {
+                 //translateIR();
+                 switch(results.value)
+                       {
+                         case IR_CODE1: Serial.println("IR CODE 1 RECIEVED");showMessageOnLcd(1,17,"IR CODE 1",5,45,"RECIEVED");recieved_code++; break;
+                         case IR_CODE2: Serial.println("IR CODE 2 RECIEVED");showMessageOnLcd(1,17,"IR CODE 2",5,45,"RECIEVED");recieved_code++; break;
+                         case IR_CODE3: Serial.println("IR CODE 3 RECIEVED");showMessageOnLcd(1,17,"IR CODE 3",5,45,"RECIEVED");recieved_code++; break;
+                         case IR_CODE4: Serial.println("IR CODE 4 RECIEVED");showMessageOnLcd(1,17,"IR CODE 4",5,45,"RECIEVED");recieved_code++; break;
+                         delay(500);
+                       }
+                 irrecv.resume(); // receive the next value      
+                 if (recieved_code==4){recieved_code=0; Serial.println("IR RECEIVER TESTED SUCCESSFULLY");  showMessageOnLcd(1,17,"IR tested",5,45,"Successfully!");}
+                   
+                }
+             }
+      Serial.println("IR RECIEVER TEST IS FINISHED");
+      showMessageOnLcd(1,17,"IR RECIEVER ",1,45,"Test Is Finished");
+    }
+  */
+  void LM35_TEST()
+      { 
+        Serial.println("LM35 TEST IS STARTED");
+        showMessageOnLcd(1,17,"LM35 TEST",5,45,"IS STARTED");
+        delay(2000);
+        Serial.println("Increase OR Decrease the Temperature");
+        showMessageOnLcd(1,17,"increase or",5,45,"decrease temp");
+        delay(2000);
+        while(330000>millis()) 
+             {
+               float temperature =( 5.0 * analogRead(temperaturePin) * 100.0) / 1024.0;
+               Serial.print("temperature: ");
+               Serial.print(temperature);
+               Serial.print(char(176)); 
+               Serial.println("C");
+               u8g.firstPage();
+               do {  
+                    u8g.drawStr( 5, 15, "Temperature");
+                    u8g.setPrintPos(30, 40);
+                    u8g.print(temperature);
+                    u8g.setPrintPos(75, 40);
+                    u8g.print(char(176));
+                    u8g.drawStr( 80, 40, "C");
+                  } while( u8g.nextPage() );
+               delay(5000);
+             }
+         Serial.println("LM35 TEST IS FINISHED");
+         showMessageOnLcd(1,17,"LM35 Test",5,45,"Is Finished");
+      }
+            //*/
+       
+uint32_t Wheel(byte WheelPos) {
+  if(WheelPos < 85) {
+   return strip.Color(WheelPos * 3, 255 - WheelPos * 3, 0);
+  } else if(WheelPos < 170) {
+   WheelPos -= 85;
+   return strip.Color(255 - WheelPos * 3, 0, WheelPos * 3);
+  } else {
+   WheelPos -= 170;
+   return strip.Color(0, WheelPos * 3, 255 - WheelPos * 3);
+  }
+}            
+                   

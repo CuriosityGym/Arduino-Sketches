@@ -1,11 +1,14 @@
 #include "U8glib.h"
 #include <IRremote.h>
-#include <ELClient.h>
-#include <ELClientRest.h>
 #include <RF24Network.h>
 #include <RF24.h>
 #include <SPI.h>
 #define delay_val 2000
+String TEST = "Test ";
+String STARTED ="Started";
+String FINISHED = "Finished";
+String TESTED = "Tested";
+String OK = "OK";
 U8GLIB_SSD1306_128X64 u8g(U8G_I2C_OPT_NONE|U8G_I2C_OPT_DEV_0);	// I2C / TWI
  
 RF24 radio(7,8);
@@ -34,10 +37,10 @@ char* messageToSend[]={"Module1 Test", "NRFL2401 M2 TEST", "NRFL2401 M3 TEST",
 
 
 byte Button1Pressed = 0;
-int Button1LastState = LOW;
+byte Button1LastState = LOW;
 
 byte touched = 0;
-int touchPadLastState=LOW;
+byte touchPadLastState=LOW;
 
 byte RECV_PIN = 3;
 IRrecv irrecv(RECV_PIN);
@@ -45,81 +48,59 @@ decode_results results;
 byte recieved_code = 0;
 
 
-char buff[32];
-
-
 void setup()
     { //Serial.begin(115200);
-      u8g.setFont(u8g_font_timB14);
-      u8g.setColorIndex(1); // Instructs the display to draw with a pixel on. 
+      u8g.setFont(u8g_font_timB14r);
+    // u8g.setColorIndex(1); // Instructs the display to draw with a pixel on. 
          
       irrecv.enableIRIn(); // Start the receiver 
       
     
-     Serial.println("Self Test Dignostics");
+     Serial.println("Self Dignostics");
      showMessageOnLcd(25,17,"Self Test",15,45,"Dignostics");
      delay(delay_val);
      
      Serial.begin(57600);
      Serial.println("NRF24L01 TEST  STARTED");
-     showMessageOnLcd(5,17,"NRF24L01",1,45,"Test Started");    
+     showMessageOnLcd(5,17,"NRF24L01",1,45,TEST+STARTED);    
      delay(delay_val);
      SPI.begin();
      radio.begin();
      network.begin(/*channel*/ 90, /*node address*/ master_node);
-     while(25000>millis()){ nrf24l01_TEST();}
+    // while(25000>millis()){ nrf24l01_TEST();}
      
-    button1_TEST(); 
-    touchPad_TEST(); 
-    IR_TEST();
-    ldr_TEST();
-    potentiometer_TEST();
-    LM35_TEST();
-    LED13_TEST();
-    
-      
-    
-  
-        
-    }
+     button1_TEST(); 
+     touchPad_TEST(); 
+     IR_TEST();
+     ldr_TEST();
+     potentiometer_TEST();
+     LM35_TEST();
+             
+   }
 void loop()
     {      
      }
 
-void showMessageOnLcd(int x,int y, const char* message1,int a,int b, const char* message2)
-    {u8g.firstPage();
-      do { //u8g.setFont(u8g_font_timB14);
-           u8g.drawStr( x, y, message1);
-          u8g.drawStr( a, b, message2);    
+void showMessageOnLcd(int x,int y, String message1,int a,int b, String message2)
+    {
+   //   int stringLength1=message1.length()+1;
+   //   int stringLength2=message2.length()+1;
+   //   char char1[stringLength1];
+   //   char char2[stringLength2];
+      u8g.firstPage();
+      do {//u8g.setFont(u8g_font_timB14);
+            
+           u8g.drawStr( x, y, message1.c_str());
+           u8g.drawStr( a, b, message2.c_str());    
          } while( u8g.nextPage() );
     }
-
-void LED13_TEST()
-    { 
-      byte led13 = 13;
-      pinMode(led13,OUTPUT);   
-      Serial.println("LED13 TEST STARTED");
-      showMessageOnLcd(30,17,"LED13 ",1,45,"Test Started");
-      delay(delay_val);   
-      while(180000 > millis())
-           {
-             digitalWrite(led13,HIGH); delay(1000);
-             digitalWrite(led13,LOW); delay(1000);
-           }  
-      Serial.println("LED13 TEST FINISHED");
-       showMessageOnLcd(5,17,"LED13 TEST ",1,45,"FINISHED");
-      delay(delay_val); 
-    }
-
-
-   
 
 void button1_TEST()
     {  
       byte Button1 = 7;
       pinMode(Button1, INPUT);
-      Serial.println("BUTTON 1 TEST STARTED");
-      showMessageOnLcd(1,17,"Button 1 Test",5,45,"Started");
+      Serial.println("BUTTON 1 "+TEST+STARTED);
+      showMessageOnLcd(1,17,"Button 1 "+TEST,5,45,STARTED);
       delay(delay_val);
       Serial.println("Press BUTTON1  3 Times");
       showMessageOnLcd(1,17,"Press Button1",5,45,"3 Times");
@@ -133,18 +114,20 @@ void button1_TEST()
                Button1Pressed++;
                Serial.print("button1 pressed:");
                Serial.println(Button1Pressed);
-               u8g.firstPage();
+            /*   u8g.firstPage();
            do {  
                 u8g.drawStr( 5, 30, "button1 pressed");
                 u8g.setPrintPos(50, 55);
                 u8g.print(Button1Pressed);
-              } while( u8g.nextPage() );
+              } while( u8g.nextPage() );*/
+              
+                showMessageOnLcd(5,15,"button1 pressed",50,40,String(Button1Pressed));
               } 
             if(Button1Pressed == 3)
               {  
                Button1Pressed =0;
-               Serial.println("BUTTON 1 TESTED OK");
-               showMessageOnLcd(1,17,"button 1 tested",5,45,"OK");
+               Serial.println("BUTTON 1 "+TESTED+OK);
+               showMessageOnLcd(1,17,"Button 1 "+TESTED,5,45,OK);
                delay(delay_val);
               }
         
@@ -152,8 +135,8 @@ void button1_TEST()
 
             Button1State= digitalRead(Button1);    
           } 
-        Serial.println("Button 1 TEST IS FINISHED");
-        showMessageOnLcd(1,17,"Button 1 Test",5,45,"Is Finished");
+        Serial.println("Button 1 "+TEST+FINISHED);
+        showMessageOnLcd(1,17,"Button 1 "+TEST,5,45,FINISHED);
         delay(delay_val); 
        
         
@@ -163,11 +146,11 @@ void touchPad_TEST()
     { 
       byte touchpadPin = 4;
       pinMode(touchpadPin,INPUT);
-      Serial.println("TOUCHPAD TEST STARTED");
-      showMessageOnLcd(1,17,"Touchpad Test",5,45,"Started");
+      Serial.println("TOUCHPAD"+TEST+STARTED);
+      showMessageOnLcd(1,17,"Touchpad "+TEST,5,45,STARTED);
       delay(delay_val);
-      Serial.println("Press TOUCHPAD 3 Times");
-      showMessageOnLcd(1,17,"Touch Touchpad",5,45,"3 Times");
+      Serial.println("Touch TOUCHPAD 3 Times");
+      showMessageOnLcd(1,17,"touch touchpad",5,45,"3 Times");
       delay(delay_val);
       while(66000 >millis())
            {
@@ -175,20 +158,21 @@ void touchPad_TEST()
              if(touchPadState == HIGH && touchPadLastState == LOW)
                { 
                  touched++;
-                 Serial.print("touchPad Touched:");
+                 Serial.print("Touchpad Touched:");
                  Serial.println(touched);
-                 u8g.firstPage();
+               /*  u8g.firstPage();
                  do {  
                      u8g.drawStr( 5, 30, "touchpad touched");
                      u8g.setPrintPos(50, 55);
                      u8g.print(touched);
-                    } while( u8g.nextPage() );
+                    } while( u8g.nextPage() ); */
+                  showMessageOnLcd(1,17,"Touchpad",5,45, "Touched   "+String(touched)); 
 	        }
               if(touched == 3)
                 {
                   touched = 0;
-                  Serial.println("TOUCHPAD TESTED OK");
-                  showMessageOnLcd(1,17,"touchpad tested",5,45,"OK");
+                  Serial.println("TOUCHPAD "+TESTED+OK);
+                  showMessageOnLcd(1,17,"touchpad "+TESTED,5,45,OK);
                   delay(delay_val);
                  } 
         
@@ -197,19 +181,19 @@ void touchPad_TEST()
                touchPadState= digitalRead(touchpadPin);    
               }
      
-       Serial.println("TOUCHPAD TEST FINISHED"); 
+       Serial.println("TOUCHPAD " +TEST+FINISHED); 
        showMessageOnLcd(1,17,"Touchpad Test",5,45,"Finished");
        delay(delay_val);
     }     
    
 void IR_TEST() 
-    { 
+    { String Code_Received = "Code Received";
       const unsigned long IR_CODE1 = 0xF20AC837;
       const unsigned long IR_CODE2 = 0xF20AA857;
       const unsigned long IR_CODE3 = 0xF20A28D7;
       const unsigned long IR_CODE4 = 0xF20A6897;
-      Serial.println("IR RECIEVER TEST STARTED");
-      showMessageOnLcd(1,17,"IR RECIEVER",1,45,"Test Started");
+      Serial.println("IR RECIEVER "+TEST+STARTED);
+      showMessageOnLcd(1,17,"IR RECIEVER",1,45,TEST+STARTED);
       delay(delay_val);
       Serial.println("PRESS REMOTE BUTTONS 1,2,3,4");
       showMessageOnLcd(1,17,"Press remote ",1,45,"Buttons 1,2,3,4");
@@ -221,27 +205,27 @@ void IR_TEST()
                  //translateIR();
                  switch(results.value)
                        {
-                         case IR_CODE1: Serial.println("CODE 1 RECIEVED");showMessageOnLcd(1,17,"IR CODE 1",5,45,"RECIEVED");recieved_code++; break;
-                         case IR_CODE2: Serial.println("CODE 2 RECIEVED");showMessageOnLcd(1,17,"IR CODE 2",5,45,"RECIEVED");recieved_code++; break;
-                         case IR_CODE3: Serial.println("CODE 3 RECIEVED");showMessageOnLcd(1,17,"IR CODE 3",5,45,"RECIEVED");recieved_code++; break;
-                         case IR_CODE4: Serial.println("CODE 4 RECIEVED");showMessageOnLcd(1,17,"IR CODE 4",5,45,"RECIEVED");recieved_code++; break;
+                         case IR_CODE1: Serial.println(Code_Received);showMessageOnLcd(1,15,Code_Received,5,45,"");recieved_code++; break;
+                         case IR_CODE2: Serial.println(Code_Received);showMessageOnLcd(1,30,Code_Received,5,45,"");recieved_code++; break;
+                         case IR_CODE3: Serial.println(Code_Received);showMessageOnLcd(1,45,Code_Received,5,45,"");recieved_code++; break;
+                         case IR_CODE4: Serial.println(Code_Received);showMessageOnLcd(1,60,Code_Received,5,45,"");recieved_code++; break;
                          delay(500);
                        }
                  irrecv.resume(); // receive the next value      
-                 if (recieved_code==4){recieved_code=0; Serial.println("IR RECEIVER TESTED OK");  showMessageOnLcd(1,17,"IR tested",5,45,"OK");}
+                 if (recieved_code==4){recieved_code=0; Serial.println("IR RECEIVER "+TESTED+OK);  showMessageOnLcd(1,17,"IR "+TESTED,5,45,OK);}
                    
                 }
              }
-      Serial.println("IR RECIEVER TEST FINISHED");
-      showMessageOnLcd(1,17,"IR RECIEVER ",1,45,"Test Finished");
+      Serial.println("IR RECIEVER "+TEST+FINISHED);
+      showMessageOnLcd(1,17,"IR RECIEVER ",1,45,TEST+FINISHED);
       delay(delay_val);
     }
   
       
  void ldr_TEST()
     {  
-      Serial.println("LDR TEST STARTED");
-      showMessageOnLcd(22,17,"LDR TEST",5,45,"STARTED");
+      Serial.println("LDR "+TEST+STARTED);
+      showMessageOnLcd(22,17,"LDR "+TEST,20,45,STARTED);
       delay(delay_val);
       Serial.println("SHINE LIGHT ON LDR");
       showMessageOnLcd(22,17,"Shine light",30,45,"ON LDR");
@@ -252,26 +236,27 @@ void IR_TEST()
              int ldr_Value = analogRead(A0);
              Serial.print("LDR Value: ");
              Serial.println(ldr_Value);
-             u8g.firstPage();
+           /*  u8g.firstPage();
            do {  
                 u8g.drawStr( 20, 30, "LDR Value");
                 u8g.setPrintPos(50, 55);
                 u8g.print(ldr_Value);
-              } while( u8g.nextPage() );
+              } while( u8g.nextPage() );*/
+            showMessageOnLcd(22,15,"LDR Value",50,40,String(ldr_Value)); 
              
            }
       //Serial.print(time);     
-      Serial.println("LDR TEST FINISHED"); 
-      showMessageOnLcd(5,17,"LDR TEST ",18,45,"FINISHED");
+      Serial.println("LDR "+TEST+FINISHED); 
+      showMessageOnLcd(5,17,"LDR "+TEST,18,45,FINISHED);
       delay(delay_val);
      
     } 
 void potentiometer_TEST()
     {  
-      Serial.println("POTENTIOMETER TEST STARTED");
-      showMessageOnLcd(1,17,"Potentiometer",1,45,"Test Started");
+      Serial.println("POTENTIOMETER "+TEST+STARTED);
+      showMessageOnLcd(1,17,"Potentiometer",1,45,TEST+STARTED);
       delay(delay_val);  
-      Serial.println("Turn the Potentiometer Knob");
+      Serial.println("Turn knob of Potentiometer Knob");
       showMessageOnLcd(1,20,"Turn knob of",1,40,"Potentiometer");
       delay(delay_val);
       
@@ -280,16 +265,17 @@ void potentiometer_TEST()
             int pot_Value = analogRead(A1);
             Serial.print("Potentiometer Value: ");
             Serial.println(pot_Value);
-            u8g.firstPage();
+           /* u8g.firstPage();
            do {  
                 u8g.drawStr( 30, 30, "Pot Value");
                 u8g.setPrintPos(50, 55);
                 u8g.print(pot_Value);
-              } while( u8g.nextPage() );
+              } while( u8g.nextPage() );*/
+             showMessageOnLcd(20,15,"Pot Value",50,40,String(pot_Value));  
             
            }
-       Serial.println("POTENTIOMETER TEST FINISHED");
-       showMessageOnLcd(5,17,"Potentiometer",1,45,"test  finished");
+       Serial.println("POTENTIOMETER "+TEST+FINISHED);
+       showMessageOnLcd(5,17,"Potentiometer",1,45,TEST+FINISHED);
        delay(delay_val);
       
      
@@ -297,8 +283,8 @@ void potentiometer_TEST()
     
   void LM35_TEST()
       { 
-        Serial.println("LM35 TEST STARTED");
-        showMessageOnLcd(1,17,"LM35 TEST",5,45,"STARTED");
+        Serial.println("LM35 "+TEST+STARTED);
+        showMessageOnLcd(1,17,"LM35 "+TEST,5,45,STARTED);
         delay(delay_val);
         Serial.println("Increase OR Decrease the Temperature");
         showMessageOnLcd(1,17,"increase or",5,45,"decrease temp");
@@ -319,10 +305,11 @@ void potentiometer_TEST()
                     u8g.print(char(176));
                     u8g.drawStr( 80, 40, "C");
                   } while( u8g.nextPage() );
+           
                delay(500);
              }
-         Serial.println("LM35 TEST FINISHED");
-         showMessageOnLcd(1,17,"LM35 Test",5,45,"Finished");
+         Serial.println("LM35"+TEST+FINISHED);
+         showMessageOnLcd(1,17,"LM35 "+TEST,5,45,FINISHED);
          delay(delay_val);
       }
              
@@ -353,12 +340,13 @@ void potentiometer_TEST()
                  {
                   Serial.print("could not write to module ");  // if it is failed to send message prompt error
                   Serial.println(i);
-                  u8g.firstPage();
+               /*   u8g.firstPage();
                do { u8g.drawStr(1,15,"could not write");
                     u8g.drawStr(5,45,"to module");
                     u8g.setPrintPos(100, 45);
                     u8g.print(i);
-                  } while( u8g.nextPage() );
+                  } while( u8g.nextPage() );*/
+                  showMessageOnLcd(1,17,"could not write",5,45,"to module"+String(i));
                  } delay(1000); 
              }
            send_message = false;
@@ -386,6 +374,6 @@ void potentiometer_TEST()
             }
  
         }
- 
+
  }   
-                     
+                               

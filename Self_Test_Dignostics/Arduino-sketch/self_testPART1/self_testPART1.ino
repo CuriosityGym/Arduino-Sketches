@@ -5,11 +5,14 @@
 #include <ELClient.h>
 #include <ELClientRest.h>
 #define delay_val 2000
-
+#define delay_val_1k 200
 #define PIN 6
 U8GLIB_SSD1306_128X64 u8g(U8G_I2C_OPT_NONE|U8G_I2C_OPT_DEV_0);	// I2C / TWI
- 
 
+String TEST="Test ";
+String FINISHED="Finished";
+String STARTED="Started";
+String FILENAME="sdTest.txt";
 char buff[32];
 
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(1, PIN, NEO_GRB + NEO_KHZ800);
@@ -33,12 +36,12 @@ void wifiCb(void *response)
 
            if(status == STATION_GOT_IP) 
              {
-               Serial.println("WIFI CONNECTED");  //Wifi gets connected at this place
+              // Serial.println("WIFI CONNECTED");  //Wifi gets connected at this place
                wifiConnected = true;
              } 
            else 
              {
-               Serial.print("WIFI NOT READY: ");//Wifi not connected,check connection
+               //Serial.print("WIFI NOT READY: ");//Wifi not connected,check connection
                Serial.println(status);
                wifiConnected = false;
              }
@@ -46,7 +49,8 @@ void wifiCb(void *response)
     }
     
 void setup()
-    { Serial.begin(115200);
+    { 
+      Serial.begin(115200);
       u8g.setFont(u8g_font_timB14);
       u8g.setColorIndex(1); // Instructs the display to draw with a pixel on. 
         
@@ -54,11 +58,11 @@ void setup()
       strip.show(); // Initialize all pixels to 'off'                                       //
     
     
-     Serial.println("Self Test Dignostics");
-     showMessageOnLcd(25,17,"Self Test",15,45,"Dignostics");
+     //Serial.println("Self"+TEST+" Dignostics");
+     showMessageOnLcd(25,17,"Self "+TEST,15,45,"Dignostics");
      delay(delay_val);
       
-    sdCard_TEST(); 
+    //sdCard_TEST(); 
    
     LED13_TEST();
     LED_TEST();
@@ -72,11 +76,17 @@ void loop()
     {      
      }
 
-void showMessageOnLcd(int x,int y, const char* message1,int a,int b, const char* message2)
-    {u8g.firstPage();
+void showMessageOnLcd(int x,int y, String message1,int a,int b, String message2)
+    {
+      int stringLength1=message1.length()+1;
+      int stringLength2=message2.length()+1;
+      char char1[stringLength1];
+      char char2[stringLength2];
+      u8g.firstPage();
       do { //u8g.setFont(u8g_font_timB14);
-           u8g.drawStr( x, y, message1);
-          u8g.drawStr( a, b, message2);    
+            
+           u8g.drawStr( x, y, message1.c_str());
+           u8g.drawStr( a, b, message2.c_str());    
          } while( u8g.nextPage() );
     }
 
@@ -84,71 +94,76 @@ void LED13_TEST()
     { 
       byte led13 = 13;
       pinMode(led13,OUTPUT);   
-      Serial.println("LED13 TEST STARTED");
-      showMessageOnLcd(30,17,"LED13 ",1,45,"Test Started");
+      Serial.println("LED13 "+TEST+STARTED);
+      showMessageOnLcd(30,17,"LED13 ",1,45,TEST+STARTED);
       delay(delay_val);   
-      while(180000 > millis())
-           {
-             digitalWrite(led13,HIGH); delay(1000);
-             digitalWrite(led13,LOW); delay(1000);
-           }  
-      Serial.println("LED13 TEST FINISHED");
-       showMessageOnLcd(5,17,"LED13 TEST ",1,45,"FINISHED");
+      for(byte a;a<5;a++)
+      {
+             digitalWrite(led13,HIGH);
+             delay(delay_val_1k);
+             digitalWrite(led13,LOW);
+             delay(delay_val_1k);
+       }  
+      Serial.println("LED13 "+TEST+FINISHED);
+       showMessageOnLcd(5,17,"LED13 "+TEST ,1,45,FINISHED);
       delay(delay_val); 
     }
   
 void LED_TEST()
     {     
-     int led_Pins[] = {1,2,3,4,5,6,7,8,9,10,11,12};   //an array of pin numbers to which LEDs are attached
+    // int led_Pins[] = {1,2,3,4,5,6,7,8,9,10,11,12};   //an array of pin numbers to which LEDs are attached
      byte pin_Count = 12;   // the number of pins (i.e. the length of the array)
-      for( byte thisPin = 0; thisPin < pin_Count; thisPin++) // set all LEDs to output
+        for( byte thisPin = 0; thisPin < pin_Count; thisPin++) // set all LEDs to output
          {
-           pinMode(led_Pins[thisPin],OUTPUT);
+           pinMode(thisPin,OUTPUT);
          } 
-      Serial.println("LED TEST STARTED");
-      showMessageOnLcd(5,17,"LED TEST",22,45,"STARTED");
+      Serial.println("LED "+TEST+STARTED);
+      showMessageOnLcd(5,17,"LED "+TEST,22,45,STARTED);
       delay(delay_val);   
-      for(byte i=0; i<12; i++)
+      for(byte i=0; i<pin_Count; i++)
          {
-           digitalWrite(led_Pins[i],HIGH);
+           digitalWrite(i,HIGH);
            Serial.print("LED: ");
-           Serial.print(i+1);
+           Serial.print(i);
            Serial.println(" ON");
-           u8g.firstPage();
+           /*u8g.firstPage();
            do {  
                 u8g.drawStr( 10, 30, "LED ");
                 u8g.setPrintPos(58, 30);
                 u8g.print(i+1);
                 u8g.drawStr( 90, 30, "ON");
-              } while( u8g.nextPage() );
-           delay(1000);
+              } while( u8g.nextPage() );*/
+           showMessageOnLcd(10, 30,"LED "+ String(i),90,30,"ON");   
+           delay(delay_val_1k);
          }
       delay(delay_val);
-      for(byte j=11; j>=0; j--)
+      for(byte j=pin_Count; j>0; j--)
          {
-           digitalWrite(led_Pins[j],LOW);
+           digitalWrite(j,LOW);
            Serial.print("LED: ");
-           Serial.print(j+1);
+           Serial.print(j);
            Serial.println(" OFF");
-           u8g.firstPage();
+          /* u8g.firstPage();
            do {  
                u8g.drawStr( 10, 30, "LED ");
                u8g.setPrintPos(58, 30);
                u8g.print(j+1);
                u8g.drawStr( 90, 30, "OFF");
-              } while( u8g.nextPage() );
-           delay(1000);
+              } while( u8g.nextPage() );*/
+           showMessageOnLcd(10, 30,"LED "+String(j+1),90,30,"OFF");    
+           delay(delay_val_1k);
+           if(j==0) break;
          }
       delay(delay_val);   
-      Serial.println("LED TEST  FINISHED");
-       showMessageOnLcd(5,17,"LED TEST ",18,45,"FINISHED");
+      Serial.println("LED "+TEST+FINISHED);
+      showMessageOnLcd(5,17,"LED "+TEST,18,45,FINISHED);
       delay(delay_val); 
     }
   
 void WS2812_TEST()
    { 
-     Serial.println("WS2812 TEST STARTED");
-     showMessageOnLcd(1,17,"WS2812 TEST",5,45,"STARTED");
+     Serial.println("WS2812 "+TEST+STARTED);
+     showMessageOnLcd(1,17,"WS2812 "+TEST,5,45,STARTED);
      delay(delay_val);
      for(byte i=0; i<3; i++)
         {
@@ -212,8 +227,8 @@ void WS2812_TEST()
            }
            
        }  
-     Serial.println("WS2812 TEST FINISHED");
-     showMessageOnLcd(1,17,"WS2812 TEST",1,45,"FINISHED");
+     Serial.println("WS2812 "+TEST+FINISHED);
+     showMessageOnLcd(1,17,"WS2812 "+TEST,1,45,FINISHED);
      delay(delay_val); 
    } 
    
@@ -236,8 +251,8 @@ uint32_t Wheel(byte WheelPos)
         } 
    
    void buzzer_TEST()
-    { Serial.println("BUZZER TEST STARTED");
-      showMessageOnLcd(0,17,"BUZZER TEST",10,45,"STARTED");
+    { Serial.println("BUZZER "+TEST+STARTED);
+      showMessageOnLcd(0,17,"BUZZER "+TEST,10,45,STARTED);
       delay(delay_val);
      // notes in the melody:
      int melody[]= {196, 196, 220, 196, 262, 247, 196, 196, 220, 196, 294, 262, 
@@ -260,8 +275,8 @@ uint32_t Wheel(byte WheelPos)
          // stop the tone playing:
          noTone(8);
         }
-      Serial.println("BUZZER TEST FINISHED"); 
-      showMessageOnLcd(0,17,"BUZZER TEST",5,45,"FINISHED");
+      Serial.println("BUZZER "+TEST+FINISHED); 
+      showMessageOnLcd(0,17,"BUZZER "+TEST,5,45,FINISHED);
       delay(delay_val); 
     }
    
@@ -269,8 +284,8 @@ void sdCard_TEST()
     {  byte chipSelect = 6;   //cs pin of SD card shield              
        // Open serial communications and wait for port to open:
      
-      Serial.println("SD CARD TEST STARTED");
-      showMessageOnLcd(1,17,"SDCARD Test",5,45,"Started");
+      Serial.println("SD CARD "+TEST+STARTED);
+      showMessageOnLcd(1,17,"SDCARD "+TEST,5,45,STARTED);
       delay(delay_val);
       while (!Serial)
           {
@@ -292,32 +307,32 @@ void sdCard_TEST()
      showMessageOnLcd(15,17,"Card ",1,45,"Initialized");
      delay(delay_val);
     
-     File dataFile = SD.open("sdTest.txt", FILE_WRITE);
+     File dataFile = SD.open(FILENAME, FILE_WRITE);
      if(dataFile) 
        {
-         Serial.print("Writing to sdTest.txt...");
-         showMessageOnLcd(1,17,"Writing to",1,45,"sdTest.txt...");
+         Serial.print("Writing to "+FILENAME);
+         showMessageOnLcd(1,17,"Writing to",1,45,FILENAME);
          delay(delay_val);
          dataFile.println("The quick brown fox jumps over the lazy dog");
          // close the file:
          dataFile.close();
          Serial.println("done.");
-         showMessageOnLcd(1,17,"Writing to",1,45,"sdTest.txt Done");
+         showMessageOnLcd(1,17,"Writing to",1,45,FILENAME+" Done");
          delay(delay_val);
        } 
      else 
        {
          // if the file didn't open, print an error:
-         Serial.println("error opening sdTest.txt");
-         showMessageOnLcd(1,17,"Error opening",1,45,"sdTest.txt");
+         Serial.println("error opening " +FILENAME);
+         showMessageOnLcd(1,17,"Error opening",1,45,FILENAME);
          delay(delay_val);
        }
 
      // re-open the file for reading:
-     dataFile = SD.open("sdTest.txt");
+     dataFile = SD.open(FILENAME);
      if(dataFile)
        {
-        Serial.println("sdTest.txt:");
+        Serial.println(FILENAME);
         showMessageOnLcd(1,17,"reading ",1,45,"from sdCard");
         delay(delay_val);
         // read from the file until there's nothing else in it:
@@ -337,15 +352,15 @@ void sdCard_TEST()
         showMessageOnLcd(1,17,"error opening",1,45,"sdText.txt");
         delay(delay_val);
        } 
-    Serial.println("SD CARD TEST FINISHED"); 
-    showMessageOnLcd(1,17,"SDCard Test",1,45,"FINISHED"); 
+    Serial.println("SD CARD "+TEST+FINISHED); 
+    showMessageOnLcd(1,17,"SDCard "+TEST,1,45,FINISHED); 
     delay(delay_val);   
   }    
        
 void esp8266_setup()
     { 
        // Serial.begin(115200);   // the baud rate here needs to match the esp-link config
-      Serial.println("EL-Client starting!");
+      //Serial.println("EL-Client starting!");
       // Sync-up with esp-link, this is required at the start of any sketch and initializes the
       // callbacks to the wifi status change callback. The callback gets called with the initial
       // status right after Sync() below completes.
@@ -354,7 +369,7 @@ void esp8266_setup()
       do 
        {
          ok = esp.Sync();      // sync up with esp-link, blocks for up to 2 seconds
-         if (!ok) Serial.println("EL-Client sync failed!"); showMessageOnLcd(20,15, "EL-Client",1,45, "sync failed!");
+         if (!ok) Serial.println("EL-Client sync failed!"); //showMessageOnLcd(20,15, "EL-Client",1,45, "sync failed!");
        } while(!ok);
       Serial.println("EL-Client synced!");
 
@@ -380,7 +395,7 @@ void esp8266_setup()
       Serial.println("EL-REST ready");
     }   
 void esp8266_TEST() 
-    { showMessageOnLcd(20,15, "ESP8266",5,45, "Test Started");
+    { showMessageOnLcd(20,15, "ESP8266",5,45, TEST+STARTED);
       delay(delay_val); 
       esp8266_setup();
       
@@ -415,7 +430,7 @@ void esp8266_TEST()
             }
           delay(delay_val);
         }
-       showMessageOnLcd(20,15, "ESP8266",1,45, "Test Finished");
+       showMessageOnLcd(20,15, "ESP8266",1,45, TEST+FINISHED);
        delay(delay_val); 
     }  
  

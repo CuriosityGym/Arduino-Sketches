@@ -12,13 +12,28 @@
 #define PIN 6
 U8GLIB_SSD1306_128X64 u8g(U8G_I2C_OPT_NONE|U8G_I2C_OPT_DEV_0);	// I2C / TWI
  
+      RF24 radio(7,8);
 
+// Network uses that radio
+RF24Network network(radio);
+
+// Address of our node
+const uint16_t master_node = 0;
+
+// Address of the other nodes
+const uint16_t node_1 = 1;
+const uint16_t node_2 = 2;
+const uint16_t node_3 = 3;
+const uint16_t node_4 = 4;
+const uint16_t node_5 = 5;
+const uint16_t node_6 = 6;
+const uint16_t node_7 = 7;
 
 boolean send_message = true;
 //char messageToSend_1[32] = "NRFL2401 M1 TEST";  
 
-char* messageToSend[]={"Module1 Test", "NRFL2401 M2 TEST", "NRFL2401 M3 TEST",
-"NRFL2401 M4 TEST", "NRFL2401 M5 TEST","NRFL2401 M6 TEST" "NRFL2401 M7 TEST"};
+char* messageToSend[]={"Module1 Test", "Module2 Test", "Module3 Test",
+"Module4 Test", "Module5 Test","Module6 Test" "Module7 Test"};
 
 int led_delay= 1000;
 int ws2812_delay =1000;
@@ -34,7 +49,6 @@ int RECV_PIN = 3;
 IRrecv irrecv(RECV_PIN);
 decode_results results;
 byte recieved_code = 0;
-
 
 char buff[32];
 
@@ -73,7 +87,7 @@ void wifiCb(void *response)
     
 void setup()
     { Serial.begin(115200);
-      u8g.setFont(u8g_font_timB14r);
+      u8g.setFont(u8g_font_timB14);
       u8g.setColorIndex(1); // Instructs the display to draw with a pixel on. 
          
       irrecv.enableIRIn(); // Start the receiver 
@@ -89,29 +103,36 @@ void setup()
     
    // 
     // Serial.begin(115200);
-      
-    
-     button1_TEST(); 
-    touchPad_TEST(); 
-    IR_TEST();
+     
     ldr_TEST();
     potentiometer_TEST();
     LM35_TEST();
-     sdCard_TEST();
+     button1_TEST(); 
+    touchPad_TEST(); 
+    IR_TEST();
+    
+     
     LED13_TEST();
     LED_TEST();
     WS2812_TEST();
-    buzzer_TEST(); 
-     
-    esp8266_TEST(); 
-    Serial.println("NRF24L01 TEST  STARTED");
+    buzzer_TEST();  
+     sdCard_TEST();
+    esp8266_TEST();
+     Serial.println("NRF24L01 TEST  STARTED");
     showMessageOnLcd(5,17,"NRF24L01",1,45,"Test Started");    
-     delay(1000);
-     nrf24l01_TEST();
+    delay(1000);
+    Serial.begin(57600);
+    SPI.begin();
+    radio.begin();
+    network.begin(/*channel*/ 90, /*node address*/ master_node);
+    nrf24l01_TEST();
+        
     }   
     
 void loop()
-    {      
+    { 
+     
+       
      }
 
 void showMessageOnLcd(int x,int y, const char* message1,int a,int b, const char* message2)
@@ -346,7 +367,7 @@ void sdCard_TEST()
          dataFile.close();
          Serial.println("done.");
          showMessageOnLcd(1,17,"Writing to",1,45,"sdTest.txt Done");
-         delay(sd_delay);
+         delay(1000);
        } 
      else 
        {
@@ -371,15 +392,17 @@ void sdCard_TEST()
              }
         // close the file:
         dataFile.close();
-        delay(sd_delay);
+        delay(1000);
        } 
      else 
        {
         // if the file didn't open, print an error:
         Serial.println("error opening sdTest.txt");
-        showMessageOnLcd(1,17,"error opening",1,45,"sdText.txt");
+        showMessageOnLcd(1,17,"error opening",1,45,"sdTest.txt");
         delay(sd_delay);
        } 
+      
+      SD.remove("sdTest.txt"); 
     Serial.println("SD CARD TEST FINISHED"); 
     showMessageOnLcd(1,17,"SDCard Test",1,45,"FINISHED"); 
     delay(sd_delay);   
@@ -396,7 +419,7 @@ void button1_TEST()
       Serial.println("Press BUTTON1  3 Times");
       showMessageOnLcd(1,17,"Press Button1",5,45,"3 Times");
       delay(2000);
-      while(20000>millis())
+      while(73000>millis() && Button1Pressed < 3)
            {
             int Button1State = digitalRead(Button1);
      
@@ -414,7 +437,7 @@ void button1_TEST()
               } 
             if(Button1Pressed == 3)
               {  
-               Button1Pressed =0;
+              // Button1Pressed =0;
                Serial.println("BUTTON 1 TESTED OK");
                showMessageOnLcd(1,17,"button 1 tested",5,45,"OK");
                delay(2000);
@@ -441,7 +464,7 @@ void touchPad_TEST()
       Serial.println("Press TOUCHPAD 3 Times");
       showMessageOnLcd(1,17,"Touch Touchpad",5,45,"3 Times");
       delay(2000);
-      while(66000 >millis())
+      while(94000 >millis() && touched < 3)
            {
              int touchPadState = digitalRead(touchpadPin);
              if(touchPadState == HIGH && touchPadLastState == LOW)
@@ -458,7 +481,7 @@ void touchPad_TEST()
 	        }
               if(touched == 3)
                 {
-                  touched = 0;
+                 // touched = 0;
                   Serial.println("TOUCHPAD TESTED OK");
                   showMessageOnLcd(1,17,"touchpad tested",5,45,"OK");
                   delay(2000);
@@ -486,7 +509,7 @@ void IR_TEST()
       Serial.println("PRESS REMOTE BUTTONS 1,2,3,4");
       showMessageOnLcd(1,17,"Press remote ",1,45,"Buttons 1,2,3,4");
       delay(2000);
-      while(90000>millis()) 
+      while(115000>millis() && recieved_code < 4) 
            {
              if(irrecv.decode(&results)) 
                {
@@ -500,9 +523,14 @@ void IR_TEST()
                          delay(500);
                        }
                  irrecv.resume(); // receive the next value      
-                 if (recieved_code==4){recieved_code=0; Serial.println("IR RECEIVER TESTED OK");  showMessageOnLcd(1,17,"IR tested",5,45,"OK");}
+                 if(recieved_code==4)
+                   { 
+                     Serial.println("IR RECEIVER TESTED OK"); 
+                     showMessageOnLcd(1,17,"IR tested",5,45,"OK");
+                     delay(2000);
+                   }
                    
-                }
+                 }
              }
       Serial.println("IR RECIEVER TEST FINISHED");
       showMessageOnLcd(1,17,"IR RECIEVER ",1,45,"Test Finished");
@@ -519,7 +547,7 @@ void IR_TEST()
       showMessageOnLcd(22,17,"Shine light",30,45,"ON LDR");
       delay(2000);
       //unsigned int time = millis();
-      while(116000 > millis())
+      while(20000 > millis())
            {
              int ldr_Value = analogRead(A0);
              Serial.print("LDR Value: ");
@@ -530,7 +558,7 @@ void IR_TEST()
                 u8g.setPrintPos(50, 55);
                 u8g.print(ldr_Value);
               } while( u8g.nextPage() );
-             
+            delay(500); 
            }
       //Serial.print(time);     
       Serial.println("LDR TEST FINISHED"); 
@@ -547,7 +575,7 @@ void potentiometer_TEST()
       showMessageOnLcd(1,20,"Turn knob of",1,40,"Potentiometer");
       delay(2000);
       
-      while(142000 > millis())
+      while(31000 > millis())
           {
             int pot_Value = analogRead(A1);
             Serial.print("Potentiometer Value: ");
@@ -558,7 +586,7 @@ void potentiometer_TEST()
                 u8g.setPrintPos(50, 55);
                 u8g.print(pot_Value);
               } while( u8g.nextPage() );
-            
+            delay(500);
            }
        Serial.println("POTENTIOMETER TEST FINISHED");
        showMessageOnLcd(5,17,"Potentiometer",1,45,"test  finished");
@@ -575,7 +603,7 @@ void potentiometer_TEST()
         Serial.println("Increase OR Decrease the Temperature");
         showMessageOnLcd(1,17,"increase or",5,45,"decrease temp");
         delay(2000);
-        while(168000>millis()) 
+        while(52000>millis()) 
              {
                float temperature =( 5.0 * analogRead(A3) * 100.0) / 1024.0;
                Serial.print("temperature: ");
@@ -665,6 +693,7 @@ void esp8266_TEST()
                 u8g.setPrintPos(10, 30);
                 u8g.print(response);
               } while( u8g.nextPage() );
+           delay(2000);   
             } 
           else 
             {
@@ -680,27 +709,9 @@ void esp8266_TEST()
  
  
  void nrf24l01_TEST() 
-    {Serial.begin(57600);
-      RF24 radio(7,8);
+    {
 
-// Network uses that radio
-RF24Network network(radio);
 
-// Address of our node
-const uint16_t master_node = 0;
-
-// Address of the other nodes
-const uint16_t node_1 = 1;
-const uint16_t node_2 = 2;
-const uint16_t node_3 = 3;
-const uint16_t node_4 = 4;
-const uint16_t node_5 = 5;
-const uint16_t node_6 = 6;
-const uint16_t node_7 = 7;
-
-       SPI.begin();
-     radio.begin();
-     network.begin(/*channel*/ 90, /*node address*/ master_node);
        // Pump the network regularly
        network.update();
       if(send_message)  // if there is typed message on serial monitor ready to send

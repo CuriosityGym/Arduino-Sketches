@@ -125,7 +125,7 @@ void setup()
     SPI.begin();
     radio.begin();
     network.begin(/*channel*/ 90, /*node address*/ master_node);
-    nrf24l01_TEST();
+    while(300000>millis()){nrf24l01_TEST();}
         
     }   
     
@@ -170,7 +170,7 @@ void LED_TEST()
          } 
       Serial.println("LED TEST STARTED");
       showMessageOnLcd(5,17,"LED TEST",22,45,"STARTED");
-      delay(3000);   
+      delay(2000);   
       for(int i=0; i<12; i++)
          {
            digitalWrite(led_Pins[i],HIGH);
@@ -186,7 +186,7 @@ void LED_TEST()
               } while( u8g.nextPage() );
            delay(led_delay);
          }
-      delay(3000);
+      delay(1000);
       for(int j=11; j>=0; j--)
          {
            digitalWrite(led_Pins[j],LOW);
@@ -202,7 +202,7 @@ void LED_TEST()
               } while( u8g.nextPage() );
            delay(led_delay);
          }
-      delay(3000);   
+      delay(1000);   
       Serial.println("LED TEST  FINISHED");
        showMessageOnLcd(5,17,"LED TEST ",18,45,"FINISHED");
       delay(2000); 
@@ -212,7 +212,7 @@ void WS2812_TEST()
    { 
      Serial.println("WS2812 TEST STARTED");
      showMessageOnLcd(1,17,"WS2812 TEST",5,45,"STARTED");
-     delay(3000);
+     delay(2000);
      for(int i=0; i<3; i++)
         {
           switch(i)
@@ -231,10 +231,10 @@ void WS2812_TEST()
                 delay(ws2812_delay); break;
                }
          } 
-    delay(3000);
+    delay(2000);
     Serial.println("Rainbow Colors");
     showMessageOnLcd(25,17,"Rainbow",35,45,"Colors");
-    delay(3000); 
+    delay(2000); 
 
      for(int j=0; j<256; j++) 
         {
@@ -275,7 +275,7 @@ void WS2812_TEST()
            }
            
        }
-     delay(3000);  
+     delay(1000);  
      Serial.println("WS2812 TEST FINISHED");
      showMessageOnLcd(1,17,"WS2812 TEST",1,45,"FINISHED");
      delay(2000); 

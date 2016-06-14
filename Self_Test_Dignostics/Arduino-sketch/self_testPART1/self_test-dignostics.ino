@@ -12,7 +12,7 @@
 #define PIN 6
 U8GLIB_SSD1306_128X64 u8g(U8G_I2C_OPT_NONE|U8G_I2C_OPT_DEV_0);	// I2C / TWI
  
-      RF24 radio(7,8);
+RF24 radio(7,8);
 
 // Network uses that radio
 RF24Network network(radio);
@@ -93,44 +93,39 @@ void setup()
       irrecv.enableIRIn(); // Start the receiver 
       strip.begin();
       strip.show(); // Initialize all pixels to 'off'                                       //
-    
-    
-     Serial.println("Self Test Dignostics");
-     showMessageOnLcd(25,17,"Self Test",15,45,"Dignostics");
-     delay(2000);
+   
+      Serial.println("Self Test Dignostics");
+      showMessageOnLcd(25,17,"Self Test",15,45,"Dignostics");
+      delay(2000);
   
-    ldr_TEST();
-    potentiometer_TEST();
-    LM35_TEST();
-    button1_TEST(); 
-    touchPad_TEST(); 
-    IR_TEST();
-    
-     
-    LED13_TEST();
-    LED_TEST();
-    WS2812_TEST();
-    buzzer_TEST();  
-    sdCard_TEST();
-    esp8266_TEST();
-    Serial.println("NRF24L01 TEST  STARTED");
-    showMessageOnLcd(5,17,"NRF24L01",1,45,"Test Started");    
-    delay(1000);
-    Serial.begin(57600);
-    SPI.begin();
-    radio.begin();
-    network.begin(/*channel*/ 90, /*node address*/ master_node);
-    while(300000>millis()){nrf24l01_TEST();}
-    Serial.println("SELF TEST DIGNOSTICS FINISHED");
-    showMessageOnLcd(25,15,"Self Test",15,35,"Dignostics");delay(1000);
-    showMessageOnLcd(25,50,"Finished",15,45,"");   
+      ldr_TEST();
+      potentiometer_TEST();
+      LM35_TEST();
+      button1_TEST(); 
+      touchPad_TEST(); 
+      IR_TEST();
+      LED13_TEST();
+      LED_TEST();
+      WS2812_TEST();
+      buzzer_TEST();  
+      sdCard_TEST();
+      esp8266_TEST();
+      Serial.println("NRF24L01 TEST  STARTED");
+      showMessageOnLcd(5,17,"NRF24L01",1,45,"Test Started");    
+      delay(1000);
+      Serial.begin(57600);
+      SPI.begin();
+      radio.begin();
+      network.begin(/*channel*/ 90, /*node address*/ master_node);
+      while(300000>millis()){nrf24l01_TEST();}
+      Serial.println("SELF TEST DIGNOSTICS FINISHED");
+      showMessageOnLcd(25,15,"Self Test",15,35,"Dignostics");delay(1000);
+      showMessageOnLcd(25,50,"Finished",15,45,"");   
     }   
     
 void loop()
     { 
-     
-       
-     }
+    }
 
 void showMessageOnLcd(int x,int y, const char* message1,int a,int b, const char* message2)
     {u8g.firstPage();
@@ -153,7 +148,7 @@ void LED13_TEST()
              digitalWrite(led13,LOW); delay(1000);
            }  
       Serial.println("LED13 TEST FINISHED");
-       showMessageOnLcd(5,17,"LED13 TEST ",1,45,"FINISHED");
+      showMessageOnLcd(5,17,"LED13 TEST ",1,45,"FINISHED");
       delay(2000); 
     }
   
@@ -298,29 +293,29 @@ uint32_t Wheel(byte WheelPos)
    
    void buzzer_TEST()
     { Serial.println("BUZZER TEST STARTED");
-      showMessageOnLcd(0,17,"BUZZER TEST",10,45,"STARTED");
+      showMessageOnLcd(0,17,"BUZZER Test",10,45,"Started");
       delay(1000);
-     // notes in the melody:
-     int melody[]= {196, 196, 220, 196, 262, 247, 196, 196, 220, 196, 294, 262, 
+      // notes in the melody:
+      int melody[]= {196, 196, 220, 196, 262, 247, 196, 196, 220, 196, 294, 262, 
                     196, 196, 392, 330, 262, 247, 220, 349, 349, 330, 262, 294, 262 };
-     // note durations: 4 = quarter note, 8 = eighth note, etc.:
-     int noteDurations[] = { 8,8,4,4,4,2,8,8,4,4,4,2,8,8,4,4,4,4,3,8,8,4,4,4,2 };
+      // note durations: 4 = quarter note, 8 = eighth note, etc.:
+      int noteDurations[] = { 8,8,4,4,4,2,8,8,4,4,4,2,8,8,4,4,4,4,3,8,8,4,4,4,2 };
 
-     // iterate over the notes of the melody: 
-     for(int thisNote = 0; thisNote < 26; thisNote++) 
-        {
-         // to calculate the note duration, take one second 
-         // divided by the note type.
-         //e.g. quarter note = 1000 / 4, eighth note = 1000/8, etc.
-         int noteDuration = 1000/noteDurations[thisNote];
-         tone(A2, melody[thisNote],noteDuration);
-         // to distinguish the notes, set a minimum time between them.
-         // the note's duration + 30% seems to work well:
-         int pauseBetweenNotes = noteDuration * 1.60;
-         delay(pauseBetweenNotes);
-         // stop the tone playing:
-         noTone(8);
-        }
+      // iterate over the notes of the melody: 
+      for(int thisNote = 0; thisNote < 26; thisNote++) 
+         {
+          // to calculate the note duration, take one second 
+          // divided by the note type.
+          //e.g. quarter note = 1000 / 4, eighth note = 1000/8, etc.
+          int noteDuration = 1000/noteDurations[thisNote];
+          tone(A2, melody[thisNote],noteDuration);
+          // to distinguish the notes, set a minimum time between them.
+          // the note's duration + 30% seems to work well:
+          int pauseBetweenNotes = noteDuration * 1.60;
+          delay(pauseBetweenNotes);
+          // stop the tone playing:
+          noTone(8);
+         }
       Serial.println("BUZZER TEST FINISHED"); 
       showMessageOnLcd(0,17,"BUZZER TEST",5,45,"FINISHED");
       delay(2000); 
@@ -399,7 +394,7 @@ void sdCard_TEST()
         delay(sd_delay);
        } 
       
-      SD.remove("sdTest.txt"); 
+    SD.remove("sdTest.txt"); 
     Serial.println("SD CARD TEST FINISHED"); 
     showMessageOnLcd(1,17,"SDCard Test",1,45,"FINISHED"); 
     delay(sd_delay);   

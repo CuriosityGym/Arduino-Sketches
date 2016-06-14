@@ -117,7 +117,7 @@ void setup()
       SPI.begin();
       radio.begin();
       network.begin(/*channel*/ 90, /*node address*/ master_node);
-      while(300000>millis()){nrf24l01_TEST();}
+      while(285000>millis()){nrf24l01_TEST();}
       Serial.println("SELF TEST DIGNOSTICS FINISHED");
       showMessageOnLcd(25,15,"Self Test",15,35,"Dignostics");delay(1000);
       showMessageOnLcd(25,50,"Finished",15,45,"");   

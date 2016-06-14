@@ -98,12 +98,7 @@ void setup()
      Serial.println("Self Test Dignostics");
      showMessageOnLcd(25,17,"Self Test",15,45,"Dignostics");
      delay(2000);
-     
 
-    
-   // 
-    // Serial.begin(115200);
-     
     ldr_TEST();
     potentiometer_TEST();
     LM35_TEST();

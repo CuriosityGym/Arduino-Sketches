@@ -106,7 +106,6 @@ void loop()
      dataSamples();
     }
  
- 
 int dataSamples()
    { 
      // here we are logging data at interval of 16 seconds for 30 mintutes, i.e, 112 samples.

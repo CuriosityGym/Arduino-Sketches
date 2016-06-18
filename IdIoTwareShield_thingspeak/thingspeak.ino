@@ -114,7 +114,7 @@ int dataSamples()
      // you value of 120 minutes then change the varible duration to 120. 
 
       tempInCelcius = ( 5.0 * analogRead(tempPin) * 100.0) / 1024.0;
-       int light_value = analogRead(A0);
+       int light_value = analogRead(A3);
       char str_light[6]; 
       char str_temp[6];
       dtostrf(tempInCelcius, 4, 2, str_temp);

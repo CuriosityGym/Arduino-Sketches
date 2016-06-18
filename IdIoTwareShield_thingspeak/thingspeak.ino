@@ -18,7 +18,6 @@
 
 #include <ELClient.h>
 #include <ELClientRest.h>
-const byte tempPin =A0;  // LM35 is connected to A0 pin
 float tempInCelcius;
 char buff[64];
 String sendData = "";
@@ -112,7 +111,7 @@ int dataSamples()
      // if you want to log data for 2 hours then simply multiply 2 by 60 which will give 
      // you value of 120 minutes then change the varible duration to 120. 
 
-      tempInCelcius = ( 5.0 * analogRead(tempPin) * 100.0) / 1024.0;
+      tempInCelcius = ( 5.0 * analogRead(A0) * 100.0) / 1024.0;
        int light_value = analogRead(A3);
       char str_light[6]; 
       char str_temp[6];

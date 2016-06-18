@@ -23,7 +23,7 @@ float tempInCelcius;
 char buff[64];
 String sendData = "";
 unsigned long time=0;
-int samplingTime = 16;  //this variable is interval(in Seconds) at which you want to log the data to SD card.
+int samplingTime = 300;  //this variable is interval(in Seconds) at which you want to log the data to SD card.
 unsigned int duration = 3000;     //this variable is duration(in Minutes) which is the total time for which you want to log data.
 
 // replace with your channel's thingspeak API key

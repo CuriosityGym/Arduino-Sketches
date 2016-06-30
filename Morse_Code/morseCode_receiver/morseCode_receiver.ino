@@ -36,7 +36,7 @@
 #include <RF24Network.h>
 #include <RF24.h>
 #include <SPI.h>
-
+#define WordGap 1400
 // Hardware configuration
 // Set up nRF24L01 radio on SPI bus plus pins 9 & 10
 U8GLIB_SSD1306_128X64 u8g(U8G_I2C_OPT_NONE|U8G_I2C_OPT_DEV_0);	// I2C / TWI
@@ -53,32 +53,38 @@ const uint16_t master_node = 1;
 
 boolean send_message = false;
 char messageToSend[32] = "";
-
+String receivedWord = "";
+unsigned long lastTimestamp =0;
 void setup()
     {
       Serial.begin(57600);
-      u8g.setFont(u8g_font_timB14);
+      
       // u8g.setFont(u8g_font_unifont);
       u8g.setColorIndex(1); // Indataucts the display to draw with a pixel on. 
       Serial.println("MORSE CODE");
-      showMessageOnLcd(1,17,"MORSE",1,45,"CODE");
+      showMessageOnLcd(27,17,"MORSE",35,45,"CODE");
       delay(1000);
       SPI.begin();
       radio.begin();
       network.begin(/*channel*/ 90, /*node address*/ node_1); 
     }
 
-void showMessageOnLcd(int x,int y, const char* message1,int a,int b, const char* message2)
+//function to print received data on OLED
+void showMessageOnLcd(int x,int y, String message1,int a,int b, String message2)
     { 
       u8g.firstPage();
-      do { 
-           u8g.drawStr( x, y, message1);
-           u8g.drawStr( a, b, message2);    
+      do { u8g.setFont(u8g_font_timB14);
+           u8g.drawStr( x, y, message1.c_str());
+           u8g.drawStr( a, b, message2.c_str());
+           u8g.setFont(u8g_font_timB12);
+           u8g.drawStr( 0,40, receivedWord.c_str());    // print received word on OLED
          } while( u8g.nextPage() );
     }
 
 void loop() 
-    {
+    {  
+       unsigned long currentTimestamp  = millis(); // get the current timestamp
+       unsigned long duration = currentTimestamp - lastTimestamp; // get elapsed time
        // Pump the network regularly
        network.update();
         if (send_message)   // if there is typed message on serial monitor ready to send
@@ -109,50 +115,62 @@ void loop()
                         recieve = network.read(header, messageToRecieve ,32);
                         Serial.print("Reciver: ");   // print recived data on serial monitor
                         Serial.println(messageToRecieve);
+                        lastTimestamp = currentTimestamp; 
                       }
-                String MorseCode(messageToRecieve); 
-                showLetter(MorseCode);
-                Serial.println(showLetter(MorseCode));
+                String MorseCode(messageToRecieve);    // convert char array of received message to string
+                Serial.println(showLetter(MorseCode)); //and print letter on serial monitor
+                receivedWord += showLetter(MorseCode);
+                Serial.print(receivedWord);  //print received message on serial monitor  
+                showLetter(MorseCode);       // show letter on OLED
+                if (duration > WordGap)      //if delay between received messages is greater than WordGap(1400)
+                   {                         // add space between words
+                     receivedWord += " ";
+                   }
+                if (receivedWord.length()>=13)  // if stringlenth is greater than 13, empty the string
+                   { 
+                     receivedWord = "";
+                   }   
           }  
   
      }
-   
+ 
+// function to decode the received morse code to respective letter and print that letter on OLED  
 char showLetter(String data)
     {
-        if (data == "12000") { showMessageOnLcd(5,15,"A",5,30,"._");       return 'A';}  
-        if (data == "21110") { showMessageOnLcd(5,15,"B",5,30,"_...");     return 'B';}
-        if (data == "21210") { showMessageOnLcd(5,15,"C",5,30,"_._.");     return 'C';}
-        if (data == "21100") { showMessageOnLcd(5,15,"D",5,30,"_..");      return 'D';}
-        if (data == "10000") { showMessageOnLcd(5,15,"E",5,30,".");        return 'E';}    
-        if (data == "11210") { showMessageOnLcd(5,15,"F",5,30,".._.");     return 'F';}
-        if (data == "22100") { showMessageOnLcd(5,15,"G",5,30,"_ _.");     return 'G';}
-        if (data == "11110") { showMessageOnLcd(5,15,"H",5,30,"....");     return 'H';}  
-        if (data == "11000") { showMessageOnLcd(5,15,"I",5,30,"..");       return 'I';}  
-        if (data == "12220") { showMessageOnLcd(5,15,"J",5,30,"._ _ _");   return 'I';}
-        if (data == "21200") { showMessageOnLcd(5,15,"K",5,30,"_._");      return 'K';}
-        if (data == "12110") { showMessageOnLcd(5,15,"L",5,30,"._..");     return 'L';}          
-        if (data == "22000") { showMessageOnLcd(5,15,"M",5,30,"_ _");      return 'M';} 
-        if (data == "21000") { showMessageOnLcd(5,15,"N",5,30,"_.");       return 'N';}  
-        if (data == "22200") { showMessageOnLcd(5,15,"O",5,30,"_ _ _");    return 'O';}          
-        if (data == "12210") { showMessageOnLcd(5,15,"P",5,30,"._ _.");    return 'P';}
-        if (data == "22120") { showMessageOnLcd(5,15,"Q",5,30,"_ _._");    return 'Q';}
-        if (data == "12100") { showMessageOnLcd(5,15,"R",5,30,"._.");      return 'R';}  
-        if (data == "11100") { showMessageOnLcd(5,15,"S",5,30,"...");      return 'S';}  
-        if (data == "20000") { showMessageOnLcd(5,15,"T",5,30,"_");        return 'T';}
-        if (data == "11200") { showMessageOnLcd(5,15,"U",5,30,".._");      return 'U';}
-        if (data == "11120") { showMessageOnLcd(5,15,"V",5,30,"..._");     return 'V';}
-        if (data == "12200") { showMessageOnLcd(5,15,"W",5,30,"._ _");     return 'W';}
-        if (data == "21120") { showMessageOnLcd(5,15,"X",5,30,"_.._");     return 'X';}
-        if (data == "21220") { showMessageOnLcd(5,15,"Y",5,30,"_._ _");    return 'Y';}
-        if (data == "22110") { showMessageOnLcd(5,15,"Z",5,30,"_ _..");    return 'Z';} 
-        if (data == "12222") { showMessageOnLcd(5,15,"1",5,30,"._ _ _ _"); return '1';}
-        if (data == "11222") { showMessageOnLcd(5,15,"2",5,30,".._ _ _ "); return '2';}
-        if (data == "11122") { showMessageOnLcd(5,15,"3",5,30,"..._ _");   return '3';}
-        if (data == "11112") { showMessageOnLcd(5,15,"4",5,30,"...._");    return '4';}
-        if (data == "11111") { showMessageOnLcd(5,15,"5",5,30,".....");    return '5';}
-        if (data == "21111") { showMessageOnLcd(5,15,"6",5,30,"_....");    return '6';}
-        if (data == "22111") { showMessageOnLcd(5,15,"7",5,30,"_ _...");   return '7';}
-        if (data == "22211") { showMessageOnLcd(5,15,"8",5,30,"_ _ _..");  return '8';}
-        if (data == "22221") { showMessageOnLcd(5,15,"9",5,30,"_ _ _ _."); return '9';}
-        if (data == "22222") { showMessageOnLcd(5,15,"0",5,30,"_ _ _ _ _");return '0';} 
+        if (data == "12000") { showMessageOnLcd(5,13,"A",25,15,"._");       return 'A';}  
+        if (data == "21110") { showMessageOnLcd(5,13,"B",25,15,"_...");     return 'B';}
+        if (data == "21210") { showMessageOnLcd(5,13,"C",25,15,"_._.");     return 'C';}
+        if (data == "21100") { showMessageOnLcd(5,13,"D",25,15,"_..");      return 'D';}
+        if (data == "10000") { showMessageOnLcd(5,13,"E",25,15,".");        return 'E';}    
+        if (data == "11210") { showMessageOnLcd(5,13,"F",25,15,".._.");     return 'F';}
+        if (data == "22100") { showMessageOnLcd(5,13,"G",25,15,"_ _.");     return 'G';}
+        if (data == "11110") { showMessageOnLcd(5,13,"H",25,15,"....");     return 'H';}  
+        if (data == "11000") { showMessageOnLcd(5,13,"I",25,15,"..");       return 'I';}  
+        if (data == "12220") { showMessageOnLcd(5,13,"J",25,15,"._ _ _");   return 'I';}
+        if (data == "21200") { showMessageOnLcd(5,13,"K",25,15,"_._");      return 'K';}
+        if (data == "12110") { showMessageOnLcd(5,13,"L",25,15,"._..");     return 'L';}                 
+        if (data == "22000") { showMessageOnLcd(5,13,"M",25,15,"_ _");      return 'M';} 
+        if (data == "21000") { showMessageOnLcd(5,13,"N",25,15,"_.");       return 'N';}  
+        if (data == "22200") { showMessageOnLcd(5,13,"O",25,15,"_ _ _");    return 'O';}          
+        if (data == "12210") { showMessageOnLcd(5,13,"P",25,15,"._ _.");    return 'P';}
+        if (data == "22120") { showMessageOnLcd(5,13,"Q",25,15,"_ _._");    return 'Q';}
+        if (data == "12100") { showMessageOnLcd(5,13,"R",25,15,"._.");      return 'R';}  
+        if (data == "11100") { showMessageOnLcd(5,13,"S",25,15,"...");      return 'S';}  
+        if (data == "20000") { showMessageOnLcd(5,13,"T",25,15,"_");        return 'T';}
+        if (data == "11200") { showMessageOnLcd(5,13,"U",25,15,".._");      return 'U';}
+        if (data == "11120") { showMessageOnLcd(5,13,"V",25,15,"..._");     return 'V';}
+        if (data == "12200") { showMessageOnLcd(5,13,"W",25,15,"._ _");     return 'W';}
+        if (data == "21120") { showMessageOnLcd(5,13,"X",25,15,"_.._");     return 'X';}
+        if (data == "21220") { showMessageOnLcd(5,13,"Y",25,15,"_._ _");    return 'Y';}
+        if (data == "22110") { showMessageOnLcd(5,13,"Z",25,15,"_ _..");    return 'Z';} 
+        if (data == "12222") { showMessageOnLcd(5,13,"1",25,15,"._ _ _ _"); return '1';}
+        if (data == "11222") { showMessageOnLcd(5,13,"2",25,15,".._ _ _ "); return '2';}
+        if (data == "11122") { showMessageOnLcd(5,13,"3",25,15,"..._ _");   return '3';}
+        if (data == "11112") { showMessageOnLcd(5,13,"4",25,15,"...._");    return '4';}
+        if (data == "11111") { showMessageOnLcd(5,13,"5",25,15,".....");    return '5';}
+        if (data == "21111") { showMessageOnLcd(5,13,"6",25,15,"_....");    return '6';}
+        if (data == "22111") { showMessageOnLcd(5,13,"7",25,15,"_ _...");   return '7';}
+        if (data == "22211") { showMessageOnLcd(5,13,"8",25,15,"_ _ _..");  return '8';}
+        if (data == "22221") { showMessageOnLcd(5,13,"9",25,15,"_ _ _ _."); return '9';}
+        if (data == "22222") { showMessageOnLcd(5,13,"0",25,15,"_ _ _ _ _");return '0';} 
       }     

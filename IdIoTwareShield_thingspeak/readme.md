@@ -1,5 +1,5 @@
 
-**Log the Temperature and Light at 5 minutes interval using the IdIotWare Arduino Shield and ESP8266**
+**Log the Temperature and Light values at 5 minutes interval using the IdIotWare Arduino Shield and ESP8266**
 
  This example shows how to log data from Arduino to Thingspeak using ESP8266   wifi module.
  ThingSpeak is an open source Internet of Things (IoT) application and API to store and 

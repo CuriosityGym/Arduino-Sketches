@@ -1,10 +1,12 @@
 /*  
 
     In this example we are using NRF24L01 radio and Arduino to
-    communicate with other Arduino and NRF24L01 using Serial Monitor.
+    communicate with other Arduino and NRF24L01 using OLED display.
     Here we are creating a local mesh between two radios(NRF24L01)
-    using <RF24.h> and <RF24Network.h library>.  
-
+    using <RF24.h> and <RF24Network.h library>. For OLED we are using
+    <Adafruit_GFX.h> and <Adafruit_SSD1306.h> libraries.
+    For every new message buzzer will alert user and message will be 
+    diplayed on OLED.
 
 */
 #include <SPI.h>
@@ -23,7 +25,7 @@
 Adafruit_SSD1306 display(OLED_RESET);
 // Set up nRF24L01 radio on SPI bus plus pins 9 & 10
 
-RF24 radio(7,8);
+RF24 radio(9,10);
 
 // Network uses that radio
 RF24Network network(radio);
@@ -86,13 +88,13 @@ void loop()
      while (network.available() )
        { // If so, grab it and print it out
          RF24NetworkHeader header;
-         char messageToRecieve[32] = "";
+         char messageToReceive[64] = "";
          boolean recieve = false;
          while (!recieve)
             {
-              recieve = network.read(header, messageToRecieve ,32);
+              recieve = network.read(header, messageToReceive ,64);
               Serial.print("Reciver: ");   // print recived data on serial monitor
-              Serial.println(messageToRecieve);
+              Serial.println(messageToReceive);
               for(int thisNote = 0; thisNote < 4; thisNote++) 
                  {
                    // to calculate the note duration, take one second divided by the note type.
@@ -106,12 +108,10 @@ void loop()
                    // stop the tone playing:
                    noTone(8);
                  }
-             display.clearDisplay();
-             display.setFont(&FreeMonoBold9pt7b);
-             display.setTextSize(0.5);
-             display.setTextColor(WHITE);         
+             // print received message on OLED    
+             display.clearDisplay();        
              display.setCursor(0,15);
-             display.println(messageToRecieve);
+             display.println(messageToReceive);
              display.display();
              delay(2000);
             }

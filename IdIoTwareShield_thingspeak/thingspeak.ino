@@ -20,11 +20,11 @@
 #include <ELClientRest.h>
 const byte tempPin =A0;  // LM35 is connected to A0 pin
 float tempInCelcius;
-char buff[64];
+char buff[128];
 String sendData = "";
 unsigned long time=0;
-int samplingTime = 300;  //this variable is interval(in Seconds) at which you want to log the data to SD card.
-unsigned int duration = 3000;     //this variable is duration(in Minutes) which is the total time for which you want to log data.
+unsigned long samplingTime =300;  //this variable is interval(in Seconds) at which you want to log the data to SD card.
+unsigned long duration = 2460;     //this variable is duration(in Minutes) which is the total time for which you want to log data.
 
 // replace with your channel's thingspeak API key
 String API_KEY = "BNOJ3CIAYB2DJPDT";
@@ -116,24 +116,33 @@ int dataSamples()
       unsigned long  elapsedTime = millis()/1000;   // this variable will keep track of elapsed time
       while(((millis()/1000)-elapsedTime) < 1);    // this loop will do nothing until a second has passed 
       time++;                                       //increment time after each second.
- 
+      int reading1 = analogRead(tempPin); delay(10);
+      int reading2 = analogRead(tempPin); delay(10);
+      int reading3 = analogRead(tempPin); delay(10);
+      int reading4 = analogRead(tempPin); delay(10);
+      
+      int averageReading = (( reading2 + reading3 + reading4 )/ 3); 
+      tempInCelcius = round(( 5.0 * averageReading * 100.0) / 1024.0);
+      
+      int light_value1 = analogRead(A3); delay(10);
+      int light_value = analogRead(A3);delay(10);
       if((duration >= time) && (time % samplingTime == 0))
         { 
-          tempInCelcius = ( 5.0 * analogRead(tempPin) * 100.0) / 1024.0;
-          int light_value = analogRead(A3);
+         
           char str_light[6]; 
           char str_temp[6];
-          dtostrf(tempInCelcius, 4, 2, str_temp);
-          dtostrf(light_value, 4, 2, str_light);
+          dtostrf(tempInCelcius, 4, 0, str_temp);
+          dtostrf(light_value, 4, 0, str_light);
           sprintf(buff, "/update?api_key=%s&field1=%s&field2=%s",API_KEY.c_str(), str_temp,str_light);
           // uncomment following line to get temperature values in Farehniet
           //tempInFarenheit = ((tempC*9)/5) + 32;            //convert celcius to farenheit
+          logToThingspeak();  //Log to thingspeak using commands under void LogToThingspeak()
           // print to the serial port too:              
           Serial.print("Temperature: ");
           Serial.print(tempInCelcius);
           Serial.print(char(176)); 
           Serial.println("C"); 
-          logToThingspeak();  //Log to thingspeak using commands under void LogToThingspeak()      
+                
         }
            
    } 
@@ -147,7 +156,7 @@ void logToThingspeak()
      
       // if we're connected make an HTTP request
       if(wifiConnected) 
-        {
+        {  Serial.println("wifi connected!!");
           // Request /utc/now from the previously set-up server
           rest.get((const char*)buff);
 

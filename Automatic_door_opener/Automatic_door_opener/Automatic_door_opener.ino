@@ -39,10 +39,9 @@ void loop()
            if (pirState == LOW) 
               {
                 // we have just turned on
-                Serial.println("Motion detected!");
-                motionDetected += 1;
+                Serial.println("Motion detected!");  //print message on serial monitor
+                motionDetected += 1;    //increment this counter by 1
                 Serial.println(motionDetected);
-                // We only want to print on the output change, not state
                 for(pos; pos < 180; pos += 1)  //goes from 0 to 180 degrees
                    {                                   //in steps of one degree
                      myservo1.write(pos);              //tells servo to go to position in variable "pos"

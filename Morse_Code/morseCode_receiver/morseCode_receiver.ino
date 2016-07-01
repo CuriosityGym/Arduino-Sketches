@@ -27,7 +27,7 @@
                                   //then Arduino will recognize it as letter L
      O --> (DASH,DASH,DASH)       //press button for 600,600,600 milliseconds three times and wiat for 600 milliseconds ,then Arduino will recognize it as letter 0
  
-  now to send the new word wait for 1400 milliseconds (1.4 seconds) and particular signlas for that word         
+  now to send the new word wait for 1400 milliseconds (1.4 seconds) and send particular signlas for that word         
          
 */
 

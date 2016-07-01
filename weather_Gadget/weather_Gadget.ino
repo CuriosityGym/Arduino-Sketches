@@ -85,7 +85,7 @@ void setup()
 
 void loop() 
     {
-     esp8266_TEST();
+     get_Weather();
      delay(5000);
     }
  
@@ -97,7 +97,7 @@ void showMessageOnLcd(int x,int y, const char* message1,int a,int b, const char*
          } while( u8g.nextPage() );
     }
     
-void esp8266_TEST()
+void get_Weather()
     { 
       sprintf(buff, "/data/2.5/weather?id=%s&appid=%s",CityID.c_str(),API_KEY.c_str());
            // process any callbacks coming from esp_link

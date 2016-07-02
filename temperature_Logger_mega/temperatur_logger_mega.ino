@@ -109,7 +109,32 @@ void setup()
          
          dataFile.close();
        }
-     
+      // check availble space on SD Card
+      uint32_t freeKB = sd.vol()->freeClusterCount();
+      freeKB *= sd.vol()->blocksPerCluster()/2;
+      Serial.print("Free space KB: ");
+      Serial.println(freeKB);
+      uint32_t freeMB= freeKB/1024;
+      Serial.print("Free space in MB: ");
+      Serial.println(freeMB); 
+      /*
+      if(freeKB <= 500)
+        {
+          Serial.println("LOW SPACE!!!");
+          int alertAlarm2[] = { 1000,1000,1000,1000,1000,1000,1000,1000,1000,1000,1000,1000,1000,1000,1000,
+                               1000,1000,1000,1000,1000,1000,1000,1000,1000,1000,1000,1000,1000,1000,1000};
+          int noteDurations[] = { 15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,
+                                  15,15,15,15,15,15,15,15,15,15,15,15,15,15,15  };
+          for (int thisNote = 0; thisNote < 20; thisNote++) 
+             {
+               // Duration = 1 second / note type
+               // e.g. quarter note = 1000 / 4, eighth note = 1000/8, etc.
+               int noteDuration = 2500 / noteDurations[thisNote];
+               tone(A2,alertAlarm2[thisNote], noteDuration);
+               //pause for the note's duration plus 50 ms:
+               delay(noteDuration + 50);
+             }
+        }*/
      duration *= 60;   //convert durartion in minutes to seconds   
    }
 

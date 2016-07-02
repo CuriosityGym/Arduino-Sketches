@@ -40,7 +40,7 @@
 // Hardware configuration
 // Set up nRF24L01 radio on SPI bus plus pins 9 & 10
 U8GLIB_SSD1306_128X64 u8g(U8G_I2C_OPT_NONE|U8G_I2C_OPT_DEV_0);	// I2C / TWI
-RF24 radio(9,10);
+RF24 radio(7,8);
 
 // Network uses that radio
 RF24Network network(radio);

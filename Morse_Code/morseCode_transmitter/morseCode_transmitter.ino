@@ -52,7 +52,7 @@ long lastTimestamp = 0;                  // Last recorded timestamp  (used for m
 char inputSignal[5]="";                     // Input signal buffer
 int inputSignalIndex = 0;                // Index into the input signal buffer
 String code = "";
-RF24 radio(9,10);
+RF24 radio(7,8);
 
 // Network uses that radio
 RF24Network network(radio);

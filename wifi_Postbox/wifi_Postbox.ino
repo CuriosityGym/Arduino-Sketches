@@ -1,4 +1,7 @@
-
+/*
+ 
+ 
+*/
 #include <Adafruit_NeoPixel.h>
 #include <CGShield.h>
 #include <Wire.h>         // Require for I2C communication
@@ -8,8 +11,6 @@ CGShield fs;             // Instanciate CGShield instance
 #include <ELClientRest.h>
 char buff[128];
 
-// replace with your channel's thingspeak API key
-String API_KEY = "BNOJ3CIAYB2DJPDT";
 // Initialize a connection to esp-link using the normal hardware serial port both for
 // SLIP and for debug messages.
 ELClient esp(&Serial, &Serial);
@@ -45,7 +46,7 @@ void wifiCb(void *response)
 
 void setup() 
     {
-      Serial.begin(115200);   // the baud rate here needs to match the esp-link config
+      Serial.begin(9600);   // the baud rate here needs to match the esp-link config
       color(255,255,255);
       Serial.println("EL-Client starting!");
 
@@ -71,7 +72,7 @@ void setup()
           Serial.println(packet->value);
         }
 
-      // Set up the REST client to talk to "maker.ifttt.com", this doesn't connect to that server,
+      // Set up the REST client to talk to www.maker.ifttt.com, this doesn't connect to that server,
       // it just sets-up stuff on the esp-link side
       int err = rest.begin("maker.ifttt.com");
       if(err != 0) 
@@ -89,22 +90,22 @@ void loop()
      new_letter();
     }
  
- 
+// this function detects the new letter
 int new_letter()
    { 
     
       int light_value1 = analogRead(A3); delay(10);
       int light_value = analogRead(A3);delay(10);
-      if(light_value <= 400)
+      Serial.println(light_value);
+      if(light_value >= 510)
         { 
-          // maker.ifttt.com/trigger/new_letter/with/key/cDlIAZcApEGZiZDeOIXExA
-          sprintf(buff, "/trigger/new_letter/with/key/cDlIAZcApEGZiZDeOIXExA");
+          sprintf(buff, "/trigger/new_letter/with/key/YOUR_API_KEY");// replace with your channel's MAKER API key
           logToMaker();  //Log to Maker using commands under void LogToMaker()
           // print to the serial port too:              
           Serial.print("New Letter!!");
                    
         }
-           
+        delay(50);   
    } 
  
     
@@ -117,7 +118,7 @@ void logToMaker()
       // if we're connected make an HTTP request
       if(wifiConnected) 
         {  Serial.println("wifi connected!!");
-          // Request /utc/now from the previously set-up server
+          // Request  from the previously set-up server
           rest.get((const char*)buff);
 
           char response[266];

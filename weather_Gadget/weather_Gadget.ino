@@ -1,7 +1,7 @@
 #include "U8glib.h"
 #include <ELClient.h>
 #include <ELClientRest.h>
-char buff[32];
+char buff[512];
 
 // replace with your channel's thingspeak API key
 String API_KEY = "15373f8c0b06b6e66e6372db065c4e46";
@@ -43,7 +43,7 @@ void wifiCb(void *response)
 
 void setup() 
     {
-      Serial.begin(115200);   // the baud rate here needs to match the esp-link config
+      Serial.begin(9600);   // the baud rate here needs to match the esp-link config
       Serial.println("EL-Client starting!");
       u8g.setFont(u8g_font_timB14);
       u8g.setColorIndex(1);
@@ -69,9 +69,9 @@ void setup()
           Serial.println(packet->value);
         }
 
-      // Set up the REST client to talk to api.openweathermap.org, this doesn't connect to that server,
+      // Set up the REST client to talk to www.timeapi.org, this doesn't connect to that server,
       // it just sets-up stuff on the esp-link side
-      int err = rest.begin("api.openweathermap.org");
+      int err = rest.begin("idiotware.herokuapp.com");
       if(err != 0) 
         {
           Serial.print("REST begin failed: ");
@@ -80,13 +80,15 @@ void setup()
         }
       Serial.println("EL-REST ready");
      
-      
+     
     }
 
 void loop() 
     {
-     get_Weather();
-     delay(5000);
+      get_Temperature();
+      get_Humidity();
+      get_weatherDescription();
+      delay(5000);
     }
  
 void showMessageOnLcd(int x,int y, const char* message1,int a,int b, const char* message2)
@@ -97,9 +99,9 @@ void showMessageOnLcd(int x,int y, const char* message1,int a,int b, const char*
          } while( u8g.nextPage() );
     }
     
-void get_Weather()
+void get_Temperature()
     { 
-      sprintf(buff, "/data/2.5/weather?id=%s&appid=%s",CityID.c_str(),API_KEY.c_str());
+      sprintf(buff, "/temperature?id=1275339&appid=15373f8c0b06b6e66e6372db065c4e46");
            // process any callbacks coming from esp_link
       esp.Process();
 
@@ -110,11 +112,12 @@ void get_Weather()
           // Request /utc/now from the previously set-up server
           rest.get((const char*)buff);
 
-          char response[512];
-          uint16_t code = rest.waitResponse(response, 512);
+          char response[20];
+          uint16_t code = rest.waitResponse(response, 20);
           if(code == HTTP_STATUS_OK)     //check for response for HTTP request  
             {
              Serial.println("ARDUINO: GET successful:");
+             Serial.print("Response: ");
              Serial.println(response);
              u8g.firstPage();
            do {  
@@ -127,10 +130,82 @@ void get_Weather()
              Serial.print("ARDUINO: GET failed: ");
              Serial.println(code);
             }
-          delay(3000);
+          delay(1000);
         }
         
     }   
     
-   
-   
+     
+void get_Humidity()
+    { 
+      sprintf(buff, "/humidity?id=1275339&appid=15373f8c0b06b6e66e6372db065c4e46");
+           // process any callbacks coming from esp_link
+      esp.Process();
+
+     
+      // if we're connected make an HTTP request
+      if(wifiConnected) 
+        {
+          // Request /utc/now from the previously set-up server
+          rest.get((const char*)buff);
+
+          char response[20];
+          uint16_t code = rest.waitResponse(response, 20);
+          if(code == HTTP_STATUS_OK)     //check for response for HTTP request  
+            {
+             Serial.println("ARDUINO: GET successful:");
+             Serial.print("Response: ");
+             Serial.println(response);
+             u8g.firstPage();
+           do {  
+                u8g.setPrintPos(15, 30);
+                u8g.print(response);
+              } while( u8g.nextPage() );
+            } 
+          else 
+            {
+             Serial.print("ARDUINO: GET failed: ");
+             Serial.println(code);
+            }
+          delay(1000);
+        }
+        
+    }   
+     
+      
+void get_weatherDescription()
+    { 
+      sprintf(buff, "/weatherDescription?id=1275339&appid=15373f8c0b06b6e66e6372db065c4e46");
+           // process any callbacks coming from esp_link
+      esp.Process();
+
+     
+      // if we're connected make an HTTP request
+      if(wifiConnected) 
+        {
+          // Request /utc/now from the previously set-up server
+          rest.get((const char*)buff);
+
+          char response[20];
+          uint16_t code = rest.waitResponse(response, 20);
+          if(code == HTTP_STATUS_OK)     //check for response for HTTP request  
+            {
+             Serial.println("ARDUINO: GET successful:");
+             Serial.print("Response: ");
+             Serial.println(response);
+             u8g.firstPage();
+           do {  
+                u8g.setPrintPos(15, 30);
+                u8g.print(response);
+              } while( u8g.nextPage() );
+            } 
+          else 
+            {
+             Serial.print("ARDUINO: GET failed: ");
+             Serial.println(code);
+            }
+          delay(1000);
+        }
+        
+    }   
+    

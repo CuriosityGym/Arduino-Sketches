@@ -2,7 +2,9 @@
 #include <ELClient.h>
 #include <ELClientRest.h>
 char buff[512];
-
+String temperature = "";
+String humidity = "";
+String weatherDescription = "";
 // replace with your channel's thingspeak API key
 String API_KEY = "15373f8c0b06b6e66e6372db065c4e46";
 String CityID = "1275339"; //Mumbai, India
@@ -45,7 +47,7 @@ void setup()
     {
       Serial.begin(9600);   // the baud rate here needs to match the esp-link config
       Serial.println("EL-Client starting!");
-      u8g.setFont(u8g_font_timB14);
+      u8g.setFont(u8g_font_timB12);
       u8g.setColorIndex(1);
       // Sync-up with esp-link, this is required at the start of any sketch and initializes the
       // callbacks to the wifi status change callback. The callback gets called with the initial
@@ -88,16 +90,11 @@ void loop()
       get_Temperature();
       get_Humidity();
       get_weatherDescription();
+      showMessageOnLcd();
       delay(5000);
     }
  
-void showMessageOnLcd(int x,int y, const char* message1,int a,int b, const char* message2)
-    {u8g.firstPage();
-      do { //u8g.setFont(u8g_font_timB14);
-           u8g.drawStr( x, y, message1);
-          u8g.drawStr( a, b, message2);    
-         } while( u8g.nextPage() );
-    }
+
     
 void get_Temperature()
     { 
@@ -112,18 +109,14 @@ void get_Temperature()
           // Request /utc/now from the previously set-up server
           rest.get((const char*)buff);
 
-          char response[20];
+          char response[3];
           uint16_t code = rest.waitResponse(response, 20);
           if(code == HTTP_STATUS_OK)     //check for response for HTTP request  
             {
              Serial.println("ARDUINO: GET successful:");
-             Serial.print("Response: ");
+             Serial.print("Temperature: ");
              Serial.println(response);
-             u8g.firstPage();
-           do {  
-                u8g.setPrintPos(15, 30);
-                u8g.print(response);
-              } while( u8g.nextPage() );
+             temperature = response;
             } 
           else 
             {
@@ -149,18 +142,14 @@ void get_Humidity()
           // Request /utc/now from the previously set-up server
           rest.get((const char*)buff);
 
-          char response[20];
+          char response[3];
           uint16_t code = rest.waitResponse(response, 20);
           if(code == HTTP_STATUS_OK)     //check for response for HTTP request  
             {
              Serial.println("ARDUINO: GET successful:");
-             Serial.print("Response: ");
+             Serial.print("Humidity: ");
              Serial.println(response);
-             u8g.firstPage();
-           do {  
-                u8g.setPrintPos(15, 30);
-                u8g.print(response);
-              } while( u8g.nextPage() );
+             humidity = response;
             } 
           else 
             {
@@ -191,13 +180,9 @@ void get_weatherDescription()
           if(code == HTTP_STATUS_OK)     //check for response for HTTP request  
             {
              Serial.println("ARDUINO: GET successful:");
-             Serial.print("Response: ");
+             Serial.print("Weather Descripion: ");
              Serial.println(response);
-             u8g.firstPage();
-           do {  
-                u8g.setPrintPos(15, 30);
-                u8g.print(response);
-              } while( u8g.nextPage() );
+             weatherDescription = response;
             } 
           else 
             {
@@ -208,4 +193,19 @@ void get_weatherDescription()
         }
         
     }   
+    
+void showMessageOnLcd()
+    {u8g.firstPage();
+      do { //u8g.setFont(u8g_font_timB14);
+           u8g.drawStr( 60, 15, "Temp:");
+           u8g.setPrintPos(105, 15);
+           u8g.print(temperature);
+           u8g.drawStr( 60, 35, "Hum:");
+           u8g.setPrintPos(105, 35);
+           u8g.print(humidity);
+           u8g.setPrintPos(80, 55);
+           u8g.print(weatherDescription);  
+            
+         } while( u8g.nextPage() );
+    }    
     

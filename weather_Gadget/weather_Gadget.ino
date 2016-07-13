@@ -1,17 +1,25 @@
-#include "U8glib.h"
+
+#include <SPI.h>
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
 #include <ELClient.h>
 #include <ELClientRest.h>
+#include "icons.h"
+#include <Fonts/FreeMono9pt7b.h>
+#define OLED_RESET 4
+Adafruit_SSD1306 display(OLED_RESET);
 char buff[512];
 float temperature;
-String humidity = "";
+int humidity;
 String location = "";
-String weatherDescription = "";
-float tempInCelsius;
+String weatherDescription="";
+int tempInCelsius;
 // replace with your channel's thingspeak API key
 String API_KEY = "15373f8c0b06b6e66e6372db065c4e46";
 String CityID = "1275339"; //Mumbai, India
 
-U8GLIB_SSD1306_128X64 u8g(U8G_I2C_OPT_NONE|U8G_I2C_OPT_DEV_0);
+
 // Initialize a connection to esp-link using the normal hardware serial port both for
 // SLIP and for debug messages.
 ELClient esp(&Serial, &Serial);
@@ -48,9 +56,13 @@ void wifiCb(void *response)
 void setup() 
     {
       Serial.begin(9600);   // the baud rate here needs to match the esp-link config
+      display.begin(SSD1306_SWITCHCAPVCC, 0x3C);  // initialize with the I2C addr 0x3D (for the 128x64)
+      display.setTextSize(1);
+      display.setTextColor(WHITE);
+      display.setFont(&FreeMono9pt7b);
       Serial.println("EL-Client starting!");
-      //u8g.setFont(u8g_font_timB12);
-      u8g.setColorIndex(1);
+      
+      
       // Sync-up with esp-link, this is required at the start of any sketch and initializes the
       // callbacks to the wifi status change callback. The callback gets called with the initial
       // status right after Sync() below completes.
@@ -92,14 +104,16 @@ void loop()
       get_Temperature();
       get_Humidity();
       get_weatherDescription();
-      showMessageOnLcd();
+      displayIcon();
+      delay(5000);
+      drawFrame2();
       delay(5000);
     }
  
 
 void get_location()
     { 
-      sprintf(buff, "/getCityCountry");
+      sprintf(buff, "/getCityCountry?id=%s&appid=%s",CityID.c_str(),API_KEY.c_str());
            // process any callbacks coming from esp_link
       esp.Process();
 
@@ -110,7 +124,7 @@ void get_location()
           // Request /utc/now from the previously set-up server
           rest.get((const char*)buff);
 
-          char response[20];
+          char response[20]="";
           uint16_t code = rest.waitResponse(response, 20);
           if(code == HTTP_STATUS_OK)     //check for response for HTTP request  
             {
@@ -131,7 +145,7 @@ void get_location()
     
 void get_Temperature()
     { 
-      sprintf(buff, "/temperature?id=1275339&appid=15373f8c0b06b6e66e6372db065c4e46");
+      sprintf(buff, "/temperature?id=%s&appid=%s",CityID.c_str(),API_KEY.c_str());
            // process any callbacks coming from esp_link
       esp.Process();
 
@@ -142,8 +156,8 @@ void get_Temperature()
           // Request /utc/now from the previously set-up server
           rest.get((const char*)buff);
 
-          char response[3];
-          uint16_t code = rest.waitResponse(response, 20);
+          char response[]="";
+          uint16_t code = rest.waitResponse(response, 3);
           if(code == HTTP_STATUS_OK)     //check for response for HTTP request  
             {
              Serial.println("ARDUINO: GET successful:");
@@ -166,7 +180,7 @@ void get_Temperature()
      
 void get_Humidity()
     { 
-      sprintf(buff, "/humidity?id=1275339&appid=15373f8c0b06b6e66e6372db065c4e46");
+      sprintf(buff, "/humidity?id=%s&appid=%s",CityID.c_str(),API_KEY.c_str());
            // process any callbacks coming from esp_link
       esp.Process();
 
@@ -177,15 +191,23 @@ void get_Humidity()
           // Request /utc/now from the previously set-up server
           rest.get((const char*)buff);
 
-          char response[3];
-          uint16_t code = rest.waitResponse(response, 3);
+          char response[]="";
+          uint16_t code = rest.waitResponse(response, 2);
           if(code == HTTP_STATUS_OK)     //check for response for HTTP request  
             {
              Serial.println("ARDUINO: GET successful:");
              Serial.print("Response: ");
              Serial.println(response);
-             humidity = response;
-            } 
+             int hum = atoi(response);
+             if (hum > 100)
+                { hum = hum/10;
+                  humidity = hum;Serial.print(hum);
+                } 
+             else 
+                {
+                  humidity = hum; Serial.print(hum);
+                }  
+            }    
           else 
             {
              Serial.print("ARDUINO: GET failed: ");
@@ -200,7 +222,7 @@ void get_Humidity()
       
 void get_weatherDescription()
     { 
-      sprintf(buff, "/weatherDescription?id=1275339&appid=15373f8c0b06b6e66e6372db065c4e46");
+      sprintf(buff, "/weatherDescription?id=%s&appid=%s",CityID.c_str(),API_KEY.c_str());
            // process any callbacks coming from esp_link
       esp.Process();
 
@@ -211,13 +233,14 @@ void get_weatherDescription()
           // Request /utc/now from the previously set-up server
           rest.get((const char*)buff);
 
-          char response[20];
+          char response[20]="";
           uint16_t code = rest.waitResponse(response, 20);
           if(code == HTTP_STATUS_OK)     //check for response for HTTP request  
             {
              Serial.println("ARDUINO: GET successful:");
              Serial.print("Response: ");
              Serial.println(response);
+             //weather(response);
              weatherDescription = response;
             } 
           else 
@@ -228,23 +251,94 @@ void get_weatherDescription()
           delay(1000);
         }
         
-    }   
-    
-void showMessageOnLcd()
-    {u8g.firstPage();
-      do { u8g.setFont(u8g_font_timB10);
-           u8g.setPrintPos(5, 15);
-           u8g.print(location);
-           u8g.setFont(u8g_font_timB12);
-           u8g.setPrintPos(70, 30);
-           u8g.print(tempInCelsius);
-           u8g.drawStr( 110, 30, "C");
-           u8g.drawStr( 65, 45, "Hum: ");
-           u8g.setPrintPos(105, 45);
-           u8g.print(humidity);
-           u8g.setPrintPos(80, 60);
-           u8g.print(weatherDescription);  
-            
-         } while( u8g.nextPage() );
-    }    
-    
+    }  
+   
+void weather( char data[]){
+  int EOT = 4;
+  char weatherDescription1[20];
+for (int i = 0; i < 20; i++){
+   Serial.println(data);
+   data[i] = weatherDescription1[i];
+   if(data[i] == EOT)
+   break;
+   
+   }
+   Serial.print("weatherDescription: ");Serial.print(weatherDescription1);
+}    
+void displayIcon() 
+    {
+      //"clear-day, clear-night, rain, snow, sleet, wind, fog, cloudy, partly-cloudy-day, or partly-cloudy-night"
+      if (weatherDescription == "Clear") 
+         {
+          drawFrame1(clear_sky);
+         } 
+      else if (weatherDescription == "Clouds") 
+         {
+          drawFrame1(few_clouds);
+         } 
+      else if (weatherDescription == "Scattered clouds") 
+         {
+          drawFrame1(scattered_clouds);
+         }
+      else if (weatherDescription == "Broken clouds") 
+         {
+          drawFrame1(broken_clouds);
+         } 
+      else if (weatherDescription == "Shower rain") 
+         {
+          drawFrame1(shower_rain);
+         }
+      else if (weatherDescription == "Rain") 
+         {
+          drawFrame1(rain);
+         } 
+      else if (weatherDescription == "Thunderstorm") 
+         {
+          drawFrame1(thunderstorm);
+         } 
+      else if (weatherDescription == "Snow") 
+         {
+          drawFrame1(snow);
+         } 
+      else if (weatherDescription == "Mist") 
+         {
+          drawFrame1(mist);
+         } 
+      else 
+         {
+          drawFrame1(no_icon);
+         }
+  //return cloudy_bits;
+}    
+void drawFrame1(const uint8_t *bitmap) 
+    { 
+      display.clearDisplay();
+      display.drawBitmap(40, 12, bitmap, 40, 40, 1);
+      display.setCursor(1,9);
+      display.println(location);
+      display.setCursor(10,60);
+      display.println(weatherDescription);
+      display.display();
+    }
+
+void drawFrame2() 
+    { display.clearDisplay();
+      display.drawBitmap(75, 15, temperature_icon, 40, 40, 1);
+      display.setCursor(1,9);
+      display.println(location);
+      display.setCursor(58,28);
+      display.println(tempInCelsius);
+      display.setCursor(0,45);
+      display.println("Hum: ");
+      display.setCursor(0,60);
+      display.println(humidity);
+      if(humidity == 100)
+        {
+         display.drawBitmap(35, 50, percentage_sign, 10, 10, 1);
+        }
+      else
+        {
+         display.drawBitmap(25, 50, percentage_sign, 10, 10, 1);
+        }  
+      display.display();
+    }

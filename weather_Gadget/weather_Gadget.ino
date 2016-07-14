@@ -1,24 +1,24 @@
-
-#include <SPI.h>
-#include <Wire.h>
-#include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
+#include "U8glib.h"
 #include <ELClient.h>
 #include <ELClientRest.h>
 #include "icons.h"
-#include <Fonts/FreeMono9pt7b.h>
-#define OLED_RESET 4
-Adafruit_SSD1306 display(OLED_RESET);
-char buff[512];
+
+U8GLIB_SSD1306_128X64 u8g(U8G_I2C_OPT_NONE|U8G_I2C_OPT_DEV_0);	// I2C / TWI 
+
+char buff[128];
 float temperature;
 int humidity;
 String location = "";
-String weatherDescription="";
+String weatherDescription = "";
 int tempInCelsius;
+
 // replace with your channel's thingspeak API key
 String API_KEY = "15373f8c0b06b6e66e6372db065c4e46";
 String CityID = "1275339"; //Mumbai, India
 
+// varibles for cursor positions
+int yPos = 0;
+int xPos = 0;
 
 // Initialize a connection to esp-link using the normal hardware serial port both for
 // SLIP and for debug messages.
@@ -56,10 +56,9 @@ void wifiCb(void *response)
 void setup() 
     {
       Serial.begin(9600);   // the baud rate here needs to match the esp-link config
-      display.begin(SSD1306_SWITCHCAPVCC, 0x3C);  // initialize with the I2C addr 0x3D (for the 128x64)
-      display.setTextSize(1);
-      display.setTextColor(WHITE);
-      display.setFont(&FreeMono9pt7b);
+      u8g.setFont(u8g_font_timB10);
+      u8g.setColorIndex(1); // Instructs the display to draw with a pixel on. 
+         
       Serial.println("EL-Client starting!");
       
       
@@ -94,23 +93,23 @@ void setup()
           Serial.println(err);
           while(1) ;
         }
-      Serial.println("EL-REST ready");
-     
+      Serial.println("EL-REST ready");  
      
     }
 
 void loop() 
-    { get_location();
+    { 
+      get_location();
       get_Temperature();
       get_Humidity();
       get_weatherDescription();
-      displayIcon();
-      delay(5000);
-      drawFrame2();
-      delay(5000);
-    }
+      for (int i=0; i<= 720; i++)
+          {
+            frameScroll();
+          }
+    }      
  
-
+// function to get humidity from 
 void get_location()
     { 
       sprintf(buff, "/getCityCountry?id=%s&appid=%s",CityID.c_str(),API_KEY.c_str());
@@ -131,7 +130,7 @@ void get_location()
              Serial.println("ARDUINO: GET successful:");
              Serial.print("Response: ");
              Serial.println(response);
-             location = response;
+             location = response;  
             } 
           else 
             {
@@ -253,18 +252,7 @@ void get_weatherDescription()
         
     }  
    
-void weather( char data[]){
-  int EOT = 4;
-  char weatherDescription1[20];
-for (int i = 0; i < 20; i++){
-   Serial.println(data);
-   data[i] = weatherDescription1[i];
-   if(data[i] == EOT)
-   break;
-   
-   }
-   Serial.print("weatherDescription: ");Serial.print(weatherDescription1);
-}    
+    
 void displayIcon() 
     {
       //"clear-day, clear-night, rain, snow, sleet, wind, fog, cloudy, partly-cloudy-day, or partly-cloudy-night"
@@ -308,37 +296,72 @@ void displayIcon()
          {
           drawFrame1(no_icon);
          }
-  //return cloudy_bits;
+ 
 }    
 void drawFrame1(const uint8_t *bitmap) 
     { 
-      display.clearDisplay();
-      display.drawBitmap(40, 12, bitmap, 40, 40, 1);
-      display.setCursor(1,9);
-      display.println(location);
-      display.setCursor(10,60);
-      display.println(weatherDescription);
-      display.display();
+       u8g.setPrintPos( yPos + xPos, 11);
+       u8g.print(location);
+       u8g.drawXBMP( yPos + xPos + 40, 12, icon_width, icon_height, bitmap);
+       u8g.setPrintPos( yPos + xPos + 10, 61);
+       u8g.print(weatherDescription);
+     
     }
 
 void drawFrame2() 
-    { display.clearDisplay();
-      display.drawBitmap(75, 15, temperature_icon, 40, 40, 1);
-      display.setCursor(1,9);
-      display.println(location);
-      display.setCursor(58,28);
-      display.println(tempInCelsius);
-      display.setCursor(0,45);
-      display.println("Hum: ");
-      display.setCursor(0,60);
-      display.println(humidity);
-      if(humidity == 100)
-        {
-         display.drawBitmap(35, 50, percentage_sign, 10, 10, 1);
-        }
-      else
-        {
-         display.drawBitmap(25, 50, percentage_sign, 10, 10, 1);
-        }  
-      display.display();
+    { 
+       u8g.setPrintPos(yPos + xPos - 128, 11);
+       u8g.print(location);
+       u8g.setPrintPos(yPos - 67 + xPos, 31);
+       u8g.print(tempInCelsius);
+       u8g.drawXBMP( yPos - 53 + xPos, 15, icon_width, icon_height, temperature_icon);
+       u8g.drawStr( yPos - 128 + xPos, 45, "Hum:");
+       u8g.setPrintPos( yPos - 128 + xPos, 60);
+       u8g.print(humidity);
+       if(humidity == 100)
+         {
+           u8g.drawXBMP( yPos - 105 + xPos, 50, percentage_sign_WIDTH,percentage_sign_HEIGHT, percentage_sign);
+         }
+       else
+         {
+           u8g.drawXBMP( yPos - 110 + xPos, 50, percentage_sign_WIDTH,percentage_sign_HEIGHT, percentage_sign);
+         }  
+         
     }
+  
+void frameScroll()
+    {
+       u8g.firstPage();
+     do 
+       {  
+         displayIcon();
+         drawFrame2();
+       } while( u8g.nextPage() );
+     if(yPos == 0)
+       {
+         delay(5000);
+       }
+     // If its too fast, you could add a delay
+     if(yPos < 128)
+       {
+         // if it's too slow, you could increment y by a greater number
+         yPos+=32;
+       }
+  
+     else 
+       {
+         if(xPos == 0)
+           {
+             delay(5000);
+           }
+         if(xPos <128)
+           {
+             xPos+=32;
+           }
+         else
+           { // When the yPos is off the screen, reset to 0.
+             xPos=0;
+             yPos=0;
+           }
+       }  
+   }

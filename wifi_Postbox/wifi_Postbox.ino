@@ -1,5 +1,9 @@
 /*
- 
+    WiFi POSTBOX
+    
+    
+if Maker then Gmail
+If Maker Event "New Letter", then send an email from supersidh13@gmail.com 
  
 */
 #include <Adafruit_NeoPixel.h>
@@ -11,6 +15,8 @@ CGShield fs;             // Instanciate CGShield instance
 #include <ELClientRest.h>
 char buff[128];
 
+// replace with your channel's thingspeak API key
+String API_KEY = "cDlIAZcApEGZiZDeOIXExA";//bEJ04i0uriNNFOfaM9QrAf
 // Initialize a connection to esp-link using the normal hardware serial port both for
 // SLIP and for debug messages.
 ELClient esp(&Serial, &Serial);
@@ -99,7 +105,7 @@ int new_letter()
       Serial.println(light_value);
       if(light_value >= 510)
         { 
-          sprintf(buff, "/trigger/new_letter/with/key/YOUR_API_KEY");// replace with your channel's MAKER API key
+          sprintf(buff, "/trigger/new_letter/with/key/bEJ04i0uriNNFOfaM9QrAf");
           logToMaker();  //Log to Maker using commands under void LogToMaker()
           // print to the serial port too:              
           Serial.print("New Letter!!");

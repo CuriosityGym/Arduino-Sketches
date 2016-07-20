@@ -12,7 +12,7 @@ char tic_tac_toe[10]={ };
 byte moves = 0;                                                
 Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800); 
 void setup() 
-    {Serial.begin(9600);
+    {Serial.begin(9600);Serial.println("NEW GAME");
       pixels.begin(); // This initializes the NeoPixel library.
       for(int i = 0; i < 9; i++)
          { 
@@ -70,7 +70,7 @@ void nextMoves()
                     tic_tac_toe[i] = 'x';
                      Serial.print(i);Serial.println( tic_tac_toe[i]);Serial.print("moves: ");Serial.println(moves);
                    // current_player = 1;
-                    moves += 1;InputPinState[i] == HIGH;//delay(2000);
+                    moves += 1;InputPinState[i] == HIGH;delay(500);
                   }}LastInputPinState[i] = InputPinState[i];
               }
          }
@@ -87,7 +87,7 @@ void nextMoves()
                   tic_tac_toe[i] = 'o';
                   Serial.print(i);Serial.println( tic_tac_toe[i]);Serial.print("moves: ");Serial.println(moves);
                   //current_player = 1;
-                  moves += 1;InputPinState[i] == HIGH;//delay(2000);
+                  moves += 1;InputPinState[i] == HIGH;delay(500);
                 }}LastInputPinState[i] = InputPinState[i];
             }
          }
@@ -98,224 +98,220 @@ void nextMoves()
 
 void gameOver()
     {
-    
-        // Check rows
-        if( tic_tac_toe[0]==tic_tac_toe[1]==tic_tac_toe[2])
-          { if(tic_tac_toe[0] == 'x')
-              { Serial.print("x won");
-                for(int i=0;i<5;i++)
-                   {
-                    pixels.setPixelColor(0, pixels.Color(0,0,250));
-                    pixels.setPixelColor(1, pixels.Color(0,0,250));
-                    pixels.setPixelColor(2, pixels.Color(0,0,250));
-                    pixels.show();
-                    delay(500);
-                   }
-                 ledEffects_P1();  
+       // Check rows
+       if(tic_tac_toe[0]== 'x' && tic_tac_toe[1]== 'x' && tic_tac_toe[2]== 'x')
+         { 
+           Serial.println("x won  1st Row");
+           for(int i=0;i<5;i++)
+              {
+               pixels.setPixelColor(0, pixels.Color(0,0,250));
+               pixels.setPixelColor(1, pixels.Color(0,0,250));
+               pixels.setPixelColor(2, pixels.Color(0,0,250));
+               pixels.show();
+               delay(500);
               }
-             if(tic_tac_toe[0] == 'o') 
-              { Serial.print("o won");
-                for(int i=0;i<5;i++)
-                   {
-                    pixels.setPixelColor(0, pixels.Color(250,0,0));
-                    pixels.setPixelColor(1, pixels.Color(250,0,0));
-                    pixels.setPixelColor(2, pixels.Color(250,0,0));
-                    pixels.show();
-                    delay(500);
-                   }
-                ledEffects_P2();   
-              }    
-           } 
-         if( tic_tac_toe[3]==tic_tac_toe[4]==tic_tac_toe[5])
-          { if(tic_tac_toe[3] == 'x')
-              { Serial.print("x won");
-                for(int i=0;i<5;i++)
-                   {
-                    pixels.setPixelColor(3, pixels.Color(0,0,250));
-                    pixels.setPixelColor(4, pixels.Color(0,0,250));
-                    pixels.setPixelColor(5, pixels.Color(0,0,250));
-                    pixels.show();
-                    delay(500);
-                   }
-                 ledEffects_P1();  
+           ledEffects_P1();  
+          }
+       if(tic_tac_toe[0]== 'o' && tic_tac_toe[1]== 'o' && tic_tac_toe[2]== 'o') 
+         {
+           Serial.println("o won  1st Row");
+           for(int i=0;i<5;i++)
+              {
+               pixels.setPixelColor(0, pixels.Color(250,0,0));
+               pixels.setPixelColor(1, pixels.Color(250,0,0));
+               pixels.setPixelColor(2, pixels.Color(250,0,0));
+               pixels.show();
+               delay(500);
               }
-             if(tic_tac_toe[3] == 'o') 
-              { Serial.print("o won");
-                for(int i=0;i<5;i++)
-                   {
-                    pixels.setPixelColor(3, pixels.Color(250,0,0));
-                    pixels.setPixelColor(4, pixels.Color(250,0,0));
-                    pixels.setPixelColor(5, pixels.Color(250,0,0));
-                    pixels.show();
-                    delay(500);
-                   }
-                ledEffects_P2();   
-              }    
-           }
-         
-         if( tic_tac_toe[6]==tic_tac_toe[7]==tic_tac_toe[8])
-          { if(tic_tac_toe[6] == 'x')
-              { for(int i=0;i<5;i++)
-                   {Serial.print("x won");
-                    pixels.setPixelColor(6, pixels.Color(0,0,250));
-                    pixels.setPixelColor(7, pixels.Color(0,0,250));
-                    pixels.setPixelColor(8, pixels.Color(0,0,250));
-                    pixels.show();
-                    delay(500);
-                   }
-                ledEffects_P1();   
-              }
-             if(tic_tac_toe[6] == 'o') 
-              { Serial.print("o won");
-                for(int i=0;i<5;i++)
-                   {
-                    pixels.setPixelColor(6, pixels.Color(250,0,0));
-                    pixels.setPixelColor(7, pixels.Color(250,0,0));
-                    pixels.setPixelColor(8, pixels.Color(250,0,0));
-                    pixels.show();
-                    delay(500);
-                   }
-                ledEffects_P2();   
-              }    
-          }       
-            
-
-        // Check columns
+           ledEffects_P2();   
+         }    
         
-        if(tic_tac_toe[0]==tic_tac_toe[3]==tic_tac_toe[6])
-          { if(tic_tac_toe[0] == 'x')
-              { Serial.print("x won");
-                for(int i=0;i<5;i++)
-                   {
-                    pixels.setPixelColor(0, pixels.Color(0,0,250));
-                    pixels.setPixelColor(3, pixels.Color(0,0,250));
-                    pixels.setPixelColor(6, pixels.Color(0,0,250));
-                    pixels.show();
-                    delay(500);
-                   }
-                 ledEffects_P1();  
+       if(tic_tac_toe[3]== 'x' && tic_tac_toe[4]== 'x' && tic_tac_toe[5]== 'x')
+         {
+           Serial.println("x won  2nd Row");
+           for(int i=0;i<5;i++)
+              {
+               pixels.setPixelColor(3, pixels.Color(0,0,250));
+               pixels.setPixelColor(4, pixels.Color(0,0,250));
+               pixels.setPixelColor(5, pixels.Color(0,0,250));
+               pixels.show();
+               delay(500);
               }
-             if(tic_tac_toe[0] == 'o') 
-              { Serial.print("o won");
-                for(int i=0;i<5;i++)
-                   {
-                    pixels.setPixelColor(0, pixels.Color(250,0,0));
-                    pixels.setPixelColor(3, pixels.Color(250,0,0));
-                    pixels.setPixelColor(6, pixels.Color(250,0,0));
-                    pixels.show();
-                    delay(500);
-                   }
-                ledEffects_P2();   
-              }    
-           } 
-         if( tic_tac_toe[1]==tic_tac_toe[4]==tic_tac_toe[7])
-          { if(tic_tac_toe[1] == 'x')
-              { Serial.print("x won");
-                for(int i=0;i<5;i++)
-                   {
-                    pixels.setPixelColor(1, pixels.Color(0,0,250));
-                    pixels.setPixelColor(4, pixels.Color(0,0,250));
-                    pixels.setPixelColor(7, pixels.Color(0,0,250));
-                    pixels.show();
-                    delay(500);
-                   }
-                ledEffects_P1();   
+           ledEffects_P1();  
+         }
+       if(tic_tac_toe[3]== 'o' && tic_tac_toe[4]== 'o' && tic_tac_toe[5]== 'o') 
+         { 
+           Serial.println("o won  2nd Row");
+           for(int i=0;i<5;i++)
+              {
+               pixels.setPixelColor(3, pixels.Color(250,0,0));
+               pixels.setPixelColor(4, pixels.Color(250,0,0));
+               pixels.setPixelColor(5, pixels.Color(250,0,0));
+               pixels.show();
+               delay(500);
               }
-             if(tic_tac_toe[1] == 'o') 
-              { Serial.print("o won");
-                for(int i=0;i<5;i++)
-                   {
-                    pixels.setPixelColor(1, pixels.Color(250,0,0));
-                    pixels.setPixelColor(4, pixels.Color(250,0,0));
-                    pixels.setPixelColor(7, pixels.Color(250,0,0));
-                    pixels.show();
-                    delay(500);
-                   }
-                ledEffects_P2();   
-              }    
-           }
-         
-         if(tic_tac_toe[2]==tic_tac_toe[5]==tic_tac_toe[8])
-          { if(tic_tac_toe[2] == 'x')
-              { Serial.print("x won");
-                for(int i=0;i<5;i++)
-                   {
-                    pixels.setPixelColor(2, pixels.Color(0,0,250));
-                    pixels.setPixelColor(5, pixels.Color(0,0,250));
-                    pixels.setPixelColor(8, pixels.Color(0,0,250));
-                    pixels.show();
-                    delay(500);
-                   }
-                 ledEffects_P1();  
-              }
-             if(tic_tac_toe[2] == 'o') 
-              { Serial.print("o won");
-                for(int i=0;i<5;i++)
-                   {
-                    pixels.setPixelColor(2, pixels.Color(250,0,0));
-                    pixels.setPixelColor(5, pixels.Color(250,0,0));
-                    pixels.setPixelColor(8, pixels.Color(250,0,0));
-                    pixels.show();
-                    delay(500);
-                   }
-                ledEffects_P2();   
-              }    
-          }      
+           ledEffects_P2();   
+         }    
         
-    // Check diagonals
-    if(tic_tac_toe[0]==tic_tac_toe[4]==tic_tac_toe[8])
-          { if(tic_tac_toe[0] == 'x')
-              { Serial.print("x won");
-                for(int i=0;i<5;i++)
-                   {
-                    pixels.setPixelColor(0, pixels.Color(0,0,250));
-                    pixels.setPixelColor(4, pixels.Color(0,0,250));
-                    pixels.setPixelColor(8, pixels.Color(0,0,250));
-                    pixels.show();
-                    delay(500);
-                   }
-                ledEffects_P1();   
-              }
-             if(tic_tac_toe[0] == 'o') 
-              { Serial.print("o won");
-                for(int i=0;i<5;i++)
-                   {
-                    pixels.setPixelColor(0, pixels.Color(250,0,0));
-                    pixels.setPixelColor(4, pixels.Color(250,0,0));
-                    pixels.setPixelColor(8, pixels.Color(250,0,0));
-                    pixels.show();
-                    delay(500);
-                   }
-                 ledEffects_P2();  
-              }    
-           } 
-           
-      if(tic_tac_toe[2]==tic_tac_toe[4]==tic_tac_toe[6])
-          { if(tic_tac_toe[2] == 'x')
-              { Serial.print("x won");
-                for(int i=0;i<5;i++)
-                   {
-                    pixels.setPixelColor(2, pixels.Color(0,0,250));
-                    pixels.setPixelColor(4, pixels.Color(0,0,250));
-                    pixels.setPixelColor(6, pixels.Color(0,0,250));
-                    pixels.show();
-                    delay(500);
-                   }
-                 ledEffects_P1();   
-              }
-             if(tic_tac_toe[2] == 'o') 
-              { Serial.print("o won");
-                for(int i=0;i<5;i++)
-                   {
-                    pixels.setPixelColor(2, pixels.Color(250,0,0));
-                    pixels.setPixelColor(4, pixels.Color(250,0,0));
-                    pixels.setPixelColor(6, pixels.Color(250,0,0));
-                    pixels.show();
-                    delay(500);
-                   }
-                ledEffects_P2();   
-              }    
-           }  //Serial.print("won");    
+      if(tic_tac_toe[6]== 'x' && tic_tac_toe[7]== 'x' && tic_tac_toe[8]== 'x')
+        { 
+          Serial.println("x won  3rd Row");
+          for(int i=0;i<5;i++)
+             {
+               pixels.setPixelColor(6, pixels.Color(0,0,250));
+               pixels.setPixelColor(7, pixels.Color(0,0,250));
+               pixels.setPixelColor(8, pixels.Color(0,0,250));
+               pixels.show();
+               delay(500);
+             }
+          ledEffects_P1();   
+        }
+      if(tic_tac_toe[8]== 'o' && tic_tac_toe[7]== 'o' && tic_tac_toe[8]== 'o') 
+        { 
+          Serial.println("o won  3rd Row");
+          for(int i=0;i<5;i++)
+             {
+               pixels.setPixelColor(6, pixels.Color(250,0,0));
+               pixels.setPixelColor(7, pixels.Color(250,0,0));
+               pixels.setPixelColor(8, pixels.Color(250,0,0));
+               pixels.show();
+               delay(500);
+             }
+          ledEffects_P2();   
+        }    
+                     
+      // Check columns
+      if(tic_tac_toe[0]== 'x' && tic_tac_toe[3]== 'x' && tic_tac_toe[6]== 'x')
+        { 
+          Serial.println("x won  1st colm");
+          for(int i=0;i<5;i++)
+             {
+              pixels.setPixelColor(0, pixels.Color(0,0,250));
+              pixels.setPixelColor(3, pixels.Color(0,0,250));
+              pixels.setPixelColor(6, pixels.Color(0,0,250));
+              pixels.show();
+              delay(500);
+             }
+          ledEffects_P1();  
+        }
+      if(tic_tac_toe[0]== 'o' && tic_tac_toe[3]== 'o' && tic_tac_toe[6]== 'o') 
+        { 
+          Serial.println("o won  1st colm");
+          for(int i=0;i<5;i++)
+             {
+              pixels.setPixelColor(0, pixels.Color(250,0,0));
+              pixels.setPixelColor(3, pixels.Color(250,0,0));
+              pixels.setPixelColor(6, pixels.Color(250,0,0));
+              pixels.show();
+              delay(500);
+             }
+          ledEffects_P2();   
+         }    
+      if(tic_tac_toe[1]== 'x' && tic_tac_toe[4]== 'x' && tic_tac_toe[7]== 'x')
+        { 
+          Serial.println("x won  2nd colm");
+          for(int i=0;i<5;i++)
+             {
+              pixels.setPixelColor(1, pixels.Color(0,0,250));
+              pixels.setPixelColor(4, pixels.Color(0,0,250));
+              pixels.setPixelColor(7, pixels.Color(0,0,250));
+              pixels.show();
+              delay(500);
+             }
+          ledEffects_P1();   
+        }
+      if(tic_tac_toe[1]== 'o' && tic_tac_toe[4]== 'o' && tic_tac_toe[7]== 'o') 
+        { 
+          Serial.println("o won  2nd colm");
+          for(int i=0;i<5;i++)
+             {
+              pixels.setPixelColor(1, pixels.Color(250,0,0));
+              pixels.setPixelColor(4, pixels.Color(250,0,0));
+              pixels.setPixelColor(7, pixels.Color(250,0,0));
+              pixels.show();
+              delay(500);
+             }
+          ledEffects_P2();   
+        }    
+      if(tic_tac_toe[2]== 'x' && tic_tac_toe[5]== 'x' && tic_tac_toe[8]== 'x')
+        { 
+          Serial.println("x won  3rd colm");
+          for(int i=0;i<5;i++)
+             {
+              pixels.setPixelColor(2, pixels.Color(0,0,250));
+              pixels.setPixelColor(5, pixels.Color(0,0,250));
+              pixels.setPixelColor(8, pixels.Color(0,0,250));
+              pixels.show();
+              delay(500);
+             }
+          ledEffects_P1();  
+        }
+      if(tic_tac_toe[2]== 'o' && tic_tac_toe[5]== 'o' && tic_tac_toe[8]== 'o') 
+        { Serial.println("o won  3rd colm");
+          for(int i=0;i<5;i++)
+             {
+              pixels.setPixelColor(2, pixels.Color(250,0,0));
+              pixels.setPixelColor(5, pixels.Color(250,0,0));
+              pixels.setPixelColor(8, pixels.Color(250,0,0));
+              pixels.show();
+              delay(500);
+             }
+          ledEffects_P2();   
+        }    
+        
+    //check diagonals
+    if(tic_tac_toe[0]== 'x' && tic_tac_toe[4]== 'x' && tic_tac_toe[8]== 'x')
+      {
+        Serial.println("x won  diagonal L");
+        for(int i=0;i<5;i++)
+           {
+            pixels.setPixelColor(0, pixels.Color(0,0,250));
+            pixels.setPixelColor(4, pixels.Color(0,0,250));
+            pixels.setPixelColor(8, pixels.Color(0,0,250));
+            pixels.show();
+            delay(500);
+           }
+        ledEffects_P1();   
+      }
+    if(tic_tac_toe[0]== 'o' && tic_tac_toe[4]== 'o' && tic_tac_toe[8]== 'o') 
+      { 
+        Serial.println("o won  diagonal L");
+        for(int i=0;i<5;i++)
+           {
+            pixels.setPixelColor(0, pixels.Color(250,0,0));
+            pixels.setPixelColor(4, pixels.Color(250,0,0));
+            pixels.setPixelColor(8, pixels.Color(250,0,0));
+            pixels.show();
+            delay(500);
+           }
+        ledEffects_P2();  
+      } 
+    if(tic_tac_toe[2]== 'x' && tic_tac_toe[4]== 'x' && tic_tac_toe[6]== 'x')
+      { 
+        Serial.println("x won  diagonal R");
+        for(int i=0;i<5;i++)
+           {
+            pixels.setPixelColor(2, pixels.Color(0,0,250));
+            pixels.setPixelColor(4, pixels.Color(0,0,250));
+            pixels.setPixelColor(6, pixels.Color(0,0,250));
+            pixels.show();
+            delay(500);
+           }
+        ledEffects_P1();   
+      }
+    if(tic_tac_toe[2]== 'o' && tic_tac_toe[4]== 'o' && tic_tac_toe[6]== 'o') 
+      { 
+        Serial.println("o won  diagonal R");
+        for(int i=0;i<5;i++)
+           {
+            pixels.setPixelColor(2, pixels.Color(250,0,0));
+            pixels.setPixelColor(4, pixels.Color(250,0,0));
+            pixels.setPixelColor(6, pixels.Color(250,0,0));
+            pixels.show();
+            delay(500);
+           }
+        ledEffects_P2();   
+      }            
     }
 
 void ledEffects_P1()

@@ -15,4 +15,4 @@ We are using Maker and Gmail channel to trigger an event.
     
 If there is new letter in postbox, Arduino will send POST request to maker channel.  
 if Maker then Gmail
-If Maker Event "New Letter", then send an email from "abcd@gmail.com" 
+If Maker Event "New Letter", then send an email from "abcd@gmail.com". 

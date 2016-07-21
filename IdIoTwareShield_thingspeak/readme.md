@@ -1,4 +1,3 @@
-
 h3 **Log the Temperature and Light values at 5 minutes interval using the IdIotWare Arduino Shield and ESP8266**
 
  This example shows how to log data from Arduino to Thingspeak using ESP8266   wifi module.

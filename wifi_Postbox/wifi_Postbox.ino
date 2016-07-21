@@ -18,9 +18,9 @@
     If there is new letter in postbox, Arduino will send POST request to maker channel.  
     if Maker then Gmail
     If Maker Event "New Letter", then send an email from "abcd@gmail.com" 
-    
       
 */
+
 #include <Adafruit_NeoPixel.h>
 #include <CGShield.h>
 #include <Wire.h>         // Require for I2C communication
@@ -68,7 +68,7 @@ void wifiCb(void *response)
 void setup() 
     {
       Serial.begin(9600);   // the baud rate here needs to match the esp-link config
-      color(255,255,255);
+      color(255,255,255);   // set white color 
       Serial.println("EL-Client starting!");
 
       // Sync-up with esp-link, this is required at the start of any sketch and initializes the

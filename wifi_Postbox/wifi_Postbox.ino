@@ -30,8 +30,6 @@ CGShield fs;             // Instanciate CGShield instance
 #include <ELClientRest.h>
 char buff[128];
 
-// replace with your Maker channel's API key
-String API_KEY = "XXXXXXXXXXXXXXXXX";//
 // Initialize a connection to esp-link using the normal hardware serial port both for
 // SLIP and for debug messages.
 ELClient esp(&Serial, &Serial);
@@ -115,12 +113,12 @@ void loop()
 int new_letter()
    { 
     
-      int light_value1 = analogRead(A3); delay(10);
-      int light_value = analogRead(A3);delay(10);  
-      Serial.println(light_value);
-      if(light_value >= 510)    //if there is change in light value (New Letter)
+      int light_value = analogRead(A3); delay(10);
+      int light_value1 = analogRead(A3);delay(10);  
+      Serial.println(light_value1);
+      if(light_value1 >= 510)    //if there is change in light value (New Letter)
         { 
-          sprintf(buff, "/trigger/new_letter/with/key/bEJ04i0uriNNFOfaM9QrAf");
+          sprintf(buff, "/trigger/new_letter/with/key/XXXXXXXXXXXXXXXXXX");//replace with your Maker channel's API Key
           logToMaker();  //Log to Maker using commands under void LogToMaker()
           // print to the serial port too:              
           Serial.print("New Letter!!");

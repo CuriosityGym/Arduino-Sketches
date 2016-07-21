@@ -1,11 +1,38 @@
+/*
+              Weather Gadget
+   In this example we are using ESP8266 wifi module and OLED display
+ to display weather conditinos of particular city from WeatherDataApi.
+              
+ WeatherDataApi: Heroku Deployment Application that reduces data 
+                 downloaded for OpenWeatherMap Api
+  
+ To get data from OpenWeatherMap Api, you need to create openweathermap 
+ account and then generate API key and use that API Key in this code.                
+
+ In this example we have used ELClient.h library to get data from WeatherDataApi. 
+ Here we are sending request for location,current temprature,humnidity and 
+ weather descrition. This code allows you to detect your location automatically
+ by IP address or to get weather conditions of particular city just change  the 
+ city ID in the following code and change autoDetectLocation to false. OLED is 
+ used to display this information.
+ We are sending request to "idiotware.herokuapp.com" after every one hour to get
+ weather information.To change this interval, change value of refreshRate. 
+               
+*/
+
+
+
 #include "U8glib.h"
 #include <ELClient.h>
 #include <ELClientRest.h>
-#include "icons.h"
-
+#include "icons.h"    // Bitmap weather icons 
+#define autoDetectLocation false
+#define refreshRate 60   //send request after ever 60 minutes(one hour) 
 U8GLIB_SSD1306_128X64 u8g(U8G_I2C_OPT_NONE|U8G_I2C_OPT_DEV_0);	// I2C / TWI 
 
+
 char buff[128];
+//variables to store recieved data
 float temperature;
 int humidity;
 String location = "";
@@ -46,7 +73,7 @@ void wifiCb(void *response)
              } 
            else 
              {
-               Serial.print("WIFI NOT READY: ");//Wifi not connected,check connection
+               Serial.print("WIFI NOT READY: "); //Wifi not connected,check connection
                Serial.println(status);
                wifiConnected = false;
              }
@@ -84,7 +111,7 @@ void setup()
           Serial.println(packet->value);
         }
 
-      // Set up the REST client to talk to www.timeapi.org, this doesn't connect to that server,
+      // Set up the REST client to talk to www.idiotware.herokuapp.com, this doesn't connect to that server,
       // it just sets-up stuff on the esp-link side
       int err = rest.begin("idiotware.herokuapp.com");
       if(err != 0) 
@@ -103,7 +130,7 @@ void loop()
       get_Temperature();
       get_Humidity();
       get_weatherDescription();
-      for (int i=0; i<= 720; i++)
+      for (int i=0; i<= (refreshRate*60)/10; i++)
           {
             frameScroll();
           }
@@ -112,10 +139,18 @@ void loop()
 // function to get humidity from 
 void get_location()
     { 
-      sprintf(buff, "/getCityCountry?id=%s&appid=%s",CityID.c_str(),API_KEY.c_str());
+      if(autoDetectLocation)
+        {
+           sprintf(buff, "/getCityCountryByIP");
            // process any callbacks coming from esp_link
-      esp.Process();
-
+           esp.Process();
+        }
+      else
+        {
+           sprintf(buff, "/getCityCountry?id=%s&appid=%s",CityID.c_str(),API_KEY.c_str());
+           // process any callbacks coming from esp_link
+           esp.Process();
+         }  
      
       // if we're connected make an HTTP request
       if(wifiConnected) 
@@ -128,8 +163,6 @@ void get_location()
           if(code == HTTP_STATUS_OK)     //check for response for HTTP request  
             {
              Serial.println("ARDUINO: GET successful:");
-             Serial.print("Response: ");
-             Serial.println(response);
              location = response;  
             } 
           else 
@@ -144,10 +177,18 @@ void get_location()
     
 void get_Temperature()
     { 
-      sprintf(buff, "/temperature?id=%s&appid=%s",CityID.c_str(),API_KEY.c_str());
+      if(autoDetectLocation)
+        {
+           sprintf(buff, "/temperature?appid=%s",API_KEY.c_str());
            // process any callbacks coming from esp_link
-      esp.Process();
-
+           esp.Process();
+        }
+      else
+        {
+           sprintf(buff, "/temperature?id=%s&appid=%s",CityID.c_str(),API_KEY.c_str());
+           // process any callbacks coming from esp_link
+           esp.Process();
+         }  
      
       // if we're connected make an HTTP request
       if(wifiConnected) 
@@ -160,11 +201,9 @@ void get_Temperature()
           if(code == HTTP_STATUS_OK)     //check for response for HTTP request  
             {
              Serial.println("ARDUINO: GET successful:");
-             Serial.print("Response: ");
-             temperature = atoi(response);
-             Serial.println(response);
-             tempInCelsius = (temperature - 273.15);
-             Serial.println(tempInCelsius);
+             temperature = atoi(response);    //convert recieved string to integer
+             tempInCelsius = (temperature - 273.15); // temperature values recieved from WeatherDataApi
+                                                     // are in Kelvin convert it to Celcius
             } 
           else 
             {
@@ -179,10 +218,18 @@ void get_Temperature()
      
 void get_Humidity()
     { 
-      sprintf(buff, "/humidity?id=%s&appid=%s",CityID.c_str(),API_KEY.c_str());
+       if(autoDetectLocation)
+        {
+           sprintf(buff, "/humidity?appid=%s",API_KEY.c_str());
            // process any callbacks coming from esp_link
-      esp.Process();
-
+           esp.Process();
+        }
+      else
+        {
+           sprintf(buff, "/humidity?id=%s&appid=%s",CityID.c_str(),API_KEY.c_str());
+           // process any callbacks coming from esp_link
+           esp.Process();
+         }  
      
       // if we're connected make an HTTP request
       if(wifiConnected) 
@@ -197,14 +244,14 @@ void get_Humidity()
              Serial.println("ARDUINO: GET successful:");
              Serial.print("Response: ");
              Serial.println(response);
-             int hum = atoi(response);
+             int hum = atoi(response);  // convert recieved string to integer
              if (hum > 100)
                 { hum = hum/10;
-                  humidity = hum;Serial.print(hum);
+                  humidity = hum;
                 } 
              else 
                 {
-                  humidity = hum; Serial.print(hum);
+                  humidity = hum; 
                 }  
             }    
           else 
@@ -216,15 +263,21 @@ void get_Humidity()
         }
         
     }   
-     
-
-      
+         
 void get_weatherDescription()
     { 
-      sprintf(buff, "/weatherDescription?id=%s&appid=%s",CityID.c_str(),API_KEY.c_str());
+       if(autoDetectLocation)
+        {
+           sprintf(buff, "/weatherDescription?appid=%s",API_KEY.c_str());
            // process any callbacks coming from esp_link
-      esp.Process();
-
+           esp.Process();
+        }
+      else
+        {
+           sprintf(buff, "/weatherDescription?id=%s&appid=%s",CityID.c_str(),API_KEY.c_str());
+           // process any callbacks coming from esp_link
+           esp.Process();
+         }
      
       // if we're connected make an HTTP request
       if(wifiConnected) 
@@ -237,9 +290,6 @@ void get_weatherDescription()
           if(code == HTTP_STATUS_OK)     //check for response for HTTP request  
             {
              Serial.println("ARDUINO: GET successful:");
-             Serial.print("Response: ");
-             Serial.println(response);
-             //weather(response);
              weatherDescription = response;
             } 
           else 
@@ -295,9 +345,10 @@ void displayIcon()
       else 
          {
           drawFrame1(no_icon);
-         }
- 
-}    
+         } 
+    } 
+
+//print weather icon and weather description on OLED
 void drawFrame1(const uint8_t *bitmap) 
     { 
        u8g.setPrintPos( yPos + xPos, 11);
@@ -307,7 +358,7 @@ void drawFrame1(const uint8_t *bitmap)
        u8g.print(weatherDescription);
      
     }
-
+//print thermometer icon and tmeperature and humidity values on OLED
 void drawFrame2() 
     { 
        u8g.setPrintPos(yPos + xPos - 128, 11);
@@ -328,7 +379,8 @@ void drawFrame2()
          }  
          
     }
-  
+
+// function to scroll frames on OLED after 5 seconds  
 void frameScroll()
     {
        u8g.firstPage();

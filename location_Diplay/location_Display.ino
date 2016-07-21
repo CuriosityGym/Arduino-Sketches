@@ -1,8 +1,17 @@
+/*
+              Location Display
+   In this example we are using ESP8266 wifi module and OLED display
+ to display location using your IP address.
+                         
+*/
+
+
+
 #include "U8glib.h"
 #include <ELClient.h>
 #include <ELClientRest.h>
 char buff[32];
-
+String location = "";
 U8GLIB_SSD1306_128X64 u8g(U8G_I2C_OPT_NONE|U8G_I2C_OPT_DEV_0);
 // Initialize a connection to esp-link using the normal hardware serial port both for
 // SLIP and for debug messages.
@@ -39,7 +48,7 @@ void wifiCb(void *response)
 
 void setup() 
     {
-      Serial.begin(115200);   // the baud rate here needs to match the esp-link config
+      Serial.begin(9600);   // the baud rate here needs to match the esp-link config
       Serial.println("EL-Client starting!");
       u8g.setFont(u8g_font_timB14);
       u8g.setColorIndex(1);
@@ -65,9 +74,9 @@ void setup()
           Serial.println(packet->value);
         }
 
-      // Set up the REST client to talk to ip-api.com, this doesn't connect to that server,
+      // Set up the REST client to talk to idiotware.herokuapp.com, this doesn't connect to that server,
       // it just sets-up stuff on the esp-link side
-      int err = rest.begin("ip-api.com");
+      int err = rest.begin("idiotware.herokuapp.com");
       if(err != 0) 
         {
           Serial.print("REST begin failed: ");
@@ -82,20 +91,12 @@ void setup()
 void loop() 
     {
      get_Location();
-     delay(5000);
     }
  
-void showMessageOnLcd(int x,int y, const char* message1,int a,int b, const char* message2)
-    {u8g.firstPage();
-      do { //u8g.setFont(u8g_font_timB14);
-           u8g.drawStr( x, y, message1);
-          u8g.drawStr( a, b, message2);    
-         } while( u8g.nextPage() );
-    }
     
 void get_Location()
     { 
-      sprintf(buff, "/json");
+      sprintf(buff, "/getCityCountryByIP");
            // process any callbacks coming from esp_link
       esp.Process();
 
@@ -106,25 +107,34 @@ void get_Location()
           // Request /utc/now from the previously set-up server
           rest.get((const char*)buff);
 
-          char response[512];
-          uint16_t code = rest.waitResponse(response, 512);
+          char response[20];
+          uint16_t code = rest.waitResponse(response, 20);
           if(code == HTTP_STATUS_OK)     //check for response for HTTP request  
             {
-             Serial.println("ARDUINO: GET successful:");
-             Serial.println(response);
-             u8g.firstPage();
-           do {  
-                u8g.setPrintPos(15, 30);
-                u8g.print(response);
-              } while( u8g.nextPage() );
+              Serial.println("ARDUINO: GET successful:");
+              location = response;
+              int commaPositon = location.indexOf(',');
+              String city= "";
+              city=location.substring(0, commaPositon);  //copy city from recived location to variable city
+              String countryCode = "";
+              countryCode=location.substring(commaPositon+2);//copy country code from recived location to variable countryCode
+              u8g.firstPage();
+              do {  
+                   u8g.setPrintPos(15, 30);
+                   u8g.print(city);
+                   u8g.setPrintPos(15, 30);
+                   u8g.print(countryCode);
+                 } while( u8g.nextPage() );
             } 
           else 
             {
-             Serial.print("ARDUINO: GET failed: ");
-             Serial.println(code);
+              Serial.print("ARDUINO: GET failed: ");
+              Serial.println(code);
             }
-          delay(3000);
+          delay(5000);
         }
         
     }   
     
+   
+   

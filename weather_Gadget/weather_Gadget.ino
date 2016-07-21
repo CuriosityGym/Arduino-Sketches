@@ -40,7 +40,7 @@ String weatherDescription = "";
 int tempInCelsius;
 
 // replace with your channel's thingspeak API key
-String API_KEY = "15373f8c0b06b6e66e6372db065c4e46";
+String API_KEY = "XXXXXXXXXXXXXXXXXXXXXXXX";
 String CityID = "1275339"; //Mumbai, India
 
 // varibles for cursor positions

@@ -27,7 +27,7 @@ int samplingTime = 16;  //this variable is interval(in Seconds) at which you wan
 int duration = 30;     //this variable is duration(in Minutes) which is the total time for which you want to log data.
 
 // replace with your channel's thingspeak API key
-String API_KEY = "BNOJ3CIAYB2DJPDT";
+String API_KEY = "XXXXXXXXXXXXXXX";
 // Initialize a connection to esp-link using the normal hardware serial port both for
 // SLIP and for debug messages.
 ELClient esp(&Serial, &Serial);

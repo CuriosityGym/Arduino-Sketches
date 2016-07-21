@@ -1,10 +1,25 @@
 /*
     WiFi POSTBOX
     
+    In this example we are using ESP8266 and IdIoTWare Shield and Arduino Board. LDR on IdIoTWare shield 
+    is used as sensor to detect letter in the letterbox. WS2812 Led (addressable RGB LED) 
+    on IdIoTWare shield is continuously ON (WHITE Color) and reflects light on LDR. As 
+    soon as new letter dropped in postbox light intensity on LDR changes due to reflection 
+    and event gets triggered.
+    Here we are using IFTTT to trigger an event.
     
-if Maker then Gmail
-If Maker Event "New Letter", then send an email from supersidh13@gmail.com 
- 
+    IFTTT is a free web-based service that allows users to create chains of simple conditional statements,
+    called "recipes", which are triggered based on changes to other web services such as Gmail, Facebook,
+    Instagram, and many more.IFTTT is an abbreviation of "If This Then That"
+    Create account on IFTTT and create your recipe.
+    
+    We are using Maker and Gmail channel to trigger an event.
+    
+    If there is new letter in postbox, Arduino will send POST request to maker channel.  
+    if Maker then Gmail
+    If Maker Event "New Letter", then send an email from "abcd@gmail.com" 
+    
+      
 */
 #include <Adafruit_NeoPixel.h>
 #include <CGShield.h>
@@ -15,8 +30,8 @@ CGShield fs;             // Instanciate CGShield instance
 #include <ELClientRest.h>
 char buff[128];
 
-// replace with your channel's thingspeak API key
-String API_KEY = "cDlIAZcApEGZiZDeOIXExA";//bEJ04i0uriNNFOfaM9QrAf
+// replace with your Maker channel's API key
+String API_KEY = "XXXXXXXXXXXXXXXXX";//
 // Initialize a connection to esp-link using the normal hardware serial port both for
 // SLIP and for debug messages.
 ELClient esp(&Serial, &Serial);
@@ -101,9 +116,9 @@ int new_letter()
    { 
     
       int light_value1 = analogRead(A3); delay(10);
-      int light_value = analogRead(A3);delay(10);
+      int light_value = analogRead(A3);delay(10);  
       Serial.println(light_value);
-      if(light_value >= 510)
+      if(light_value >= 510)    //if there is change in light value (New Letter)
         { 
           sprintf(buff, "/trigger/new_letter/with/key/bEJ04i0uriNNFOfaM9QrAf");
           logToMaker();  //Log to Maker using commands under void LogToMaker()
@@ -114,7 +129,7 @@ int new_letter()
         delay(50);   
    } 
  
-    
+//function to send POST request to Maker channel    
 void logToMaker()
     {
            // process any callbacks coming from esp_link

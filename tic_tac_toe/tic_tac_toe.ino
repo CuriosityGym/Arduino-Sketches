@@ -5,10 +5,10 @@
 //#define COLS    3
 
 boolean current_player = true;
-int InputPin[9] = {2, 3, 4, 5, 11, 7, 8, 9, 10};
+int InputPin[9] = {0 ,2, 3, 4, 5, 6, 7, 8, 12};
 int InputPinState[9] = {1,1,1,1,1,1,1,1,1};
 int LastInputPinState[9] = {1,1,1,1,1,1,1,1,1};
-char tic_tac_toe[10]={ };
+char tic_tac_toe[9]={ };
 byte moves = 0;                                                
 Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800); 
 void setup() 
@@ -68,9 +68,11 @@ void nextMoves()
                     pixels.setPixelColor(i, pixels.Color(250,0,0)); //  red color.
                     pixels.show(); // This sends the updated pixel color to the hardware.
                     tic_tac_toe[i] = 'x';
-                     Serial.print(i);Serial.println( tic_tac_toe[i]);Serial.print("moves: ");Serial.println(moves);
+                     Serial.print(i);Serial.print( tic_tac_toe[i]);Serial.print("moves: ");Serial.println(moves);
                    // current_player = 1;
-                    moves += 1;InputPinState[i] == HIGH;delay(500);
+                    moves += 1;
+                    //InputPinState[i] == HIGH;
+                    delay(500);
                   }}LastInputPinState[i] = InputPinState[i];
               }
          }
@@ -85,9 +87,11 @@ void nextMoves()
                   pixels.setPixelColor(i, pixels.Color(0,0,250)); //  red color.
                   pixels.show(); // This sends the updated pixel color to the hardware.
                   tic_tac_toe[i] = 'o';
-                  Serial.print(i);Serial.println( tic_tac_toe[i]);Serial.print("moves: ");Serial.println(moves);
+                  Serial.print(i);Serial.print( tic_tac_toe[i]);Serial.print("moves: ");Serial.println(moves);
                   //current_player = 1;
-                  moves += 1;InputPinState[i] == HIGH;delay(500);
+                  moves += 1;
+                  //InputPinState[i] == HIGH;
+                  delay(500);
                 }}LastInputPinState[i] = InputPinState[i];
             }
          }
@@ -166,7 +170,7 @@ void gameOver()
              }
           ledEffects_P1();   
         }
-      if(tic_tac_toe[8]== 'o' && tic_tac_toe[7]== 'o' && tic_tac_toe[8]== 'o') 
+      if(tic_tac_toe[6]== 'o' && tic_tac_toe[7]== 'o' && tic_tac_toe[8]== 'o') 
         { 
           Serial.println("o won  3rd Row");
           for(int i=0;i<5;i++)
@@ -342,6 +346,4 @@ void ledEffects_P2()
            pixels.show();
            delay(250);
          }    
-    }    
-    
-     
+} 

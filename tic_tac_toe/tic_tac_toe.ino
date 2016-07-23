@@ -25,10 +25,10 @@ void setup()
 void loop() 
     {
       nextMoves();
-      if(moves>4 && winCondition() && !won)
-        {
+      if(moves>=4 )
+        { 
           winCondition();
-          won = true;
+           
         }  
         
       if (moves == 9 && !winCondition())
@@ -216,9 +216,10 @@ boolean winCondition()
              }
           ledEffects_P1();
           return true;   
+         
         }
       if(tic_tac_toe[6]== 'o' && tic_tac_toe[7]== 'o' && tic_tac_toe[8]== 'o') 
-        { 
+        {  
           Serial.println("o won  3rd Row");
           for(int i=0;i<5;i++)
              {
@@ -234,6 +235,7 @@ boolean winCondition()
                delay(500);
              }
           ledEffects_P2();
+          
           return true;   
         }    
                      
@@ -433,7 +435,7 @@ boolean winCondition()
     }
 
 void ledEffects_P1()
-    {
+    { 
       for(byte i=0;i<9;i++)
          {
            pixels.setPixelColor(i, pixels.Color(0,0,250));
@@ -451,13 +453,17 @@ void ledEffects_P1()
 void ledEffects_P2()
     {
       for(byte i=0;i<9;i++)
-         {
+         { 
+           moves = 0;
+           tic_tac_toe[9]={ };
            pixels.setPixelColor(i, pixels.Color(250,0,0));
            pixels.show();
            delay(250);
          }
       for(byte i=0;i<9;i++)
-         {
+         { 
+           moves = 0;
+           tic_tac_toe[9]={ };
            pixels.setPixelColor(i%10, pixels.Color(0,0,0));
            pixels.show();
            delay(250);

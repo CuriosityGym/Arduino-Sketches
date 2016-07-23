@@ -1,5 +1,5 @@
 #include <Adafruit_NeoPixel.h>
-#define PIN  6
+#define PIN  9
 #define NUMPIXELS  9
 //#define ROWS    3
 //#define COLS    3
@@ -18,7 +18,7 @@ void setup()
       for(int i = 0; i < 9; i++)
          { 
            pinMode(InputPin[i], INPUT_PULLUP);
-           pixels.setPixelColor(i, pixels.Color(0,0,250));
+           pixels.setPixelColor(i, pixels.Color(0,0,0));
            pixels.show();
          }
       first_XorO();
@@ -29,8 +29,20 @@ void loop()
     {
        //firstMove();
        nextMoves();
-      if (moves>4){ winCondition();
-      }
+      if(moves>4)
+        { 
+          winCondition();
+        }
+      if (moves== 8 && !winCondition())
+         { Serial.print("draw");
+            for(int i = 0; i < 9; i++)
+         { 
+           pixels.setPixelColor(i, pixels.Color(0,250,0));
+           pixels.show();
+         }
+         delay(2000);
+         
+         }
     }
  
 
@@ -101,7 +113,7 @@ void nextMoves()
       }     
 
 
-void winCondition()
+boolean winCondition()
     {
        // Check rows
        if(tic_tac_toe[0]== 'x' && tic_tac_toe[1]== 'x' && tic_tac_toe[2]== 'x')
@@ -115,7 +127,8 @@ void winCondition()
                pixels.show();
                delay(500);
               }
-           ledEffects_P1();  
+           ledEffects_P1();
+           return true;  
           }
        if(tic_tac_toe[0]== 'o' && tic_tac_toe[1]== 'o' && tic_tac_toe[2]== 'o') 
          {
@@ -128,7 +141,8 @@ void winCondition()
                pixels.show();
                delay(500);
               }
-           ledEffects_P2();   
+           ledEffects_P2(); 
+           return true;  
          }    
         
        if(tic_tac_toe[3]== 'x' && tic_tac_toe[4]== 'x' && tic_tac_toe[5]== 'x')
@@ -143,6 +157,7 @@ void winCondition()
                delay(500);
               }
            ledEffects_P1();  
+           return true;
          }
        if(tic_tac_toe[3]== 'o' && tic_tac_toe[4]== 'o' && tic_tac_toe[5]== 'o') 
          { 
@@ -155,7 +170,8 @@ void winCondition()
                pixels.show();
                delay(500);
               }
-           ledEffects_P2();   
+           ledEffects_P2();
+           return true;   
          }    
         
       if(tic_tac_toe[6]== 'x' && tic_tac_toe[7]== 'x' && tic_tac_toe[8]== 'x')
@@ -169,7 +185,8 @@ void winCondition()
                pixels.show();
                delay(500);
              }
-          ledEffects_P1();   
+          ledEffects_P1();
+          return true;   
         }
       if(tic_tac_toe[6]== 'o' && tic_tac_toe[7]== 'o' && tic_tac_toe[8]== 'o') 
         { 
@@ -182,7 +199,8 @@ void winCondition()
                pixels.show();
                delay(500);
              }
-          ledEffects_P2();   
+          ledEffects_P2();
+          return true;   
         }    
                      
       // Check columns
@@ -197,7 +215,8 @@ void winCondition()
               pixels.show();
               delay(500);
              }
-          ledEffects_P1();  
+          ledEffects_P1();
+          return true;  
         }
       if(tic_tac_toe[0]== 'o' && tic_tac_toe[3]== 'o' && tic_tac_toe[6]== 'o') 
         { 
@@ -210,7 +229,8 @@ void winCondition()
               pixels.show();
               delay(500);
              }
-          ledEffects_P2();   
+          ledEffects_P2();
+          return true;   
          }    
       if(tic_tac_toe[1]== 'x' && tic_tac_toe[4]== 'x' && tic_tac_toe[7]== 'x')
         { 
@@ -223,7 +243,8 @@ void winCondition()
               pixels.show();
               delay(500);
              }
-          ledEffects_P1();   
+          ledEffects_P1(); 
+          return true;  
         }
       if(tic_tac_toe[1]== 'o' && tic_tac_toe[4]== 'o' && tic_tac_toe[7]== 'o') 
         { 
@@ -236,7 +257,8 @@ void winCondition()
               pixels.show();
               delay(500);
              }
-          ledEffects_P2();   
+          ledEffects_P2(); 
+          return true;  
         }    
       if(tic_tac_toe[2]== 'x' && tic_tac_toe[5]== 'x' && tic_tac_toe[8]== 'x')
         { 
@@ -249,7 +271,8 @@ void winCondition()
               pixels.show();
               delay(500);
              }
-          ledEffects_P1();  
+          ledEffects_P1();
+          return true;  
         }
       if(tic_tac_toe[2]== 'o' && tic_tac_toe[5]== 'o' && tic_tac_toe[8]== 'o') 
         { Serial.println("o won  3rd colm");
@@ -261,7 +284,8 @@ void winCondition()
               pixels.show();
               delay(500);
              }
-          ledEffects_P2();   
+          ledEffects_P2();
+          return true;   
         }    
         
     //check diagonals
@@ -276,7 +300,8 @@ void winCondition()
             pixels.show();
             delay(500);
            }
-        ledEffects_P1();   
+        ledEffects_P1();
+        return true;   
       }
     if(tic_tac_toe[0]== 'o' && tic_tac_toe[4]== 'o' && tic_tac_toe[8]== 'o') 
       { 
@@ -289,7 +314,8 @@ void winCondition()
             pixels.show();
             delay(500);
            }
-        ledEffects_P2();  
+        ledEffects_P2(); 
+        return true; 
       } 
     if(tic_tac_toe[2]== 'x' && tic_tac_toe[4]== 'x' && tic_tac_toe[6]== 'x')
       { 
@@ -302,7 +328,8 @@ void winCondition()
             pixels.show();
             delay(500);
            }
-        ledEffects_P1();   
+        ledEffects_P1();
+        return true;   
       }
     if(tic_tac_toe[2]== 'o' && tic_tac_toe[4]== 'o' && tic_tac_toe[6]== 'o') 
       { 
@@ -315,8 +342,10 @@ void winCondition()
             pixels.show();
             delay(500);
            }
-        ledEffects_P2();   
-      }            
+        ledEffects_P2();
+        return true;   
+      }   
+     return false;      
     }
 
 void ledEffects_P1()

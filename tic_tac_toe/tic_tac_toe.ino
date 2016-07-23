@@ -1,10 +1,7 @@
 #include <Adafruit_NeoPixel.h>
 #define PIN  9
 #define NUMPIXELS  9
-//#define ROWS    3
-//#define COLS    3
-
-boolean current_player = true;
+boolean won = false;
 int InputPin[9] = {0 ,2, 3, 4, 5, 6, 7, 8, 12};
 int InputPinState[9] = {1,1,1,1,1,1,1,1,1};
 int LastInputPinState[9] = {1,1,1,1,1,1,1,1,1};
@@ -28,10 +25,12 @@ void setup()
 void loop() 
     {
       nextMoves();
-      if(moves>4)
-        { 
+      if(moves>4 && winCondition() && !won)
+        {
           winCondition();
-        }
+          won = true;
+        }  
+        
       if (moves == 9 && !winCondition())
          {  
            moves = 0;
@@ -85,9 +84,7 @@ void nextMoves()
                        pixels.show(); // This sends the updated pixel color to the hardware.
                       }  
                      Serial.print(i);Serial.print( tic_tac_toe[i]);Serial.print("moves: ");Serial.println(moves);
-                   // current_player = 1;
                     moves += 1;
-                    //InputPinState[i] == HIGH;
                     delay(500);
                   }}LastInputPinState[i] = InputPinState[i];
               }
@@ -112,9 +109,7 @@ void nextMoves()
                        pixels.show(); // This sends the updated pixel color to the hardware.
                       }  
                   Serial.print(i);Serial.print( tic_tac_toe[i]);Serial.print("moves: ");Serial.println(moves);
-                  //current_player = 1;
                   moves += 1;
-                  //InputPinState[i] == HIGH;
                   delay(500);
                 }}LastInputPinState[i] = InputPinState[i];
             }

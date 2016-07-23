@@ -1,4 +1,3 @@
-
-h1**Tic Tac Toe**
+H1 **Tic Tac Toe**
 
  work in progress

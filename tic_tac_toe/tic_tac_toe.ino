@@ -9,7 +9,8 @@ int InputPin[9] = {0 ,2, 3, 4, 5, 6, 7, 8, 12};
 int InputPinState[9] = {1,1,1,1,1,1,1,1,1};
 int LastInputPinState[9] = {1,1,1,1,1,1,1,1,1};
 char tic_tac_toe[9]={ };
-byte moves = 0;                                                
+byte moves = 0; 
+int firstPlayer;
 Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800); 
 void setup() 
     {Serial.begin(9600);Serial.println("NEW GAME");
@@ -20,40 +21,26 @@ void setup()
            pixels.setPixelColor(i, pixels.Color(0,0,250));
            pixels.show();
          }
-      
+      first_XorO();
+      Serial.println(first_XorO());
     } 
  
 void loop() 
     {
        //firstMove();
        nextMoves();
-      if (moves>4){ gameOver();
+      if (moves>4){ winCondition();
       }
     }
-/*   
-void firstMove()
-    { 
-      if(current_player)
-        {
-      for(int i = 0; i < 9; i++)
-         { InputPinState[i] = digitalRead(InputPin[i]);
-           if(InputPinState[i] == LOW)
-             {Serial.print(InputPin[i]);
-               Serial.print(InputPinState[i]);
-              //  playerOne = 'x';
-               pixels.setPixelColor(i, pixels.Color(0,0,250)); // blue color.
-               pixels.show(); // This sends the updated pixel color to the hardware.
-               tic_tac_toe[i] = 'x'; 
-               Serial.print(i);Serial.println( tic_tac_toe[i]);   
-                 
-               moves += 1;
-               Serial.print("moves: ");Serial.print(moves);
-             }    
-             }
-            current_player = false; 
-         }
-     }
-  */   
+ 
+
+int first_XorO()
+    { randomSeed(analogRead(0));
+      firstPlayer = random(2);
+      return firstPlayer;
+    }
+
+  
 void nextMoves()     
      {
        if( moves%2 == 0 && moves < 9)
@@ -67,7 +54,14 @@ void nextMoves()
                     //char playerOne = 'o';
                     pixels.setPixelColor(i, pixels.Color(250,0,0)); //  red color.
                     pixels.show(); // This sends the updated pixel color to the hardware.
-                    tic_tac_toe[i] = 'x';
+                    if(firstPlayer== 1)
+                      {
+                       tic_tac_toe[i] = 'x';
+                      }
+                    if(firstPlayer == 0)
+                      {
+                       tic_tac_toe[i] = 'o';
+                      }  
                      Serial.print(i);Serial.print( tic_tac_toe[i]);Serial.print("moves: ");Serial.println(moves);
                    // current_player = 1;
                     moves += 1;
@@ -86,7 +80,14 @@ void nextMoves()
                   //char playerOne = 'o';
                   pixels.setPixelColor(i, pixels.Color(0,0,250)); //  red color.
                   pixels.show(); // This sends the updated pixel color to the hardware.
-                  tic_tac_toe[i] = 'o';
+                  if(firstPlayer == 1)
+                      {
+                       tic_tac_toe[i] = 'o';
+                      }
+                    if(firstPlayer == 0)
+                      {
+                       tic_tac_toe[i] = 'x';
+                      }  
                   Serial.print(i);Serial.print( tic_tac_toe[i]);Serial.print("moves: ");Serial.println(moves);
                   //current_player = 1;
                   moves += 1;
@@ -100,7 +101,7 @@ void nextMoves()
       }     
 
 
-void gameOver()
+void winCondition()
     {
        // Check rows
        if(tic_tac_toe[0]== 'x' && tic_tac_toe[1]== 'x' && tic_tac_toe[2]== 'x')

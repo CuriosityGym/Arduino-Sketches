@@ -410,7 +410,7 @@ boolean winCondition()
             delay(500);
            }
         ledEffects_P1();
-        return true;   
+   
       }
     if(tic_tac_toe[2]== 'o' && tic_tac_toe[4]== 'o' && tic_tac_toe[6]== 'o') 
       { 
@@ -435,7 +435,8 @@ boolean winCondition()
     }
 
 void ledEffects_P1()
-    { 
+    { moves = 0;
+           tic_tac_toe[9]={ };
       for(byte i=0;i<9;i++)
          {
            pixels.setPixelColor(i, pixels.Color(0,0,250));
@@ -451,11 +452,10 @@ void ledEffects_P1()
     }
 
 void ledEffects_P2()
-    {
+    { moves = 0;
+      tic_tac_toe[9]={ };
       for(byte i=0;i<9;i++)
          { 
-           moves = 0;
-           tic_tac_toe[9]={ };
            pixels.setPixelColor(i, pixels.Color(250,0,0));
            pixels.show();
            delay(250);

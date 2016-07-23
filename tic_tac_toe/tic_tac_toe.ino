@@ -27,23 +27,32 @@ void setup()
  
 void loop() 
     {
-       //firstMove();
-       nextMoves();
+      nextMoves();
       if(moves>4)
         { 
           winCondition();
         }
-      if (moves== 8 && !winCondition())
-         { Serial.print("draw");
+      if (moves == 9 && !winCondition())
+         {  
+           moves = 0;
+           tic_tac_toe[9]={ };
+           for(int i = 0; i < 9; i++)
+              { 
+                pixels.setPixelColor(i, pixels.Color(0,250,0));
+                pixels.show();
+                delay(250);
+              }
+            delay(2000);
             for(int i = 0; i < 9; i++)
-         { 
-           pixels.setPixelColor(i, pixels.Color(0,250,0));
-           pixels.show();
+              { 
+                pixels.setPixelColor(i, pixels.Color(0,0,0));
+                pixels.show();
+                delay(250);
+              }
+            delay(1000);
+            Serial.print("draw");
          }
-         delay(2000);
-         
-         }
-    }
+     }
  
 
 int first_XorO()
@@ -110,9 +119,7 @@ void nextMoves()
                 }}LastInputPinState[i] = InputPinState[i];
             }
          }
-        if (moves == 9)
-       { moves = 0; tic_tac_toe[10]={ };delay(5000);}
-      }     
+     }     
 
 
 boolean winCondition()

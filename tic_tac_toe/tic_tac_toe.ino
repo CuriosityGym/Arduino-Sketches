@@ -63,16 +63,17 @@ void nextMoves()
                if (InputPinState[i] != LastInputPinState[i]){
                 if(InputPinState[i] == LOW)
                   {
-                    //char playerOne = 'o';
-                    pixels.setPixelColor(i, pixels.Color(250,0,0)); //  red color.
-                    pixels.show(); // This sends the updated pixel color to the hardware.
                     if(firstPlayer== 1)
                       {
                        tic_tac_toe[i] = 'x';
+                       pixels.setPixelColor(i, pixels.Color(0,0,250)); //  red color.
+                       pixels.show(); // This sends the updated pixel color to the hardware.
                       }
                     if(firstPlayer == 0)
                       {
                        tic_tac_toe[i] = 'o';
+                       pixels.setPixelColor(i, pixels.Color(250,0,0)); //  red color.
+                       pixels.show(); // This sends the updated pixel color to the hardware.
                       }  
                      Serial.print(i);Serial.print( tic_tac_toe[i]);Serial.print("moves: ");Serial.println(moves);
                    // current_player = 1;
@@ -89,16 +90,17 @@ void nextMoves()
               if (InputPinState[i] != LastInputPinState[i]){
               if(InputPinState[i] == LOW)
                 {
-                  //char playerOne = 'o';
-                  pixels.setPixelColor(i, pixels.Color(0,0,250)); //  red color.
-                  pixels.show(); // This sends the updated pixel color to the hardware.
                   if(firstPlayer == 1)
                       {
                        tic_tac_toe[i] = 'o';
+                       pixels.setPixelColor(i, pixels.Color(250,0,0)); //  red color.
+                       pixels.show(); // This sends the updated pixel color to the hardware.
                       }
                     if(firstPlayer == 0)
                       {
                        tic_tac_toe[i] = 'x';
+                       pixels.setPixelColor(i, pixels.Color(0,0,250)); //  red color.
+                       pixels.show(); // This sends the updated pixel color to the hardware.
                       }  
                   Serial.print(i);Serial.print( tic_tac_toe[i]);Serial.print("moves: ");Serial.println(moves);
                   //current_player = 1;
@@ -121,6 +123,11 @@ boolean winCondition()
            Serial.println("x won  1st Row");
            for(int i=0;i<5;i++)
               {
+               pixels.setPixelColor(0, pixels.Color(0,0,0));
+               pixels.setPixelColor(1, pixels.Color(0,0,0));
+               pixels.setPixelColor(2, pixels.Color(0,0,0));
+               pixels.show();
+               delay(500);
                pixels.setPixelColor(0, pixels.Color(0,0,250));
                pixels.setPixelColor(1, pixels.Color(0,0,250));
                pixels.setPixelColor(2, pixels.Color(0,0,250));
@@ -140,6 +147,11 @@ boolean winCondition()
                pixels.setPixelColor(2, pixels.Color(250,0,0));
                pixels.show();
                delay(500);
+               pixels.setPixelColor(0, pixels.Color(0,0,0));
+               pixels.setPixelColor(1, pixels.Color(0,0,0));
+               pixels.setPixelColor(2, pixels.Color(0,0,0));
+               pixels.show();
+               delay(500);
               }
            ledEffects_P2(); 
            return true;  
@@ -150,6 +162,11 @@ boolean winCondition()
            Serial.println("x won  2nd Row");
            for(int i=0;i<5;i++)
               {
+               pixels.setPixelColor(3, pixels.Color(0,0,0));
+               pixels.setPixelColor(4, pixels.Color(0,0,0));
+               pixels.setPixelColor(5, pixels.Color(0,0,0));
+               pixels.show();
+               delay(500);
                pixels.setPixelColor(3, pixels.Color(0,0,250));
                pixels.setPixelColor(4, pixels.Color(0,0,250));
                pixels.setPixelColor(5, pixels.Color(0,0,250));
@@ -169,6 +186,11 @@ boolean winCondition()
                pixels.setPixelColor(5, pixels.Color(250,0,0));
                pixels.show();
                delay(500);
+               pixels.setPixelColor(3, pixels.Color(0,0,0));
+               pixels.setPixelColor(4, pixels.Color(0,0,0));
+               pixels.setPixelColor(5, pixels.Color(0,0,0));
+               pixels.show();
+               delay(500);
               }
            ledEffects_P2();
            return true;   
@@ -179,11 +201,16 @@ boolean winCondition()
           Serial.println("x won  3rd Row");
           for(int i=0;i<5;i++)
              {
-               pixels.setPixelColor(6, pixels.Color(0,0,250));
-               pixels.setPixelColor(7, pixels.Color(0,0,250));
-               pixels.setPixelColor(8, pixels.Color(0,0,250));
-               pixels.show();
-               delay(500);
+              pixels.setPixelColor(6, pixels.Color(0,0,0));
+              pixels.setPixelColor(7, pixels.Color(0,0,0));
+              pixels.setPixelColor(8, pixels.Color(0,0,0));
+              pixels.show();
+              delay(500);
+              pixels.setPixelColor(6, pixels.Color(0,0,250));
+              pixels.setPixelColor(7, pixels.Color(0,0,250));
+              pixels.setPixelColor(8, pixels.Color(0,0,250));
+              pixels.show();
+              delay(500);
              }
           ledEffects_P1();
           return true;   
@@ -198,6 +225,11 @@ boolean winCondition()
                pixels.setPixelColor(8, pixels.Color(250,0,0));
                pixels.show();
                delay(500);
+               pixels.setPixelColor(6, pixels.Color(0,0,0));
+               pixels.setPixelColor(7, pixels.Color(0,0,0));
+               pixels.setPixelColor(8, pixels.Color(0,0,0));
+               pixels.show();
+               delay(500);
              }
           ledEffects_P2();
           return true;   
@@ -209,6 +241,11 @@ boolean winCondition()
           Serial.println("x won  1st colm");
           for(int i=0;i<5;i++)
              {
+              pixels.setPixelColor(0, pixels.Color(0,0,0));
+              pixels.setPixelColor(3, pixels.Color(0,0,0));
+              pixels.setPixelColor(6, pixels.Color(0,0,0));
+              pixels.show();
+              delay(500);
               pixels.setPixelColor(0, pixels.Color(0,0,250));
               pixels.setPixelColor(3, pixels.Color(0,0,250));
               pixels.setPixelColor(6, pixels.Color(0,0,250));
@@ -228,6 +265,11 @@ boolean winCondition()
               pixels.setPixelColor(6, pixels.Color(250,0,0));
               pixels.show();
               delay(500);
+              pixels.setPixelColor(0, pixels.Color(0,0,0));
+              pixels.setPixelColor(3, pixels.Color(0,0,0));
+              pixels.setPixelColor(6, pixels.Color(0,0,0));
+              pixels.show();
+              delay(500);
              }
           ledEffects_P2();
           return true;   
@@ -237,6 +279,11 @@ boolean winCondition()
           Serial.println("x won  2nd colm");
           for(int i=0;i<5;i++)
              {
+              pixels.setPixelColor(1, pixels.Color(0,0,0));
+              pixels.setPixelColor(4, pixels.Color(0,0,0));
+              pixels.setPixelColor(7, pixels.Color(0,0,0));
+              pixels.show();
+              delay(500);
               pixels.setPixelColor(1, pixels.Color(0,0,250));
               pixels.setPixelColor(4, pixels.Color(0,0,250));
               pixels.setPixelColor(7, pixels.Color(0,0,250));
@@ -256,6 +303,11 @@ boolean winCondition()
               pixels.setPixelColor(7, pixels.Color(250,0,0));
               pixels.show();
               delay(500);
+              pixels.setPixelColor(1, pixels.Color(0,0,0));
+              pixels.setPixelColor(4, pixels.Color(0,0,0));
+              pixels.setPixelColor(7, pixels.Color(0,0,0));
+              pixels.show();
+              delay(500);
              }
           ledEffects_P2(); 
           return true;  
@@ -265,6 +317,11 @@ boolean winCondition()
           Serial.println("x won  3rd colm");
           for(int i=0;i<5;i++)
              {
+              pixels.setPixelColor(2, pixels.Color(0,0,0));
+              pixels.setPixelColor(5, pixels.Color(0,0,0));
+              pixels.setPixelColor(8, pixels.Color(0,0,0));
+              pixels.show();
+              delay(500);
               pixels.setPixelColor(2, pixels.Color(0,0,250));
               pixels.setPixelColor(5, pixels.Color(0,0,250));
               pixels.setPixelColor(8, pixels.Color(0,0,250));
@@ -283,22 +340,32 @@ boolean winCondition()
               pixels.setPixelColor(8, pixels.Color(250,0,0));
               pixels.show();
               delay(500);
+              pixels.setPixelColor(2, pixels.Color(0,0,0));
+              pixels.setPixelColor(5, pixels.Color(0,0,0));
+              pixels.setPixelColor(8, pixels.Color(0,0,0));
+              pixels.show();
+              delay(500);
              }
           ledEffects_P2();
           return true;   
         }    
         
-    //check diagonals
-    if(tic_tac_toe[0]== 'x' && tic_tac_toe[4]== 'x' && tic_tac_toe[8]== 'x')
-      {
-        Serial.println("x won  diagonal L");
-        for(int i=0;i<5;i++)
-           {
-            pixels.setPixelColor(0, pixels.Color(0,0,250));
-            pixels.setPixelColor(4, pixels.Color(0,0,250));
-            pixels.setPixelColor(8, pixels.Color(0,0,250));
-            pixels.show();
-            delay(500);
+     //check diagonals
+     if(tic_tac_toe[0]== 'x' && tic_tac_toe[4]== 'x' && tic_tac_toe[8]== 'x')
+       {
+         Serial.println("x won  diagonal L");
+         for(int i=0;i<5;i++)
+            {
+             pixels.setPixelColor(0, pixels.Color(0,0,0));
+             pixels.setPixelColor(4, pixels.Color(0,0,0));
+             pixels.setPixelColor(8, pixels.Color(0,0,0));
+             pixels.show();
+             delay(500);
+             pixels.setPixelColor(0, pixels.Color(0,0,250));
+             pixels.setPixelColor(4, pixels.Color(0,0,250));
+             pixels.setPixelColor(8, pixels.Color(0,0,250));
+             pixels.show();
+              delay(500);
            }
         ledEffects_P1();
         return true;   
@@ -313,6 +380,11 @@ boolean winCondition()
             pixels.setPixelColor(8, pixels.Color(250,0,0));
             pixels.show();
             delay(500);
+            pixels.setPixelColor(0, pixels.Color(0,0,0));
+            pixels.setPixelColor(4, pixels.Color(0,0,0));
+            pixels.setPixelColor(8, pixels.Color(0,0,0));
+            pixels.show();
+            delay(500);
            }
         ledEffects_P2(); 
         return true; 
@@ -322,6 +394,11 @@ boolean winCondition()
         Serial.println("x won  diagonal R");
         for(int i=0;i<5;i++)
            {
+            pixels.setPixelColor(2, pixels.Color(0,0,0));
+            pixels.setPixelColor(4, pixels.Color(0,0,0));
+            pixels.setPixelColor(6, pixels.Color(0,0,0));
+            pixels.show();
+            delay(500);
             pixels.setPixelColor(2, pixels.Color(0,0,250));
             pixels.setPixelColor(4, pixels.Color(0,0,250));
             pixels.setPixelColor(6, pixels.Color(0,0,250));
@@ -341,6 +418,11 @@ boolean winCondition()
             pixels.setPixelColor(6, pixels.Color(250,0,0));
             pixels.show();
             delay(500);
+            pixels.setPixelColor(2, pixels.Color(0,0,0));
+            pixels.setPixelColor(4, pixels.Color(0,0,0));
+            pixels.setPixelColor(6, pixels.Color(0,0,0));
+            pixels.show();
+            delay(500);
            }
         ledEffects_P2();
         return true;   
@@ -354,6 +436,7 @@ void ledEffects_P1()
          {
            pixels.setPixelColor(i, pixels.Color(0,0,250));
            pixels.show();
+           delay(250);
          }
       for(byte i=0;i<9;i++)
          {
@@ -369,6 +452,7 @@ void ledEffects_P2()
          {
            pixels.setPixelColor(i, pixels.Color(250,0,0));
            pixels.show();
+           delay(250);
          }
       for(byte i=0;i<9;i++)
          {

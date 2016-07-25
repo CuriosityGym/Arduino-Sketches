@@ -8,6 +8,19 @@ int LastInputPinState[9] = {1,1,1,1,1,1,1,1,1};
 char tic_tac_toe[9]={ };
 byte moves = 0; 
 int firstPlayer;
+byte player1 = 10;
+byte player2 = 11;
+
+// notes in the melody:
+int WinMelody[]= {659,587,370,415,523,494,294,329,494,440,277,329,440};
+// note durations: 4 = quarter note, 8 = eighth note, etc.:
+int noteDurations1[] = {  8,8,4,4,8,4,4,4,8,8,4,4,4};
+
+// notes in the melody:
+int DrawMelody[]= {1000,1000,1000,1000,1000,1000,1000,1000,1000,1000};
+// note durations: 4 = quarter note, 8 = eighth note, etc.:
+int noteDurations2[] = {8,8,8,8,8,8,8,8,8,8};
+
 Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800); 
 void setup() 
     {Serial.begin(9600);Serial.println("NEW GAME");
@@ -18,8 +31,11 @@ void setup()
            pixels.setPixelColor(i, pixels.Color(0,0,0));
            pixels.show();
          }
+      pinMode(player1, OUTPUT);
+      pinMode(player2, OUTPUT);
       first_XorO();
       Serial.println(first_XorO());
+       
     } 
  
 void loop() 
@@ -35,12 +51,27 @@ void loop()
          {  
            moves = 0;
            tic_tac_toe[9]={ };
+           for(int thisNote = 0; thisNote < 10; thisNote++)
+              {
+               // to calculate the note duration, take one second 
+               // divided by the note type.
+               //e.g. quarter note = 1000 / 4, eighth note = 1000/8, etc.
+               int noteDuration2 = 1000/noteDurations2[thisNote];
+               tone(A1, DrawMelody[thisNote],noteDuration2);
+               //to distinguish the notes, set a minimum time between them.
+               //the note's duration + 30% seems to work well:
+               int pauseBetweenNotes = noteDuration2 * 1.60;
+               delay(pauseBetweenNotes);
+               // stop the tone playing:
+               noTone(8);
+              }
            for(int i = 0; i < 9; i++)
               { 
                 pixels.setPixelColor(i, pixels.Color(0,250,0));
                 pixels.show();
                 delay(250);
               }
+           
             delay(2000);
             for(int i = 0; i < 9; i++)
               { 
@@ -55,9 +86,20 @@ void loop()
  
 
 int first_XorO()
-    { randomSeed(analogRead(0));
+    { randomSeed(analogRead(A5));
       firstPlayer = random(2);
-      return firstPlayer;
+      
+      if(firstPlayer == 1)
+        {
+          digitalWrite(player1,HIGH);
+          digitalWrite(player2,LOW);
+        }
+      if(firstPlayer == 0)
+        {
+          digitalWrite(player2,HIGH);
+          digitalWrite(player1,LOW);
+        } 
+      return firstPlayer;  
     }
 
   
@@ -129,12 +171,12 @@ boolean winCondition()
                pixels.setPixelColor(1, pixels.Color(0,0,0));
                pixels.setPixelColor(2, pixels.Color(0,0,0));
                pixels.show();
-               delay(500);
+               delay(250);
                pixels.setPixelColor(0, pixels.Color(0,0,250));
                pixels.setPixelColor(1, pixels.Color(0,0,250));
                pixels.setPixelColor(2, pixels.Color(0,0,250));
                pixels.show();
-               delay(500);
+               delay(250);
               }
            ledEffects_P1();
            return true;  
@@ -148,12 +190,12 @@ boolean winCondition()
                pixels.setPixelColor(1, pixels.Color(250,0,0));
                pixels.setPixelColor(2, pixels.Color(250,0,0));
                pixels.show();
-               delay(500);
+               delay(250);
                pixels.setPixelColor(0, pixels.Color(0,0,0));
                pixels.setPixelColor(1, pixels.Color(0,0,0));
                pixels.setPixelColor(2, pixels.Color(0,0,0));
                pixels.show();
-               delay(500);
+               delay(250);
               }
            ledEffects_P2(); 
            return true;  
@@ -168,12 +210,12 @@ boolean winCondition()
                pixels.setPixelColor(4, pixels.Color(0,0,0));
                pixels.setPixelColor(5, pixels.Color(0,0,0));
                pixels.show();
-               delay(500);
+               delay(250);
                pixels.setPixelColor(3, pixels.Color(0,0,250));
                pixels.setPixelColor(4, pixels.Color(0,0,250));
                pixels.setPixelColor(5, pixels.Color(0,0,250));
                pixels.show();
-               delay(500);
+               delay(250);
               }
            ledEffects_P1();  
            return true;
@@ -187,12 +229,12 @@ boolean winCondition()
                pixels.setPixelColor(4, pixels.Color(250,0,0));
                pixels.setPixelColor(5, pixels.Color(250,0,0));
                pixels.show();
-               delay(500);
+               delay(250);
                pixels.setPixelColor(3, pixels.Color(0,0,0));
                pixels.setPixelColor(4, pixels.Color(0,0,0));
                pixels.setPixelColor(5, pixels.Color(0,0,0));
                pixels.show();
-               delay(500);
+               delay(250);
               }
            ledEffects_P2();
            return true;   
@@ -207,12 +249,12 @@ boolean winCondition()
               pixels.setPixelColor(7, pixels.Color(0,0,0));
               pixels.setPixelColor(8, pixels.Color(0,0,0));
               pixels.show();
-              delay(500);
+              delay(250);
               pixels.setPixelColor(6, pixels.Color(0,0,250));
               pixels.setPixelColor(7, pixels.Color(0,0,250));
               pixels.setPixelColor(8, pixels.Color(0,0,250));
               pixels.show();
-              delay(500);
+              delay(250);
              }
           ledEffects_P1();
           return true;   
@@ -227,12 +269,12 @@ boolean winCondition()
                pixels.setPixelColor(7, pixels.Color(250,0,0));
                pixels.setPixelColor(8, pixels.Color(250,0,0));
                pixels.show();
-               delay(500);
+               delay(250);
                pixels.setPixelColor(6, pixels.Color(0,0,0));
                pixels.setPixelColor(7, pixels.Color(0,0,0));
                pixels.setPixelColor(8, pixels.Color(0,0,0));
                pixels.show();
-               delay(500);
+               delay(250);
              }
           ledEffects_P2();
           
@@ -249,12 +291,12 @@ boolean winCondition()
               pixels.setPixelColor(3, pixels.Color(0,0,0));
               pixels.setPixelColor(6, pixels.Color(0,0,0));
               pixels.show();
-              delay(500);
+              delay(250);
               pixels.setPixelColor(0, pixels.Color(0,0,250));
               pixels.setPixelColor(3, pixels.Color(0,0,250));
               pixels.setPixelColor(6, pixels.Color(0,0,250));
               pixels.show();
-              delay(500);
+              delay(250);
              }
           ledEffects_P1();
           return true;  
@@ -268,12 +310,12 @@ boolean winCondition()
               pixels.setPixelColor(3, pixels.Color(250,0,0));
               pixels.setPixelColor(6, pixels.Color(250,0,0));
               pixels.show();
-              delay(500);
+              delay(250);
               pixels.setPixelColor(0, pixels.Color(0,0,0));
               pixels.setPixelColor(3, pixels.Color(0,0,0));
               pixels.setPixelColor(6, pixels.Color(0,0,0));
               pixels.show();
-              delay(500);
+              delay(250);
              }
           ledEffects_P2();
           return true;   
@@ -287,12 +329,12 @@ boolean winCondition()
               pixels.setPixelColor(4, pixels.Color(0,0,0));
               pixels.setPixelColor(7, pixels.Color(0,0,0));
               pixels.show();
-              delay(500);
+              delay(250);
               pixels.setPixelColor(1, pixels.Color(0,0,250));
               pixels.setPixelColor(4, pixels.Color(0,0,250));
               pixels.setPixelColor(7, pixels.Color(0,0,250));
               pixels.show();
-              delay(500);
+              delay(250);
              }
           ledEffects_P1(); 
           return true;  
@@ -306,7 +348,7 @@ boolean winCondition()
               pixels.setPixelColor(4, pixels.Color(250,0,0));
               pixels.setPixelColor(7, pixels.Color(250,0,0));
               pixels.show();
-              delay(500);
+              delay(250);
               pixels.setPixelColor(1, pixels.Color(0,0,0));
               pixels.setPixelColor(4, pixels.Color(0,0,0));
               pixels.setPixelColor(7, pixels.Color(0,0,0));
@@ -325,12 +367,12 @@ boolean winCondition()
               pixels.setPixelColor(5, pixels.Color(0,0,0));
               pixels.setPixelColor(8, pixels.Color(0,0,0));
               pixels.show();
-              delay(500);
+              delay(250);
               pixels.setPixelColor(2, pixels.Color(0,0,250));
               pixels.setPixelColor(5, pixels.Color(0,0,250));
               pixels.setPixelColor(8, pixels.Color(0,0,250));
               pixels.show();
-              delay(500);
+              delay(250);
              }
           ledEffects_P1();
           return true;  
@@ -343,12 +385,12 @@ boolean winCondition()
               pixels.setPixelColor(5, pixels.Color(250,0,0));
               pixels.setPixelColor(8, pixels.Color(250,0,0));
               pixels.show();
-              delay(500);
+              delay(250);
               pixels.setPixelColor(2, pixels.Color(0,0,0));
               pixels.setPixelColor(5, pixels.Color(0,0,0));
               pixels.setPixelColor(8, pixels.Color(0,0,0));
               pixels.show();
-              delay(500);
+              delay(250);
              }
           ledEffects_P2();
           return true;   
@@ -364,12 +406,12 @@ boolean winCondition()
              pixels.setPixelColor(4, pixels.Color(0,0,0));
              pixels.setPixelColor(8, pixels.Color(0,0,0));
              pixels.show();
-             delay(500);
+             delay(250);
              pixels.setPixelColor(0, pixels.Color(0,0,250));
              pixels.setPixelColor(4, pixels.Color(0,0,250));
              pixels.setPixelColor(8, pixels.Color(0,0,250));
              pixels.show();
-              delay(500);
+              delay(250);
            }
         ledEffects_P1();
         return true;   
@@ -383,12 +425,12 @@ boolean winCondition()
             pixels.setPixelColor(4, pixels.Color(250,0,0));
             pixels.setPixelColor(8, pixels.Color(250,0,0));
             pixels.show();
-            delay(500);
+            delay(250);
             pixels.setPixelColor(0, pixels.Color(0,0,0));
             pixels.setPixelColor(4, pixels.Color(0,0,0));
             pixels.setPixelColor(8, pixels.Color(0,0,0));
             pixels.show();
-            delay(500);
+            delay(250);
            }
         ledEffects_P2(); 
         return true; 
@@ -402,12 +444,12 @@ boolean winCondition()
             pixels.setPixelColor(4, pixels.Color(0,0,0));
             pixels.setPixelColor(6, pixels.Color(0,0,0));
             pixels.show();
-            delay(500);
+            delay(250);
             pixels.setPixelColor(2, pixels.Color(0,0,250));
             pixels.setPixelColor(4, pixels.Color(0,0,250));
             pixels.setPixelColor(6, pixels.Color(0,0,250));
             pixels.show();
-            delay(500);
+            delay(250);
            }
         ledEffects_P1();
    
@@ -421,12 +463,12 @@ boolean winCondition()
             pixels.setPixelColor(4, pixels.Color(250,0,0));
             pixels.setPixelColor(6, pixels.Color(250,0,0));
             pixels.show();
-            delay(500);
+            delay(250);
             pixels.setPixelColor(2, pixels.Color(0,0,0));
             pixels.setPixelColor(4, pixels.Color(0,0,0));
             pixels.setPixelColor(6, pixels.Color(0,0,0));
             pixels.show();
-            delay(500);
+            delay(250);
            }
         ledEffects_P2();
         return true;   
@@ -436,13 +478,15 @@ boolean winCondition()
 
 void ledEffects_P1()
     { moves = 0;
-           tic_tac_toe[9]={ };
+      tic_tac_toe[9]={ };
+      winningTone();     
       for(byte i=0;i<9;i++)
          {
            pixels.setPixelColor(i, pixels.Color(0,0,250));
            pixels.show();
            delay(250);
          }
+         delay(2000);
       for(byte i=0;i<9;i++)
          {
            pixels.setPixelColor(i%10, pixels.Color(0,0,0));
@@ -454,12 +498,14 @@ void ledEffects_P1()
 void ledEffects_P2()
     { moves = 0;
       tic_tac_toe[9]={ };
+      winningTone();
       for(byte i=0;i<9;i++)
          { 
            pixels.setPixelColor(i, pixels.Color(250,0,0));
            pixels.show();
            delay(250);
          }
+         delay(2000);
       for(byte i=0;i<9;i++)
          { 
            moves = 0;
@@ -468,4 +514,22 @@ void ledEffects_P2()
            pixels.show();
            delay(250);
          }    
-} 
+}
+
+void winningTone()
+    {
+       for(int thisNote = 0; thisNote < 13; thisNote++)
+          {
+           // to calculate the note duration, take one second 
+           // divided by the note type.
+           //e.g. quarter note = 1000 / 4, eighth note = 1000/8, etc.
+           int noteDuration1 = 1000/noteDurations1[thisNote];
+           tone(A1, WinMelody[thisNote],noteDuration1);
+           //to distinguish the notes, set a minimum time between them.
+           //the note's duration + 30% seems to work well:
+           int pauseBetweenNotes = noteDuration1 * 1.10;
+           delay(pauseBetweenNotes);
+           // stop the tone playing:
+           noTone(8);
+          }
+    }        

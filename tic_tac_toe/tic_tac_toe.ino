@@ -282,38 +282,38 @@ boolean winCondition()
         }    
                      
       // Check columns
-      if(tic_tac_toe[0]== 'x' && tic_tac_toe[3]== 'x' && tic_tac_toe[6]== 'x')
+      if(tic_tac_toe[2]== 'x' && tic_tac_toe[3]== 'x' && tic_tac_toe[8]== 'x')
         { 
           Serial.println("x won  1st colm");
           for(int i=0;i<5;i++)
              {
-              pixels.setPixelColor(0, pixels.Color(0,0,0));
+              pixels.setPixelColor(2, pixels.Color(0,0,0));
               pixels.setPixelColor(3, pixels.Color(0,0,0));
-              pixels.setPixelColor(6, pixels.Color(0,0,0));
+              pixels.setPixelColor(8, pixels.Color(0,0,0));
               pixels.show();
               delay(250);
-              pixels.setPixelColor(0, pixels.Color(0,0,250));
+              pixels.setPixelColor(2, pixels.Color(0,0,250));
               pixels.setPixelColor(3, pixels.Color(0,0,250));
-              pixels.setPixelColor(6, pixels.Color(0,0,250));
+              pixels.setPixelColor(8, pixels.Color(0,0,250));
               pixels.show();
               delay(250);
              }
           ledEffects_P1();
           return true;  
         }
-      if(tic_tac_toe[0]== 'o' && tic_tac_toe[3]== 'o' && tic_tac_toe[6]== 'o') 
+      if(tic_tac_toe[2]== 'o' && tic_tac_toe[3]== 'o' && tic_tac_toe[8]== 'o') 
         { 
           Serial.println("o won  1st colm");
           for(int i=0;i<5;i++)
              {
-              pixels.setPixelColor(0, pixels.Color(250,0,0));
+              pixels.setPixelColor(2, pixels.Color(250,0,0));
               pixels.setPixelColor(3, pixels.Color(250,0,0));
-              pixels.setPixelColor(6, pixels.Color(250,0,0));
+              pixels.setPixelColor(8, pixels.Color(250,0,0));
               pixels.show();
               delay(250);
-              pixels.setPixelColor(0, pixels.Color(0,0,0));
+              pixels.setPixelColor(2, pixels.Color(0,0,0));
               pixels.setPixelColor(3, pixels.Color(0,0,0));
-              pixels.setPixelColor(6, pixels.Color(0,0,0));
+              pixels.setPixelColor(8, pixels.Color(0,0,0));
               pixels.show();
               delay(250);
              }
@@ -358,37 +358,37 @@ boolean winCondition()
           ledEffects_P2(); 
           return true;  
         }    
-      if(tic_tac_toe[2]== 'x' && tic_tac_toe[5]== 'x' && tic_tac_toe[8]== 'x')
+      if(tic_tac_toe[0]== 'x' && tic_tac_toe[5]== 'x' && tic_tac_toe[6]== 'x')
         { 
           Serial.println("x won  3rd colm");
           for(int i=0;i<5;i++)
              {
-              pixels.setPixelColor(2, pixels.Color(0,0,0));
+              pixels.setPixelColor(0, pixels.Color(0,0,0));
               pixels.setPixelColor(5, pixels.Color(0,0,0));
-              pixels.setPixelColor(8, pixels.Color(0,0,0));
+              pixels.setPixelColor(6, pixels.Color(0,0,0));
               pixels.show();
               delay(250);
-              pixels.setPixelColor(2, pixels.Color(0,0,250));
+              pixels.setPixelColor(0, pixels.Color(0,0,250));
               pixels.setPixelColor(5, pixels.Color(0,0,250));
-              pixels.setPixelColor(8, pixels.Color(0,0,250));
+              pixels.setPixelColor(6, pixels.Color(0,0,250));
               pixels.show();
               delay(250);
              }
           ledEffects_P1();
           return true;  
         }
-      if(tic_tac_toe[2]== 'o' && tic_tac_toe[5]== 'o' && tic_tac_toe[8]== 'o') 
+      if(tic_tac_toe[0]== 'o' && tic_tac_toe[5]== 'o' && tic_tac_toe[6]== 'o') 
         { Serial.println("o won  3rd colm");
           for(int i=0;i<5;i++)
              {
-              pixels.setPixelColor(2, pixels.Color(250,0,0));
+              pixels.setPixelColor(0, pixels.Color(250,0,0));
               pixels.setPixelColor(5, pixels.Color(250,0,0));
-              pixels.setPixelColor(8, pixels.Color(250,0,0));
+              pixels.setPixelColor(6, pixels.Color(250,0,0));
               pixels.show();
               delay(250);
-              pixels.setPixelColor(2, pixels.Color(0,0,0));
+              pixels.setPixelColor(0, pixels.Color(0,0,0));
               pixels.setPixelColor(5, pixels.Color(0,0,0));
-              pixels.setPixelColor(8, pixels.Color(0,0,0));
+              pixels.setPixelColor(6, pixels.Color(0,0,0));
               pixels.show();
               delay(250);
              }
@@ -484,14 +484,14 @@ void ledEffects_P1()
          {
            pixels.setPixelColor(i, pixels.Color(0,0,250));
            pixels.show();
-           delay(250);
+           delay(100);
          }
          delay(2000);
       for(byte i=0;i<9;i++)
          {
            pixels.setPixelColor(i%10, pixels.Color(0,0,0));
            pixels.show();
-           delay(250);
+           delay(100);
          }   
     }
 
@@ -503,7 +503,7 @@ void ledEffects_P2()
          { 
            pixels.setPixelColor(i, pixels.Color(250,0,0));
            pixels.show();
-           delay(250);
+           delay(100);
          }
          delay(2000);
       for(byte i=0;i<9;i++)
@@ -512,7 +512,7 @@ void ledEffects_P2()
            tic_tac_toe[9]={ };
            pixels.setPixelColor(i%10, pixels.Color(0,0,0));
            pixels.show();
-           delay(250);
+           delay(100);
          }    
 }
 

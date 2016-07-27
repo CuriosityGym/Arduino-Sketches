@@ -40,7 +40,7 @@ String weatherDescription = "";
 int tempInCelsius;
 
 // replace with your channel's thingspeak API key
-String API_KEY = "XXXXXXXXXXXXXXXXXXXXXXXX";
+String API_KEY = "15373f8c0b06b6e66e6372db065c4e46";
 String CityID = "1275339"; //Mumbai, India
 
 // varibles for cursor positions
@@ -72,7 +72,12 @@ void wifiCb(void *response)
                wifiConnected = true;
              } 
            else 
-             {
+             {  
+               u8g.firstPage();
+               do 
+                 {  
+                  u8g.drawStr(0,12,"WIFI Disconnected");
+                 } while( u8g.nextPage() );
                Serial.print("WIFI NOT READY: "); //Wifi not connected,check connection
                Serial.println(status);
                wifiConnected = false;
@@ -97,7 +102,13 @@ void setup()
       do 
        {
          ok = esp.Sync();      // sync up with esp-link, blocks for up to 2 seconds
-         if (!ok) Serial.println("EL-Client sync failed!");
+         if (!ok) 
+             u8g.firstPage();
+             do 
+               {  
+                u8g.drawStr(0,12,"WIFI Disconnected");
+               } while( u8g.nextPage() );
+             Serial.println("EL-Client sync failed!");
        } while(!ok);
       Serial.println("EL-Client synced!");
 

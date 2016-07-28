@@ -21,7 +21,9 @@ int noteDurations2[] = {8,8,8,8,8,8,8,8,8,8};
 Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800); 
 
 void setup() 
-    {Serial.begin(9600);Serial.println("NEW GAME");
+    {
+      Serial.begin(9600);
+      Serial.println("NEW GAME");
       pixels.begin(); // This initializes the NeoPixel library.
       for(int i = 0; i < 9; i++)
          { 
@@ -31,7 +33,34 @@ void setup()
          }
       first_XorO();
       Serial.println(first_XorO());
-       
+      if(firstPlayer == 1)
+        {
+          for(int i=0; i<9; i++)
+             {
+               pixels.setPixelColor(i, pixels.Color(0,250,0));
+               pixels.show();
+             }  
+          delay(2000);
+          for(int i=0; i<9; i++)
+             {
+               pixels.setPixelColor(i, pixels.Color(0,0,0));
+               pixels.show();
+             }  
+        } 
+        if(firstPlayer == 0)
+        {
+          for(int i=0; i<9; i++)
+             {
+               pixels.setPixelColor(i, pixels.Color(250,0,0));
+               pixels.show();
+             } 
+          delay(2000);
+          for(int i=0; i<9; i++)
+             {
+               pixels.setPixelColor(i, pixels.Color(0,0,0));
+               pixels.show();
+             }    
+        }   
     } 
  
 void loop() 
@@ -78,37 +107,10 @@ void loop()
  
 
 int first_XorO()
-    { randomSeed(analogRead(A5));
+    { 
+      randomSeed(analogRead(A5));
       firstPlayer = random(2);
-      
-      if(firstPlayer == 1)
-        {
-          for(int i=0; i<9; i++)
-             {
-               pixels.setPixelColor(i, pixels.Color(0,250,0));
-               pixels.show();
-             }  
-          delay(2000);
-          for(int i=0; i<9; i++)
-             {
-               pixels.setPixelColor(i, pixels.Color(0,0,0));
-               pixels.show();
-             }  
-        }
-      if(firstPlayer == 0)
-        {
-          for(int i=0; i<9; i++)
-             {
-               pixels.setPixelColor(i, pixels.Color(250,0,0));
-               pixels.show();
-             } 
-          delay(2000);
-          for(int i=0; i<9; i++)
-             {
-               pixels.setPixelColor(i, pixels.Color(0,0,0));
-               pixels.show();
-             }    
-        } 
+
       return firstPlayer;  
     }
 

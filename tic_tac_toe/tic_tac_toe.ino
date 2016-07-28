@@ -1,7 +1,6 @@
 #include <Adafruit_NeoPixel.h>
 #define PIN  9
 #define NUMPIXELS  9
-boolean won = false;
 int InputPin[9] = {0 ,2, 3, 4, 5, 6, 7, 8, 12};
 int InputPinState[9] = {1,1,1,1,1,1,1,1,1};
 int LastInputPinState[9] = {1,1,1,1,1,1,1,1,1};
@@ -12,7 +11,7 @@ int firstPlayer;
 // notes in the melody:
 int WinMelody[]= {659,587,370,415,523,494,294,329,494,440,277,329,440};
 // note durations: 4 = quarter note, 8 = eighth note, etc.:
-int noteDurations1[] = {  8,8,4,4,8,4,4,4,8,8,4,4,4};
+int noteDurations1[] = { 8,8,4,4,8,4,4,4,8,8,4,4,4};
 
 // notes in the melody:
 int DrawMelody[]= {1000,1000,1000,1000,1000,1000,1000,1000,1000,1000};
@@ -20,6 +19,7 @@ int DrawMelody[]= {1000,1000,1000,1000,1000,1000,1000,1000,1000,1000};
 int noteDurations2[] = {8,8,8,8,8,8,8,8,8,8};
 
 Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800); 
+
 void setup() 
     {Serial.begin(9600);Serial.println("NEW GAME");
       pixels.begin(); // This initializes the NeoPixel library.
@@ -60,14 +60,10 @@ void loop()
                delay(pauseBetweenNotes);
                // stop the tone playing:
                noTone(8);
-              }
-           for(int i = 0; i < 9; i++)
-              { 
-                pixels.setPixelColor(i, pixels.Color(0,250,0));
-                pixels.show();
-                delay(250);
-              }
-           
+               pixels.setPixelColor(thisNote, pixels.Color(2550,255,0));
+               pixels.show();
+             //  delay(250);
+              }  
             delay(2000);
             for(int i = 0; i < 9; i++)
               { 
@@ -89,7 +85,7 @@ int first_XorO()
         {
           for(int i=0; i<9; i++)
              {
-               pixels.setPixelColor(i, pixels.Color(0,0,250));
+               pixels.setPixelColor(i, pixels.Color(0,250,0));
                pixels.show();
              }  
           delay(2000);
@@ -124,54 +120,59 @@ void nextMoves()
            for(int i = 0; i < 9; i++)
               { 
                 InputPinState[i] = digitalRead(InputPin[i]);
-               if (InputPinState[i] != LastInputPinState[i]){
-                if(InputPinState[i] == LOW)
+                if(InputPinState[i] != LastInputPinState[i])
                   {
-                    if(firstPlayer== 1)
+                    if(InputPinState[i] == LOW)
                       {
-                       tic_tac_toe[i] = 'x';
-                       pixels.setPixelColor(i, pixels.Color(0,0,250)); //  red color.
-                       pixels.show(); // This sends the updated pixel color to the hardware.
+                        if(firstPlayer== 1)
+                          {
+                            tic_tac_toe[i] = 'x';
+                            pixels.setPixelColor(i, pixels.Color(0,250,0)); //  red color.
+                            pixels.show(); // This sends the updated pixel color to the hardware.
+                          }
+                        if(firstPlayer == 0)
+                          {
+                            tic_tac_toe[i] = 'o';
+                            pixels.setPixelColor(i, pixels.Color(250,0,0)); //  red color.
+                            pixels.show(); // This sends the updated pixel color to the hardware.
+                          }  
+                        Serial.print(i);Serial.print( tic_tac_toe[i]);Serial.print("moves: ");Serial.println(moves);
+                        moves += 1;
+                        delay(500);
                       }
-                    if(firstPlayer == 0)
-                      {
-                       tic_tac_toe[i] = 'o';
-                       pixels.setPixelColor(i, pixels.Color(250,0,0)); //  red color.
-                       pixels.show(); // This sends the updated pixel color to the hardware.
-                      }  
-                     Serial.print(i);Serial.print( tic_tac_toe[i]);Serial.print("moves: ");Serial.println(moves);
-                    moves += 1;
-                    delay(500);
-                  }}LastInputPinState[i] = InputPinState[i];
+                   }
+                   LastInputPinState[i] = InputPinState[i];
               }
          }
-      if( moves%2 == 1 && moves < 9)
+       if( moves%2 == 1 && moves < 9)
          {
            for(int i = 0; i < 9; i++)
-            { InputPinState[i] = digitalRead(InputPin[i]);
-              if (InputPinState[i] != LastInputPinState[i]){
-              if(InputPinState[i] == LOW)
-                {
-                  if(firstPlayer == 1)
+              { 
+                InputPinState[i] = digitalRead(InputPin[i]);
+                if(InputPinState[i] != LastInputPinState[i])
+                  {
+                    if(InputPinState[i] == LOW)
                       {
-                       tic_tac_toe[i] = 'o';
-                       pixels.setPixelColor(i, pixels.Color(250,0,0)); //  red color.
-                       pixels.show(); // This sends the updated pixel color to the hardware.
+                        if(firstPlayer == 1)
+                          {
+                            tic_tac_toe[i] = 'o';
+                            pixels.setPixelColor(i, pixels.Color(250,0,0)); //  red color.
+                            pixels.show(); // This sends the updated pixel color to the hardware.
+                          }
+                        if(firstPlayer == 0)
+                          {
+                            tic_tac_toe[i] = 'x';
+                            pixels.setPixelColor(i, pixels.Color(0,250,0)); //  red color.
+                            pixels.show(); // This sends the updated pixel color to the hardware.
+                          }  
+                        Serial.print(i);Serial.print( tic_tac_toe[i]);Serial.print("moves: ");Serial.println(moves);
+                        moves += 1;
+                        delay(500);
                       }
-                    if(firstPlayer == 0)
-                      {
-                       tic_tac_toe[i] = 'x';
-                       pixels.setPixelColor(i, pixels.Color(0,0,250)); //  red color.
-                       pixels.show(); // This sends the updated pixel color to the hardware.
-                      }  
-                  Serial.print(i);Serial.print( tic_tac_toe[i]);Serial.print("moves: ");Serial.println(moves);
-                  moves += 1;
-                  delay(500);
-                }
-              }
-              LastInputPinState[i] = InputPinState[i];
-            }
-         }
+                  }
+                 LastInputPinState[i] = InputPinState[i];
+               }
+          }
      }     
 
 
@@ -188,9 +189,9 @@ boolean winCondition()
                pixels.setPixelColor(2, pixels.Color(0,0,0));
                pixels.show();
                delay(250);
-               pixels.setPixelColor(0, pixels.Color(0,0,250));
-               pixels.setPixelColor(1, pixels.Color(0,0,250));
-               pixels.setPixelColor(2, pixels.Color(0,0,250));
+               pixels.setPixelColor(0, pixels.Color(0,250,0));
+               pixels.setPixelColor(1, pixels.Color(0,250,0));
+               pixels.setPixelColor(2, pixels.Color(0,250,0));
                pixels.show();
                delay(250);
               }
@@ -227,9 +228,9 @@ boolean winCondition()
                pixels.setPixelColor(5, pixels.Color(0,0,0));
                pixels.show();
                delay(250);
-               pixels.setPixelColor(3, pixels.Color(0,0,250));
-               pixels.setPixelColor(4, pixels.Color(0,0,250));
-               pixels.setPixelColor(5, pixels.Color(0,0,250));
+               pixels.setPixelColor(3, pixels.Color(0,250,0));
+               pixels.setPixelColor(4, pixels.Color(0,250,0));
+               pixels.setPixelColor(5, pixels.Color(0,250,0));
                pixels.show();
                delay(250);
               }
@@ -266,9 +267,9 @@ boolean winCondition()
               pixels.setPixelColor(8, pixels.Color(0,0,0));
               pixels.show();
               delay(250);
-              pixels.setPixelColor(6, pixels.Color(0,0,250));
-              pixels.setPixelColor(7, pixels.Color(0,0,250));
-              pixels.setPixelColor(8, pixels.Color(0,0,250));
+              pixels.setPixelColor(6, pixels.Color(0,250,0));
+              pixels.setPixelColor(7, pixels.Color(0,250,0));
+              pixels.setPixelColor(8, pixels.Color(0,250,0));
               pixels.show();
               delay(250);
              }
@@ -308,9 +309,9 @@ boolean winCondition()
               pixels.setPixelColor(8, pixels.Color(0,0,0));
               pixels.show();
               delay(250);
-              pixels.setPixelColor(2, pixels.Color(0,0,250));
-              pixels.setPixelColor(3, pixels.Color(0,0,250));
-              pixels.setPixelColor(8, pixels.Color(0,0,250));
+              pixels.setPixelColor(2, pixels.Color(0,250,0));
+              pixels.setPixelColor(3, pixels.Color(0,250,0));
+              pixels.setPixelColor(8, pixels.Color(0,250,0));
               pixels.show();
               delay(250);
              }
@@ -346,9 +347,9 @@ boolean winCondition()
               pixels.setPixelColor(7, pixels.Color(0,0,0));
               pixels.show();
               delay(250);
-              pixels.setPixelColor(1, pixels.Color(0,0,250));
-              pixels.setPixelColor(4, pixels.Color(0,0,250));
-              pixels.setPixelColor(7, pixels.Color(0,0,250));
+              pixels.setPixelColor(1, pixels.Color(0,250,0));
+              pixels.setPixelColor(4, pixels.Color(0,250,0));
+              pixels.setPixelColor(7, pixels.Color(0,250,0));
               pixels.show();
               delay(250);
              }
@@ -384,9 +385,9 @@ boolean winCondition()
               pixels.setPixelColor(6, pixels.Color(0,0,0));
               pixels.show();
               delay(250);
-              pixels.setPixelColor(0, pixels.Color(0,0,250));
-              pixels.setPixelColor(5, pixels.Color(0,0,250));
-              pixels.setPixelColor(6, pixels.Color(0,0,250));
+              pixels.setPixelColor(0, pixels.Color(0,250,0));
+              pixels.setPixelColor(5, pixels.Color(0,250,0));
+              pixels.setPixelColor(6, pixels.Color(0,250,0));
               pixels.show();
               delay(250);
              }
@@ -423,9 +424,9 @@ boolean winCondition()
              pixels.setPixelColor(8, pixels.Color(0,0,0));
              pixels.show();
              delay(250);
-             pixels.setPixelColor(0, pixels.Color(0,0,250));
-             pixels.setPixelColor(4, pixels.Color(0,0,250));
-             pixels.setPixelColor(8, pixels.Color(0,0,250));
+             pixels.setPixelColor(0, pixels.Color(0,250,0));
+             pixels.setPixelColor(4, pixels.Color(0,250,0));
+             pixels.setPixelColor(8, pixels.Color(0,250,0));
              pixels.show();
               delay(250);
            }
@@ -461,9 +462,9 @@ boolean winCondition()
             pixels.setPixelColor(6, pixels.Color(0,0,0));
             pixels.show();
             delay(250);
-            pixels.setPixelColor(2, pixels.Color(0,0,250));
-            pixels.setPixelColor(4, pixels.Color(0,0,250));
-            pixels.setPixelColor(6, pixels.Color(0,0,250));
+            pixels.setPixelColor(2, pixels.Color(0,250,0));
+            pixels.setPixelColor(4, pixels.Color(0,250,0));
+            pixels.setPixelColor(6, pixels.Color(0,250,0));
             pixels.show();
             delay(250);
            }
@@ -495,15 +496,24 @@ boolean winCondition()
 void ledEffects_P1()
     { moves = 0;
       tic_tac_toe[9]={ };
-      winningTone();     
-      for(byte i=0;i<9;i++)
-         {
-           pixels.setPixelColor(i, pixels.Color(0,0,250));
+      for(int thisNote = 0; thisNote < 13; thisNote++)
+        {
+         // to calculate the note duration, take one second 
+         // divided by the note type.
+         //e.g. quarter note = 1000 / 4, eighth note = 1000/8, etc.
+         int noteDuration1 = 1000/noteDurations1[thisNote];
+         tone(A1, WinMelody[thisNote],noteDuration1);
+         //to distinguish the notes, set a minimum time between them.
+         //the note's duration + 30% seems to work well:
+         int pauseBetweenNotes = noteDuration1 * 1.10;
+         delay(pauseBetweenNotes);
+         // stop the tone playing:
+         noTone(8);
+         pixels.setPixelColor(thisNote, pixels.Color(0,250,0));
            pixels.show();
-           delay(100);
-         }
-         delay(2000);
-      for(byte i=0;i<9;i++)
+        }     
+      delay(2000);
+      for(byte i=9;i>=0;i--)
          {
            pixels.setPixelColor(i%10, pixels.Color(0,0,0));
            pixels.show();
@@ -514,27 +524,7 @@ void ledEffects_P1()
 void ledEffects_P2()
     { moves = 0;
       tic_tac_toe[9]={ };
-      winningTone();
-      for(byte i=0;i<9;i++)
-         { 
-           pixels.setPixelColor(i, pixels.Color(250,0,0));
-           pixels.show();
-           delay(100);
-         }
-         delay(2000);
-      for(byte i=0;i<9;i++)
-         { 
-           moves = 0;
-           tic_tac_toe[9]={ };
-           pixels.setPixelColor(i%10, pixels.Color(0,0,0));
-           pixels.show();
-           delay(100);
-         }    
-}
-
-void winningTone()
-    {
-       for(int thisNote = 0; thisNote < 13; thisNote++)
+      for(int thisNote = 0; thisNote < 13; thisNote++)
           {
            // to calculate the note duration, take one second 
            // divided by the note type.
@@ -547,5 +537,16 @@ void winningTone()
            delay(pauseBetweenNotes);
            // stop the tone playing:
            noTone(8);
+           pixels.setPixelColor(thisNote , pixels.Color(250,0,0));
+           pixels.show();
           }
-    }        
+      delay(2000);
+      for(byte i=9;i>=0;i--)
+         { 
+           moves = 0;
+           tic_tac_toe[9]={ };
+           pixels.setPixelColor(i%10, pixels.Color(0,0,0));
+           pixels.show();
+           delay(100);
+         }    
+    }

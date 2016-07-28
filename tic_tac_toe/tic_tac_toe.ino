@@ -94,11 +94,11 @@ void loop()
              //  delay(250);
               }  
             delay(2000);
-            for(int i = 0; i < 9; i++)
+            for(int i = 9; i>=0; i--)
               { 
                 pixels.setPixelColor(i, pixels.Color(0,0,0));
                 pixels.show();
-                delay(250);
+                delay(100);
               }
             delay(1000);
             Serial.print("draw");
@@ -191,9 +191,9 @@ boolean winCondition()
                pixels.setPixelColor(2, pixels.Color(0,0,0));
                pixels.show();
                delay(250);
-               pixels.setPixelColor(0, pixels.Color(0,250,0));
-               pixels.setPixelColor(1, pixels.Color(0,250,0));
-               pixels.setPixelColor(2, pixels.Color(0,250,0));
+               pixels.setPixelColor(0, pixels.Color(0,255,0));
+               pixels.setPixelColor(1, pixels.Color(0,255,0));
+               pixels.setPixelColor(2, pixels.Color(0,255,0));
                pixels.show();
                delay(250);
               }
@@ -205,14 +205,14 @@ boolean winCondition()
            Serial.println("o won  1st Row");
            for(int i=0;i<5;i++)
               {
-               pixels.setPixelColor(0, pixels.Color(250,0,0));
-               pixels.setPixelColor(1, pixels.Color(250,0,0));
-               pixels.setPixelColor(2, pixels.Color(250,0,0));
-               pixels.show();
-               delay(250);
                pixels.setPixelColor(0, pixels.Color(0,0,0));
                pixels.setPixelColor(1, pixels.Color(0,0,0));
                pixels.setPixelColor(2, pixels.Color(0,0,0));
+               pixels.show();
+               delay(250);
+               pixels.setPixelColor(0, pixels.Color(255,0,0));
+               pixels.setPixelColor(1, pixels.Color(255,0,0));
+               pixels.setPixelColor(2, pixels.Color(255,0,0));
                pixels.show();
                delay(250);
               }
@@ -230,9 +230,9 @@ boolean winCondition()
                pixels.setPixelColor(5, pixels.Color(0,0,0));
                pixels.show();
                delay(250);
-               pixels.setPixelColor(3, pixels.Color(0,250,0));
-               pixels.setPixelColor(4, pixels.Color(0,250,0));
-               pixels.setPixelColor(5, pixels.Color(0,250,0));
+               pixels.setPixelColor(3, pixels.Color(0,255,0));
+               pixels.setPixelColor(4, pixels.Color(0,255,0));
+               pixels.setPixelColor(5, pixels.Color(0,255,0));
                pixels.show();
                delay(250);
               }
@@ -244,14 +244,14 @@ boolean winCondition()
            Serial.println("o won  2nd Row");
            for(int i=0;i<5;i++)
               {
-               pixels.setPixelColor(3, pixels.Color(250,0,0));
-               pixels.setPixelColor(4, pixels.Color(250,0,0));
-               pixels.setPixelColor(5, pixels.Color(250,0,0));
-               pixels.show();
-               delay(250);
                pixels.setPixelColor(3, pixels.Color(0,0,0));
                pixels.setPixelColor(4, pixels.Color(0,0,0));
                pixels.setPixelColor(5, pixels.Color(0,0,0));
+               pixels.show();
+               delay(250);
+               pixels.setPixelColor(3, pixels.Color(255,0,0));
+               pixels.setPixelColor(4, pixels.Color(255,0,0));
+               pixels.setPixelColor(5, pixels.Color(255,0,0));
                pixels.show();
                delay(250);
               }
@@ -269,9 +269,9 @@ boolean winCondition()
               pixels.setPixelColor(8, pixels.Color(0,0,0));
               pixels.show();
               delay(250);
-              pixels.setPixelColor(6, pixels.Color(0,250,0));
-              pixels.setPixelColor(7, pixels.Color(0,250,0));
-              pixels.setPixelColor(8, pixels.Color(0,250,0));
+              pixels.setPixelColor(6, pixels.Color(0,255,0));
+              pixels.setPixelColor(7, pixels.Color(0,255,0));
+              pixels.setPixelColor(8, pixels.Color(0,255,0));
               pixels.show();
               delay(250);
              }
@@ -284,14 +284,14 @@ boolean winCondition()
           Serial.println("o won  3rd Row");
           for(int i=0;i<5;i++)
              {
-               pixels.setPixelColor(6, pixels.Color(250,0,0));
-               pixels.setPixelColor(7, pixels.Color(250,0,0));
-               pixels.setPixelColor(8, pixels.Color(250,0,0));
-               pixels.show();
-               delay(250);
                pixels.setPixelColor(6, pixels.Color(0,0,0));
                pixels.setPixelColor(7, pixels.Color(0,0,0));
                pixels.setPixelColor(8, pixels.Color(0,0,0));
+               pixels.show();
+               delay(250);
+               pixels.setPixelColor(6, pixels.Color(255,0,0));
+               pixels.setPixelColor(7, pixels.Color(255,0,0));
+               pixels.setPixelColor(8, pixels.Color(255,0,0));
                pixels.show();
                delay(250);
              }
@@ -311,9 +311,9 @@ boolean winCondition()
               pixels.setPixelColor(8, pixels.Color(0,0,0));
               pixels.show();
               delay(250);
-              pixels.setPixelColor(2, pixels.Color(0,250,0));
-              pixels.setPixelColor(3, pixels.Color(0,250,0));
-              pixels.setPixelColor(8, pixels.Color(0,250,0));
+              pixels.setPixelColor(2, pixels.Color(0,255,0));
+              pixels.setPixelColor(3, pixels.Color(0,255,0));
+              pixels.setPixelColor(8, pixels.Color(0,255,0));
               pixels.show();
               delay(250);
              }
@@ -325,14 +325,14 @@ boolean winCondition()
           Serial.println("o won  1st colm");
           for(int i=0;i<5;i++)
              {
-              pixels.setPixelColor(2, pixels.Color(250,0,0));
-              pixels.setPixelColor(3, pixels.Color(250,0,0));
-              pixels.setPixelColor(8, pixels.Color(250,0,0));
-              pixels.show();
-              delay(250);
               pixels.setPixelColor(2, pixels.Color(0,0,0));
               pixels.setPixelColor(3, pixels.Color(0,0,0));
               pixels.setPixelColor(8, pixels.Color(0,0,0));
+              pixels.show();
+              delay(250);
+              pixels.setPixelColor(2, pixels.Color(255,0,0));
+              pixels.setPixelColor(3, pixels.Color(255,0,0));
+              pixels.setPixelColor(8, pixels.Color(255,0,0));
               pixels.show();
               delay(250);
              }
@@ -349,9 +349,9 @@ boolean winCondition()
               pixels.setPixelColor(7, pixels.Color(0,0,0));
               pixels.show();
               delay(250);
-              pixels.setPixelColor(1, pixels.Color(0,250,0));
-              pixels.setPixelColor(4, pixels.Color(0,250,0));
-              pixels.setPixelColor(7, pixels.Color(0,250,0));
+              pixels.setPixelColor(1, pixels.Color(0,255,0));
+              pixels.setPixelColor(4, pixels.Color(0,255,0));
+              pixels.setPixelColor(7, pixels.Color(0,255,0));
               pixels.show();
               delay(250);
              }
@@ -363,14 +363,14 @@ boolean winCondition()
           Serial.println("o won  2nd colm");
           for(int i=0;i<5;i++)
              {
-              pixels.setPixelColor(1, pixels.Color(250,0,0));
-              pixels.setPixelColor(4, pixels.Color(250,0,0));
-              pixels.setPixelColor(7, pixels.Color(250,0,0));
-              pixels.show();
-              delay(250);
               pixels.setPixelColor(1, pixels.Color(0,0,0));
               pixels.setPixelColor(4, pixels.Color(0,0,0));
               pixels.setPixelColor(7, pixels.Color(0,0,0));
+              pixels.show();
+              delay(250);
+              pixels.setPixelColor(1, pixels.Color(255,0,0));
+              pixels.setPixelColor(4, pixels.Color(255,0,0));
+              pixels.setPixelColor(7, pixels.Color(255,0,0));
               pixels.show();
               delay(500);
              }
@@ -387,9 +387,9 @@ boolean winCondition()
               pixels.setPixelColor(6, pixels.Color(0,0,0));
               pixels.show();
               delay(250);
-              pixels.setPixelColor(0, pixels.Color(0,250,0));
-              pixels.setPixelColor(5, pixels.Color(0,250,0));
-              pixels.setPixelColor(6, pixels.Color(0,250,0));
+              pixels.setPixelColor(0, pixels.Color(0,255,0));
+              pixels.setPixelColor(5, pixels.Color(0,255,0));
+              pixels.setPixelColor(6, pixels.Color(0,255,0));
               pixels.show();
               delay(250);
              }
@@ -400,14 +400,14 @@ boolean winCondition()
         { Serial.println("o won  3rd colm");
           for(int i=0;i<5;i++)
              {
-              pixels.setPixelColor(0, pixels.Color(250,0,0));
-              pixels.setPixelColor(5, pixels.Color(250,0,0));
-              pixels.setPixelColor(6, pixels.Color(250,0,0));
-              pixels.show();
-              delay(250);
               pixels.setPixelColor(0, pixels.Color(0,0,0));
               pixels.setPixelColor(5, pixels.Color(0,0,0));
               pixels.setPixelColor(6, pixels.Color(0,0,0));
+              pixels.show();
+              delay(250);
+              pixels.setPixelColor(0, pixels.Color(255,0,0));
+              pixels.setPixelColor(5, pixels.Color(255,0,0));
+              pixels.setPixelColor(6, pixels.Color(255,0,0));
               pixels.show();
               delay(250);
              }
@@ -426,9 +426,9 @@ boolean winCondition()
              pixels.setPixelColor(8, pixels.Color(0,0,0));
              pixels.show();
              delay(250);
-             pixels.setPixelColor(0, pixels.Color(0,250,0));
-             pixels.setPixelColor(4, pixels.Color(0,250,0));
-             pixels.setPixelColor(8, pixels.Color(0,250,0));
+             pixels.setPixelColor(0, pixels.Color(0,255,0));
+             pixels.setPixelColor(4, pixels.Color(0,255,0));
+             pixels.setPixelColor(8, pixels.Color(0,255,0));
              pixels.show();
               delay(250);
            }
@@ -440,14 +440,14 @@ boolean winCondition()
         Serial.println("o won  diagonal L");
         for(int i=0;i<5;i++)
            {
-            pixels.setPixelColor(0, pixels.Color(250,0,0));
-            pixels.setPixelColor(4, pixels.Color(250,0,0));
-            pixels.setPixelColor(8, pixels.Color(250,0,0));
-            pixels.show();
-            delay(250);
             pixels.setPixelColor(0, pixels.Color(0,0,0));
             pixels.setPixelColor(4, pixels.Color(0,0,0));
             pixels.setPixelColor(8, pixels.Color(0,0,0));
+            pixels.show();
+            delay(250);
+            pixels.setPixelColor(0, pixels.Color(255,0,0));
+            pixels.setPixelColor(4, pixels.Color(255,0,0));
+            pixels.setPixelColor(8, pixels.Color(255,0,0));
             pixels.show();
             delay(250);
            }
@@ -464,9 +464,9 @@ boolean winCondition()
             pixels.setPixelColor(6, pixels.Color(0,0,0));
             pixels.show();
             delay(250);
-            pixels.setPixelColor(2, pixels.Color(0,250,0));
-            pixels.setPixelColor(4, pixels.Color(0,250,0));
-            pixels.setPixelColor(6, pixels.Color(0,250,0));
+            pixels.setPixelColor(2, pixels.Color(0,255,0));
+            pixels.setPixelColor(4, pixels.Color(0,255,0));
+            pixels.setPixelColor(6, pixels.Color(0,255,0));
             pixels.show();
             delay(250);
            }
@@ -478,14 +478,14 @@ boolean winCondition()
         Serial.println("o won  diagonal R");
         for(int i=0;i<5;i++)
            {
-            pixels.setPixelColor(2, pixels.Color(250,0,0));
-            pixels.setPixelColor(4, pixels.Color(250,0,0));
-            pixels.setPixelColor(6, pixels.Color(250,0,0));
-            pixels.show();
-            delay(250);
             pixels.setPixelColor(2, pixels.Color(0,0,0));
             pixels.setPixelColor(4, pixels.Color(0,0,0));
             pixels.setPixelColor(6, pixels.Color(0,0,0));
+            pixels.show();
+            delay(250);
+            pixels.setPixelColor(2, pixels.Color(255,0,0));
+            pixels.setPixelColor(4, pixels.Color(255,0,0));
+            pixels.setPixelColor(6, pixels.Color(255,0,0));
             pixels.show();
             delay(250);
            }
@@ -511,7 +511,7 @@ void ledEffects_P1()
          delay(pauseBetweenNotes);
          // stop the tone playing:
          noTone(8);
-         pixels.setPixelColor(thisNote, pixels.Color(0,250,0));
+         pixels.setPixelColor(thisNote, pixels.Color(0,255,0));
            pixels.show();
         }     
       delay(2000);
@@ -539,7 +539,7 @@ void ledEffects_P2()
            delay(pauseBetweenNotes);
            // stop the tone playing:
            noTone(8);
-           pixels.setPixelColor(thisNote , pixels.Color(250,0,0));
+           pixels.setPixelColor(thisNote , pixels.Color(255,0,0));
            pixels.show();
           }
       delay(2000);

@@ -8,8 +8,6 @@ int LastInputPinState[9] = {1,1,1,1,1,1,1,1,1};
 char tic_tac_toe[9]={ };
 byte moves = 0; 
 int firstPlayer;
-byte player1 = 10;
-byte player2 = 11;
 
 // notes in the melody:
 int WinMelody[]= {659,587,370,415,523,494,294,329,494,440,277,329,440};
@@ -31,8 +29,6 @@ void setup()
            pixels.setPixelColor(i, pixels.Color(0,0,0));
            pixels.show();
          }
-      pinMode(player1, OUTPUT);
-      pinMode(player2, OUTPUT);
       first_XorO();
       Serial.println(first_XorO());
        
@@ -91,13 +87,31 @@ int first_XorO()
       
       if(firstPlayer == 1)
         {
-          digitalWrite(player1,HIGH);
-          digitalWrite(player2,LOW);
+          for(int i=0; i<9; i++)
+             {
+               pixels.setPixelColor(i, pixels.Color(0,0,250));
+               pixels.show();
+             }  
+          delay(2000);
+          for(int i=0; i<9; i++)
+             {
+               pixels.setPixelColor(i, pixels.Color(0,0,0));
+               pixels.show();
+             }  
         }
       if(firstPlayer == 0)
         {
-          digitalWrite(player2,HIGH);
-          digitalWrite(player1,LOW);
+          for(int i=0; i<9; i++)
+             {
+               pixels.setPixelColor(i, pixels.Color(250,0,0));
+               pixels.show();
+             } 
+          delay(2000);
+          for(int i=0; i<9; i++)
+             {
+               pixels.setPixelColor(i, pixels.Color(0,0,0));
+               pixels.show();
+             }    
         } 
       return firstPlayer;  
     }
@@ -153,7 +167,9 @@ void nextMoves()
                   Serial.print(i);Serial.print( tic_tac_toe[i]);Serial.print("moves: ");Serial.println(moves);
                   moves += 1;
                   delay(500);
-                }}LastInputPinState[i] = InputPinState[i];
+                }
+              }
+              LastInputPinState[i] = InputPinState[i];
             }
          }
      }     

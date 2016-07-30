@@ -1,7 +1,7 @@
 #include <Adafruit_NeoPixel.h>
 #define PIN  9
 #define NUMPIXELS  9
-int InputPin[9] = {0 ,2, 3, 4, 5, 6, 7, 8, 12};
+int InputPin[9] = {0 ,2, 3, 4, 5, 6, 8, 7, 12};
 int InputPinState[9] = {1,1,1,1,1,1,1,1,1};
 int LastInputPinState[9] = {1,1,1,1,1,1,1,1,1};
 char tic_tac_toe[9]={ };

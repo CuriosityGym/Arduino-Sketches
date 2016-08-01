@@ -121,6 +121,8 @@ void nextMoves()
          {
            for(int i = 0; i < 9; i++)
               { 
+                int InputPinStates = digitalRead(InputPin[i]);
+                delay(1000);
                 InputPinState[i] = digitalRead(InputPin[i]);
                 if(InputPinState[i] != LastInputPinState[i])
                   {
@@ -150,6 +152,8 @@ void nextMoves()
          {
            for(int i = 0; i < 9; i++)
               { 
+                int InputPinStates = digitalRead(InputPin[i]);
+                delay(1000);
                 InputPinState[i] = digitalRead(InputPin[i]);
                 if(InputPinState[i] != LastInputPinState[i])
                   {

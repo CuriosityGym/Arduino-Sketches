@@ -39,14 +39,19 @@ int noteDurations[] = { 8,8,8,8 };
 U8GLIB_SH1106_128X64 u8g(U8G_I2C_OPT_NONE);	// I2C / TWI 
 
 void setup(void)
-{ u8g.setFont(u8g_font_unifont);
-  Serial.begin(57600);
-  Serial.println("NRF24L01 MESSENGER");
+    { 
+      u8g.setFont(u8g_font_unifont);
+      Serial.begin(57600);
+      Serial.println("NRF24L01 MESSENGER");
  
-  SPI.begin();
-  radio.begin();
-  network.begin(/*channel*/ 90, /*node address*/ this_node);
-}
+      SPI.begin();
+      radio.begin();
+      network.begin(/*channel*/ 90, /*node address*/ this_node);
+      u8g.firstPage();  
+      do 
+       {
+       } while( u8g.nextPage() );   
+    }
 
 void loop() 
     {

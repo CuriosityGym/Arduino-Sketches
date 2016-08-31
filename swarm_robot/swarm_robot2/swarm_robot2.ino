@@ -38,6 +38,9 @@ int noteDurations[] = { 8,8,8,8 };
 
 U8GLIB_SH1106_128X64 u8g(U8G_I2C_OPT_NONE);	// I2C / TWI 
 
+String inputString = "";         // a string to hold incoming data
+boolean stringComplete = false;  // whether the string is complete
+
 void setup(void)
      {
        u8g.setFont(u8g_font_unifont);
@@ -50,6 +53,10 @@ void setup(void)
        u8g.firstPage();  
        do 
         {
+          u8g.setPrintPos(0, 10); 
+         u8g.print("Robot " );
+         u8g.setPrintPos(45, 10); 
+         u8g.print(this_node);
         } while( u8g.nextPage() );   
       }
 
@@ -58,20 +65,26 @@ void loop()
        // Pump the network regularly
        network.update();
        
-       if (send_message)  // if there is typed message on serial monitor ready to send
+       if (stringComplete)  // if there is typed message on serial monitor ready to send
         {
+          inputString.replace("\r","");
+          inputString.replace("\n","");
+          
           RF24NetworkHeader header1(/*to node*/ other_node);
-          boolean message = network.write(header1, messageToSend, 32); // send message to other user
+          boolean message = network.write(header1, inputString.c_str(), 32); // send message to other user
           if (message)
             {
               Serial.print("Robot2: ");  // print message on serial monitor
-              Serial.println(messageToSend);
+              Serial.println(inputString);
               send_message = false;
             }
           
           else
             
               Serial.println("could not write....\n");  // if it is failed to send message prompt error
+              
+              stringComplete=false;
+              inputString="";
         }  
     
     
@@ -109,11 +122,28 @@ void loop()
             }
  
         }
-    
+   /* 
      if (Serial.available()) // type message on serial monitor
        { 
          byte data = Serial.readBytesUntil('\n', messageToSend, 32);//read typed message from serial monitor
           messageToSend[data-1] = 0x20;
          send_message = true;  
-       }
+       }*/
    }
+   
+void serialEvent() 
+     {
+       while (Serial.available()) 
+             {
+               // get the new byte:  
+               char inChar = (char)Serial.read(); 
+               // add it to the inputString:
+               inputString += inChar;
+               // if the incoming character is a newline, set a flag
+               // so the main loop can do something about it:
+               if (inChar == '\n') 
+                  {
+                     stringComplete = true;
+                  } 
+             }
+     }

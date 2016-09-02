@@ -19,9 +19,9 @@ int clockCentreX = 32; // used to fix the centre the analog clock
 int clockCentreY = 32; // used to fix the centre the analog clock
 int tempPin = A0; 
 int date, hours,minutes,seconds;
-int hourOffset= 11;
-int minuteOffset = 43;
-String offsetString = "+"; 
+int hourOffset;
+int minuteOffset;
+
 // Initialize a connection to esp-link using the normal hardware serial port both for
 // SLIP and for debug messages.
 ELClient esp(&Serial, &Serial);
@@ -69,11 +69,7 @@ void draw(void)
            thisTime=thisTime + "0"; // add leading zero if required
          } 
       thisTime=thisTime + String(minutes) +  AMorPM ;
-     // if (seconds < 10)
-     //    {
-     //      thisTime=thisTime + "0"; // add leading zero if required
-     //    }
-     // thisTime=thisTime + String(seconds);
+    
       const char* newTime = (const char*) thisTime.c_str();
       u8g.drawStr(65,15, newTime); 
      
@@ -157,6 +153,67 @@ void setup(void)
            Serial.println(packet->value);
          }
 
+      getTimeZone();
+  
+    }
+
+
+
+void loop(void) 
+    { 
+      getTime();
+      // picture loop
+      u8g.firstPage();  
+      do 
+        {
+          draw();
+        } while( u8g.nextPage() );
+    }
+
+void getTimeZone()
+    {
+      //idiotware.herokuapp.com/getTimeZoneOffset?appid=AIzaSyARAKu23k_1vltEKesq6REtMSIflQ3c3jo
+      
+       // Set up the REST client to talk to www.timeapi.org, this doesn't connect to that server,
+      // it just sets-up stuff on the esp-link side
+      int err = rest.begin("idiotware.herokuapp.com");
+      if (err != 0)
+         {
+           Serial.print("REST begin failed: ");
+           Serial.println(err);
+           while(1) ;
+         }
+      Serial.println("EL-REST ready");
+       // process any callbacks coming from esp_link
+      esp.Process();
+
+      // if we're connected make an HTTP request
+      if(wifiConnected)
+        {
+          // Request /utc/now from the previously set-up server
+          rest.get("/getTimeZoneOffset?appid=AIzaSyARAKu23k_1vltEKesq6REtMSIflQ3c3jo");
+
+          char response[BUFLEN];
+          memset(response, 0, BUFLEN);
+          uint16_t code = rest.waitResponse(response, BUFLEN);
+          if(code == HTTP_STATUS_OK){
+          Serial.println("ARDUINO: GET successful:");
+          Serial.println(response);
+          signed long offsetTime = atoi(response);
+          hourOffset = offsetTime/3600;
+          minuteOffset = (offsetTime%3600)/60;
+          Serial.println(hourOffset);Serial.println(minuteOffset);
+          
+        }
+         else
+        {
+          Serial.print("ARDUINO: GET failed: ");
+          Serial.println(code);
+        }
+        }
+    }
+void getTime()
+    { 
       // Set up the REST client to talk to www.timeapi.org, this doesn't connect to that server,
       // it just sets-up stuff on the esp-link side
       int err = rest.begin("www.timeapi.org");
@@ -167,24 +224,6 @@ void setup(void)
            while(1) ;
          }
       Serial.println("EL-REST ready");
-  
-    }
-
-
-
-void loop(void) 
-    {
-      getTime();
-      // picture loop
-      u8g.firstPage();  
-      do 
-        {
-          draw();
-        } while( u8g.nextPage() );
-    }
-
-void getTime()
-    {
       // process any callbacks coming from esp_link
       esp.Process();
 
@@ -228,38 +267,9 @@ void getTime()
           String minute = data.substring(14,16);
           minutes = atoi(minute.c_str());
           int hoursInMinutes = hours*60;
-          int h = (hourOffset*60)+minuteOffset;
-          if(h>24) h= h%24;
-          Serial.print("h:");Serial.println(h);
-          int m = minuteOffset%60;
-          if(m > 0){ h-=1;}  
-          if(offsetString == "+")
-            {  
-              if(((hours - hourOffset)%24) > 12 )// minutes >= minuteOffset)
-                {
-                  AMorPM = "am"; 
-                }
-              if(((hours - hourOffset)%24) <= 12)// && minutes >= minuteOffset)
-                {
-                  AMorPM = "pm";
-                }
-              hours = hours + hourOffset-1;  
-            }   
-          if(offsetString == "-")
-            {  
-              if(((hours + hourOffset)%24) > 12 )// minutes >= minuteOffset)
-                {
-                  AMorPM = "am";  
-                }
-              if(((hours + hourOffset)%24) <= 12)// && minutes >= minuteOffset)
-                {
-                  AMorPM = "pm";
-                } 
-               hours = hours - hourOffset;  
-            }   
-            
-          //hours = hours + hourOffset;
-          if(hours>12)
+         
+           hours = hours + hourOffset-1; 
+           if(hours>12)
             {
               hours = hours%12;
             }  
@@ -272,6 +282,15 @@ void getTime()
              }  
           String second = data.substring(17,19);
           seconds = atoi(second.c_str());
+              if(((hours - hourOffset)%24) > 12 )// minutes >= minuteOffset)
+                {
+                  AMorPM = "am"; 
+                }
+              if(((hours - hourOffset)%24) <= 12)// && minutes >= minuteOffset)
+                {
+                  AMorPM = "pm";
+                }
+     
           Serial.println("hours: ");
           Serial.println(hours);
           Serial.println("minutes: ");

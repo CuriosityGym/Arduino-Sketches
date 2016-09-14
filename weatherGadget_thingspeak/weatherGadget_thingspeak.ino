@@ -26,7 +26,7 @@
 #include <ELClientRest.h>
 #include "icons.h"    // Bitmap weather icons 
 #define autoDetectLocation false
-#define refreshRate 60   //send request after ever 60 minutes(one hour) 
+#define refreshRate 15   //send request after ever 60 minutes(one hour) 
 U8GLIB_SSD1306_128X64 u8g(U8G_I2C_OPT_NONE|U8G_I2C_OPT_DEV_0);  // I2C / TWI 
 #define tempPin A0  // LM35 is connected to A0 pin
 #define pass "Arduino Get Succesful"
@@ -38,7 +38,7 @@ int humidity;
 String location = "";
 String weatherDescription = "";
 int tempInC;
-
+//boolean firstRequest = true;
 // replace with your channel's thingspeak API key
 String API_KEY = "15373f8c0b06b6e66e6372db065c4e46";
 String CityID = "1275339"; //Mumbai, India
@@ -58,9 +58,9 @@ long previousMillis = 0;        // will store last time LED was updated
 
 // the follow variables is a long because the time, measured in miliseconds,
 // will quickly become a bigger number than can be stored in an int.
-long interval1 = 5000;           // interval at which to blink (milliseconds)
-long interval2 = 10000;
-long interval3 = 15000;
+#define interval1  5000           // interval at which to blink (milliseconds)
+#define interval2  10000
+#define interval3  15000
 boolean frame1 = true;
 boolean frame2 = true;
 boolean frame3 = true;
@@ -143,7 +143,7 @@ void setup()
              do 
                {  
                 u8g.drawStr(0,15,"sync failed!");
-                u8g.drawXBMP( 110, 0, wifi_logo_width, wifi_logo_height,wifi_logo_bits);
+              //  u8g.drawXBMP( 110, 0, wifi_logo_width, wifi_logo_height,wifi_logo_bits);
                } while( u8g.nextPage() );
              Serial.println("EL-Client sync failed!");
        } while(!ok);
@@ -163,6 +163,23 @@ void setup()
       // it just sets-up stuff on the esp-link side
      
       Serial.println("EL-REST ready");  
+      
+         int err = rest.begin("idiotware.herokuapp.com");
+      if(err != 0) 
+        {
+          Serial.print("REST begin failed: ");
+                       u8g.firstPage();
+             do 
+               {  
+                u8g.drawStr(0,15,"REST begin failed:");
+               } while( u8g.nextPage() );
+          Serial.println(err);
+          while(1) ;
+        }
+      get_location();
+      get_Temperature();
+      get_Humidity();
+      get_weatherDescription();
     
     }
 
@@ -172,7 +189,7 @@ void loop()
       while(((millis()/1000)-elapsedTime) < 1);    // this loop will do nothing until a second has passed 
       time++;                                       //increment time after each second.
 
-     if(refreshRate*60 == time || time <= 3)
+     if(time % (refreshRate*60) == 0 )
      {
        int err = rest.begin("idiotware.herokuapp.com");
       if(err != 0) 
@@ -204,27 +221,50 @@ int dataSamples()
      // if you want to log data for 2 hours then simply multiply 2 by 60 which will give 
      // you value of 120 minutes then change the varible duration to 120. 
 
+
      
       int reading1 = analogRead(tempPin); delay(10);
       int reading2 = analogRead(tempPin); delay(10);
       int reading3 = analogRead(tempPin); delay(10);
       int reading4 = analogRead(tempPin); delay(10);
       
-      int averageReading = ((reading1 +  reading3 + reading4 )/ 3); 
+      int averageReading = ((reading2 +  reading3 + reading4 )/ 3); 
       tempInCelcius = round(( 5.0 * averageReading * 100.0) / 1024.0);
       
       int light_value1 = analogRead(A3); delay(10);
       int light_value = analogRead(A3);delay(10);
+     /* 
+      if(time % (refreshRate*60) == 0)
+        {
+         int err = rest.begin("idiotware.herokuapp.com");
+         if(err != 0) 
+           {
+             Serial.print("REST begin failed: ");
+             u8g.firstPage();
+             do 
+               {  
+                u8g.drawStr(0,15,"REST begin failed:");
+               } while( u8g.nextPage() );
+             Serial.println(err);
+             while(1) ;
+           }
+         get_location();
+         get_Temperature();
+         get_Humidity();
+         get_weatherDescription();
+        }
+     */
       if((duration >= time) && (time % samplingTime == 0))
         { 
+          
           int err = rest.begin("api.thingspeak.com");
-      if(err != 0) 
-        {
-          Serial.print("REST begin failed: ");
-          Serial.println(err);
-          while(1) ;
-        }
-      Serial.println("EL-REST ready");
+          if(err != 0) 
+            {
+             Serial.print("REST begin failed: ");
+             Serial.println(err);
+             while(1) ;
+            }
+          Serial.println("EL-REST ready");
           char str_light[6]; 
           char str_temp[6];
           dtostrf(tempInCelcius, 4, 0, str_temp);
@@ -234,10 +274,10 @@ int dataSamples()
           //tempInFarenheit = ((tempC*9)/5) + 32;            //convert celcius to farenheit
           logToThingspeak();  //Log to thingspeak using commands under void LogToThingspeak()
           // print to the serial port too:              
-    //      Serial.print("Temperature: ");
-    //      Serial.print(tempInCelcius);
-    //      Serial.print(char(176)); 
-    //      Serial.println("C"); 
+          //Serial.print("Temperature: ");
+          //Serial.print(tempInCelcius);
+          //Serial.print(char(176)); 
+          //Serial.println("C"); 
                 
         }
            
@@ -627,13 +667,4 @@ frame3 = true; }
        } */
    }
    
- /*  
-void requestFailed()
-     {
-         do 
-       {  
-         
-         u8g.drawStr(0,15,"request failed");
-         u8g.drawStr(0,15,"restet IdIoTware shield");
-       } while( u8g.nextPage() );
-     }   */
+ 

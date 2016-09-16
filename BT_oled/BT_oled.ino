@@ -11,60 +11,61 @@ SoftwareSerial BTserial(10, 9); // RX | TX
 // Connect the HC-05 RX to Arduino pin 3 TX through a voltage divider.
  
 U8GLIB_SH1106_128X64 u8g(U8G_I2C_OPT_NONE);	// I2C / TWI 
-char receivedData = ' ';
-int melody[]= {2000,2000,2000,2000,2000,2000,2000,2000,2000,2000,2000,2000,2000,2000,2000,2000,2000,2000,2000,2000};
-// note durations: 4 = quarter note, 8 = eighth note, etc.:
-int noteDurations[] = { 8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8};
+char receivedData[32] = "";
+
+int BuzzerPin = A1;
 
 void setup() 
-    {
-      Serial.begin(9600);
-      Serial.println("Arduino is ready");
- 
-      // HC-05 default serial speed for commincation mode is 9600
-      BTserial.begin(115200);  
-    }
+{
+    Serial.begin(9600);
+    Serial.println("Arduino is ready");
+    pinMode(BuzzerPin,OUTPUT);
+    // HC-05 default serial speed for commincation mode is 9600
+    BTserial.begin(9600);  
+}
  
 void loop()
-    {
+{
  
-      // Keep reading from HC-05 and send to Arduino Serial Monitor
-      if (BTserial.available())
-         {  
-          receivedData = BTserial.read();
-          Serial.write(receivedData);
-          u8g.firstPage();  
-          do 
-           { 
-             u8g.setFont(u8g_font_timB10);
-             u8g.setPrintPos(0, 10); 
-             u8g.print("Token Number" );
-             u8g.setFont(u8g_font_fub25);
-             u8g.setPrintPos(0, 50); 
-             u8g.print(receivedData);
-           } while( u8g.nextPage() );
-          for(byte thisNote = 0; thisNote < 20; thisNote++) 
-             {
-               color(0,thisNote*5,0); 
-               // to calculate the note duration, take one second divided by the note type.
-               //e.g. quarter note = 1000 / 4, eighth note = 1000/8, etc.
-               int noteDuration = 1000/noteDurations[thisNote];
-               tone(A1, melody[thisNote],noteDuration);
-               // to distinguish the notes, set a minimum time between them.
-               // the note's duration + 30% seems to work well:
-               int pauseBetweenNotes = noteDuration * 1.5;
-               delay(pauseBetweenNotes);
-           
-               // stop the tone playing:
-               noTone(8);
-               color(0,0,0);
-               delay(250);
-             }
+    // Keep reading from HC-05 and send to Arduino Serial Monitor
+    if(BTserial.available())
+      {  
+        int data = BTserial.readBytesUntil('\n',receivedData,32);
+        receivedData[data] = '\0';
+        Serial.write(receivedData);
+        displayData();
+        buzzer();
       }
-    /*// Keep reading from Arduino Serial Monitor and send to HC-05
-    if (Serial.available())
+        
+        
+    }
+
+
+void displayData()
+     {
+         u8g.firstPage();  
+       do 
+        { 
+          u8g.setFont(u8g_font_timB10);
+          u8g.setPrintPos(0, 10); 
+          u8g.print("Token Number" );
+          u8g.setFont(u8g_font_fub25);
+          u8g.setPrintPos(33, 50); 
+          u8g.print(receivedData);
+        } while( u8g.nextPage() );
+        
+       
+     }      
+        
+void buzzer() 
     {
-        receivedData =  Serial.read();
-        BTserial.write(receivedData);  
-    }*/
-}
+      for(byte i=0; i<10; i++)
+         {
+           color(0,100,0);
+           digitalWrite(BuzzerPin, HIGH);   // turn the LED on (HIGH is the voltage level)
+           delay(250); 
+           color(0,0,0);               // wait for a second
+           digitalWrite(BuzzerPin, LOW);    // turn the LED off by making the voltage LOW
+           delay(250);               // wait for a second
+        }
+    }  

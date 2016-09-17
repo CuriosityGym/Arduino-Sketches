@@ -43,16 +43,13 @@ int tempInC;
 String API_KEY = "15373f8c0b06b6e66e6372db065c4e46";
 String CityID = "1275339"; //Mumbai, India
 
-// varibles for cursor positions
-//int yPos = 0;
-//int xPos = 0;
-//int zPos = 0;
+
 int tempInCelcius = 0;
 //char buff[90];
 String sendData = "";
 unsigned long  elapsedTime;
 unsigned long time=0;
-unsigned long samplingTime = 300;   //this variable is interval(in Seconds) at which you want to log the data to SD card.
+unsigned long samplingTime = 300;   //this variable is interval(in Seconds) at which you want to log the data to thingspeak.
 unsigned long duration = 2800;     //this variable is duration(in Minutes) which is the total time for which you want to log data.
 long previousMillis = 0;        // will store last time LED was updated
 

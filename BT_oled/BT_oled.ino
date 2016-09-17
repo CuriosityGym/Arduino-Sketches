@@ -34,8 +34,11 @@ void loop()
         receivedData[data] = '\0';
         Serial.write(receivedData);
         displayData();
-        buzzer();
-      }
+        if(receivedData == 555)
+           {
+             buzzer();
+           }
+       }
         
         
     }
@@ -68,4 +71,15 @@ void buzzer()
            digitalWrite(BuzzerPin, LOW);    // turn the LED off by making the voltage LOW
            delay(250);               // wait for a second
         }
-    }  
+    }    
+        
+ /*
+    // Keep reading from Arduino Serial Monitor and send to HC-05
+    if (Serial.available())
+    {
+        receivedData =  Serial.read();
+        BTserial.write(receivedData);  
+    }
+ 
+*/
+//}

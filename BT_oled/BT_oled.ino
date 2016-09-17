@@ -34,7 +34,7 @@ void loop()
         receivedData[data] = '\0';
         Serial.write(receivedData);
         displayData();
-        if(receivedData == 555)
+        if(receivedData == "555")
            {
              buzzer();
            }

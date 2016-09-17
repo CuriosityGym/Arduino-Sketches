@@ -25,7 +25,7 @@
 #include <ELClient.h>
 #include <ELClientRest.h>
 #include "icons.h"    // Bitmap weather icons 
-#define autoDetectLocation false
+#define autoDetectLocation true
 #define refreshRate 15   //send request after ever 60 minutes(one hour) 
 U8GLIB_SSD1306_128X64 u8g(U8G_I2C_OPT_NONE|U8G_I2C_OPT_DEV_0);  // I2C / TWI 
 #define tempPin A0  // LM35 is connected to A0 pin
@@ -43,21 +43,24 @@ int tempInC;
 String API_KEY = "15373f8c0b06b6e66e6372db065c4e46";
 String CityID = "1275339"; //Mumbai, India
 
-
+// varibles for cursor positions
+//int yPos = 0;
+//int xPos = 0;
+//int zPos = 0;
 int tempInCelcius = 0;
 //char buff[90];
 String sendData = "";
 unsigned long  elapsedTime;
 unsigned long time=0;
-unsigned long samplingTime = 300;   //this variable is interval(in Seconds) at which you want to log the data to thingspeak.
-unsigned long duration = 2800;     //this variable is duration(in Minutes) which is the total time for which you want to log data.
-long previousMillis = 0;        // will store last time LED was updated
+unsigned long samplingTime = 180;   //this variable is interval(in Seconds) at which you want to log the data to thingspeak.
+unsigned long duration = 60;     //this variable is duration(in Minutes) which is the total time for which you want to log data.
+unsigned long previousMillis = 0;        // will store last time LED was updated
 
 // the follow variables is a long because the time, measured in miliseconds,
 // will quickly become a bigger number than can be stored in an int.
-#define interval1  5000           // interval at which to blink (milliseconds)
-#define interval2  10000
-#define interval3  15000
+unsigned long interval1 = 5000;           // interval at which to blink (milliseconds)
+unsigned long interval2 = 10000;
+unsigned long interval3 = 15000;
 boolean frame1 = true;
 boolean frame2 = true;
 boolean frame3 = true;
@@ -161,7 +164,7 @@ void setup()
      
       Serial.println("EL-REST ready");  
       
-         int err = rest.begin("idiotware.herokuapp.com");
+      int err = rest.begin("idiotware.herokuapp.com");
       if(err != 0) 
         {
           Serial.print("REST begin failed: ");
@@ -177,39 +180,20 @@ void setup()
       get_Temperature();
       get_Humidity();
       get_weatherDescription();
-    
+      duration = 2800 * 60;
     }
 
 void loop() 
     { 
-       elapsedTime = millis()/1000;   // this variable will keep track of elapsed time
+      elapsedTime = millis()/1000;   // this variable will keep track of elapsed time
       while(((millis()/1000)-elapsedTime) < 1);    // this loop will do nothing until a second has passed 
       time++;                                       //increment time after each second.
 
-     if(time % (refreshRate*60) == 0 )
-     {
-       int err = rest.begin("idiotware.herokuapp.com");
-      if(err != 0) 
-        {
-          Serial.print("REST begin failed: ");
-                       u8g.firstPage();
-             do 
-               {  
-                u8g.drawStr(0,15,"REST begin failed:");
-               } while( u8g.nextPage() );
-          Serial.println(err);
-          while(1) ;
-        }
-      get_location();
-      get_Temperature();
-      get_Humidity();
-      get_weatherDescription();
-     }
-     dataSamples();
-    //  for (int i=0; i<= (refreshRate*60)/10; i++)
-    //      {
-            frameScroll();
-    //      }
+      weatherData();
+      dataSamples();
+  
+      frameScroll();
+  
     }      
 
 int dataSamples()
@@ -218,8 +202,6 @@ int dataSamples()
      // if you want to log data for 2 hours then simply multiply 2 by 60 which will give 
      // you value of 120 minutes then change the varible duration to 120. 
 
-
-     
       int reading1 = analogRead(tempPin); delay(10);
       int reading2 = analogRead(tempPin); delay(10);
       int reading3 = analogRead(tempPin); delay(10);
@@ -230,30 +212,9 @@ int dataSamples()
       
       int light_value1 = analogRead(A3); delay(10);
       int light_value = analogRead(A3);delay(10);
-     /* 
-      if(time % (refreshRate*60) == 0)
-        {
-         int err = rest.begin("idiotware.herokuapp.com");
-         if(err != 0) 
-           {
-             Serial.print("REST begin failed: ");
-             u8g.firstPage();
-             do 
-               {  
-                u8g.drawStr(0,15,"REST begin failed:");
-               } while( u8g.nextPage() );
-             Serial.println(err);
-             while(1) ;
-           }
-         get_location();
-         get_Temperature();
-         get_Humidity();
-         get_weatherDescription();
-        }
-     */
+     
       if((duration >= time) && (time % samplingTime == 0))
         { 
-          
           int err = rest.begin("api.thingspeak.com");
           if(err != 0) 
             {
@@ -275,9 +236,12 @@ int dataSamples()
           //Serial.print(tempInCelcius);
           //Serial.print(char(176)); 
           //Serial.println("C"); 
+          
+          
                 
         }
-           
+      
+    
    } 
  
     
@@ -401,8 +365,8 @@ boolean get_Humidity()
            // process any callbacks coming from esp_link
            esp.Process();
         }
-      else
-        {
+       else
+         {
            sprintf(buff, "/humidity?id=%s&appid=%s",CityID.c_str(),API_KEY.c_str());
            // process any callbacks coming from esp_link
            esp.Process();
@@ -422,11 +386,16 @@ boolean get_Humidity()
              Serial.print("Response: ");
              Serial.println(response);
              int hum = atoi(response);  // convert recieved string to integer
-             if (hum >=101)
-                { hum = (hum/10);
+             if (hum >=101 && hum<200)
+                { hum = 100;
                   humidity = hum;
                 } 
-             else 
+             else if(hum >199) 
+                {
+                  hum = hum/10;
+                  humidity = hum; 
+                }  
+             else
                 {
                   humidity = hum; 
                 }  
@@ -588,80 +557,61 @@ void drawFrame3()
 // function to scroll frames on OLED after 5 seconds  
 void frameScroll()
     { unsigned long currentMillis = millis();
-      if(currentMillis - previousMillis > interval1 && frame1 == true) {
-    // save the last time you blinked the LED 
-    
-       u8g.firstPage();
-     do 
-       {  
-         displayIcon();
-         frame1 = false;
-       } while( u8g.nextPage() );}
-   
-  //  delay(5000);
-    if(currentMillis - previousMillis > interval2 && frame2 == true) {
-      u8g.firstPage();
-     do 
-       {  
-         
-         drawFrame2();
-         frame2 = false;
-       } while( u8g.nextPage() );}
-    //  delay(5000);
-      if(currentMillis - previousMillis > interval3 && frame3==true) {
-         u8g.firstPage();
-     do 
-       {  
+      if(currentMillis - previousMillis > interval1 && frame1 == true)
+        {
+          u8g.firstPage();
+          do 
+            {  
+              displayIcon();
+              frame1 = false;
+            } while( u8g.nextPage() );}
+ 
+      if(currentMillis - previousMillis > interval2 && frame2 == true) 
+        {
+          u8g.firstPage();
+          do 
+            {  
+              drawFrame2();
+              frame2 = false;
+            } while( u8g.nextPage() );}
       
-         drawFrame3();
-         frame3 = false;
-       } while( u8g.nextPage() );
-    //   delay(5000);
+      if(currentMillis - previousMillis > interval3 && frame3==true) 
+        {
+          u8g.firstPage();
+          do 
+            {  
+              drawFrame3();
+              frame3 = false;
+            } while( u8g.nextPage() );
+     
        previousMillis = currentMillis;
-    frame1 = true;
- frame2 = true;
-frame3 = true; }
-    /*
-      if(yPos == 0)
-       {
-         delay(5000);
-       }
-     // If its too fast, you could add a delay
-     if(yPos < 128)
-       {
-         // if it's too slow, you could increment y by a greater number
-         yPos+=32;
-       }
-  
-     else 
-       {
-         if(xPos == 0)
-           {
-             delay(5000);
-           }
-         if(xPos <128)
-           {
-             xPos+=32;
-           }
-     else 
-       {
-         if(zPos == 0)
-           { yPos=128;
-             delay(5000);
-           }
-         if(zPos <128)
-           {yPos=128;
-             zPos+=32;
-           } 
-         else
-           { // When the yPos is off the screen, reset to 0.
-             xPos=0;
-             yPos=0;
-             zPos=0;
-           }
-       }  
+       frame1 = true;
+       frame2 = true;
+       frame3 = true;
+     }
    
-       } */
    }
    
- 
+
+ void weatherData()
+     {
+      if(time % (refreshRate*60) == 0 )
+        {
+          int err = rest.begin("idiotware.herokuapp.com");
+          if(err != 0) 
+            {
+              Serial.print("REST begin failed: ");
+              u8g.firstPage();
+              do 
+               {  
+                u8g.drawStr(0,15,"REST begin failed:");
+               } while( u8g.nextPage() );
+              Serial.println(err);
+              while(1) ;
+            }
+          get_location();
+          get_Temperature();
+          get_Humidity();
+          get_weatherDescription();
+        }
+     }     

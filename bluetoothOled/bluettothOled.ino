@@ -25,24 +25,21 @@ void setup()
 }
  
 void loop()
-{
- 
-    // Keep reading from HC-05 and send to Arduino Serial Monitor
-    if(BTserial.available())
-      {  
-        int data = BTserial.readBytesUntil('\n',receivedData,32);
-        receivedData[data] = '\0';
-        Serial.write(receivedData);
-        displayData();
-        int i = atoi(receivedData);
-        if(i == 489)
-           {
-             Serial.write("compare true");
-             buzzer();
-           }
-       }
-        
-        
+    {
+       // Keep reading from HC-05 and send to Arduino Serial Monitor
+       if(BTserial.available())
+         {  
+           int data = BTserial.readBytesUntil('\n',receivedData,32);
+           receivedData[data] = '\0';
+           Serial.write(receivedData);
+           displayData();
+           int i = atoi(receivedData);
+           if(i == 489)
+             {
+               Serial.write("compare true");
+                buzzer();
+              }
+         }
     }
 
 

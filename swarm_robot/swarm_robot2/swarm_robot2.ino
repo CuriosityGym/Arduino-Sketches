@@ -1,4 +1,3 @@
-//#include <Adafruit_NeoPixel.h>
 #include <RF24Network.h>
 #include <RF24.h>
 #include <SPI.h>
@@ -13,14 +12,14 @@ RF24 radio(7,8);
 RF24Network network(radio);
 
 // Address of our node
-const uint16_t this_node = 1;
+const uint16_t this_node = 0;
 
 // Address of the other node
-const uint16_t other_node = 0;
+const uint16_t other_node = 1;
 
 boolean send_message = false;
 char messageToSend[32] = "";  //
-
+ //char messageToRecieve[32] = "";
 int melody[]= {2000,2000,2000,2000};
 // note durations: 4 = quarter note, 8 = eighth note, etc.:
 int noteDurations[] = { 8,8,8,8 };
@@ -30,31 +29,28 @@ U8GLIB_SH1106_128X64 u8g(U8G_I2C_OPT_NONE);	// I2C / TWI
 String inputString = "";         // a string to hold incoming data
 boolean stringComplete = false;  // whether the string is complete
 
-int motor_left[] = {2, 3};
-int motor_right[] = {4, 5};
+int motor_left[] = {2, 4};
+int motor_right[] = {A0, A1};
+int motor1Speed = 3;
+int motor2Speed = 5;
 #define trigPin 9
 #define echoPin 6
+byte potPin = A2;
+int speed;
 long previousMillis = 0;        // will store last time LED was updated
 long interval = 1000;           // interval at which to blink (milliseconds)
 int duration, distance;
 int x, y;
-//#define PIN 6
-
-// Parameter 1 = number of pixels in strip
-// Parameter 2 = pin number (most are valid)
-// Parameter 3 = pixel type flags, add together as needed:
-//   NEO_KHZ800  800 KHz bitstream (most NeoPixel products w/WS2812 LEDs)
-//   NEO_KHZ400  400 KHz (classic 'v1' (not v2) FLORA pixels, WS2811 drivers)
-//   NEO_GRB     Pixels are wired for GRB bitstream (most NeoPixel products)
-//   NEO_RGB     Pixels are wired for RGB bitstream (v1 FLORA pixels, not v2)
-//Adafruit_NeoPixel strip = Adafruit_NeoPixel(1, PIN, NEO_GRB + NEO_KHZ800);
-
+boolean msg=false;
 // --------------------------------------------------------------------------- Setup
 void setup() 
      { 
        Serial.begin(57600);
        pinMode(trigPin, OUTPUT);
        pinMode(echoPin, INPUT);
+       //pinMode(potPin, INPUT);
+       pinMode(motor1Speed , OUTPUT);
+       pinMode(motor2Speed , OUTPUT);
        // Setup motors
        for(byte i = 0; i < 2; i++)
           {
@@ -62,22 +58,19 @@ void setup()
             pinMode(motor_right[i], OUTPUT);
           }
        u8g.setFont(u8g_font_unifont);
-       
-    //    strip.begin();
-  //strip.show(); // Initialize all pixels to 'off'
-       SPI.begin();
-       radio.begin();
-       network.begin(/*channel*/ 90, /*node address*/ this_node);
        u8g.firstPage();  
        do 
         {
           u8g.setPrintPos(0, 10); 
-          u8g.print("Robot " );
-          u8g.setPrintPos(45, 10); 
-          u8g.print(this_node);
-        } while( u8g.nextPage() );   
-     
-
+         u8g.print("Robot " );
+         u8g.setPrintPos(45, 10); 
+         u8g.print(this_node);
+        } while( u8g.nextPage() ); 
+ 
+       SPI.begin();
+       radio.begin();
+       network.begin(/*channel*/ 90, /*node address*/ this_node);
+         
       }
 
 
@@ -86,7 +79,8 @@ void loop()
     {  
       // Pump the network regularly
        network.update();
-       
+       speed = analogRead(A2);
+     //  Serial.println(speed);
        unsigned long currentMillis = millis();
        
        if(currentMillis - previousMillis > interval)
@@ -97,24 +91,22 @@ void loop()
            digitalWrite(trigPin, LOW);
            duration = pulseIn(echoPin, HIGH);
            distance = (duration/2) / 29.1;
-            x = (x + distance)%100;
+           x = (x + distance)%100;
            y = (x + y + distance)%100;
            Serial.println(distance);
            
-         }  
-       if (distance < 20)
-          { //strip.setPixelColor(0, 255,0,0);    //turn every third pixel o      }
-            //strip.show();
-            Serial.println("right");
+         } 
+      if (distance <= 6)
+          { 
             motor_stop();
-            delay(250);
-            turn_right();
-            delay(600);
-            motor_stop();
-            delay(250);
-            
-            inputString = String(x) + "   " + String(y);
-            RF24NetworkHeader header1(/*to node*/ other_node);
+          }  
+         
+      if (send_message )
+          { 
+          
+           
+          //  inputString = String(x) + "   " + String(y);
+            RF24NetworkHeader header1( other_node);
             boolean message = network.write(header1, inputString.c_str(), 32); // send message to other user
             if (message)
                {
@@ -132,10 +124,11 @@ void loop()
                }
           }    
     
-       else
-          {
-            Serial.println("forward");
-            drive_forward();
+     
+      // else
+      //    {
+            
+           
              // Is there anything ready for us?
             while (network.available() )   
                   { 
@@ -146,7 +139,7 @@ void loop()
                     while (!recieve)
                           {
                             recieve = network.read(header, messageToRecieve , 32 );
-                            Serial.print("Robot2: ");   // print recived data on okserial monitor
+                            Serial.print("Robot1: ");   // print recived data on okserial monitor
                             Serial.println(messageToRecieve);
                             for(int thisNote = 0; thisNote < 4; thisNote++) 
                                {
@@ -161,19 +154,62 @@ void loop()
                                 // stop the tone playing:
                                 noTone(8);
                                }
+                               
                              u8g.firstPage();  
                              do 
                                {
-                                 u8g.drawStr(0,10, "Robot1 says: "); 
-                               //  u8g.drawStr(0,25, "found obstacle at: ");
-                               //  u8g.setPrintPos(0, 44); 
-                               //  u8g.print(messageToRecieve); 
-                               } while( u8g.nextPage() );   
+                                 u8g.drawStr(0,10, "Robot2 says: "); 
+                                 u8g.drawStr(0,25, "found obstacle: ");
+                                 u8g.setPrintPos(0, 44); 
+                                 u8g.print(messageToRecieve); 
+                               } while( u8g.nextPage() );  
+                               moveRobot(messageToRecieve);
+                
+                              
                          }
                  }
           }
-    }     
-
+   // }     
+void moveRobot(String action)
+    {
+      
+      if(action == "RIGHT")
+        {
+           Serial.println("RIGHT message Recived");
+           inputString = "ACKR";
+           send_message = true; 
+            motor_stop();
+           delay(250);
+           turn_right();
+           delay(800);
+           motor_stop();
+           delay(250);
+        }
+        if(action == "FORWARD")
+        {
+           
+             Serial.println("FORWARD message Recived");
+            // inputString = "ACKF";
+            // send_message = true; 
+             drive_forward();
+        }
+        if(action == "GO")
+        {
+           
+             Serial.println("GO message Recived");
+             inputString = "GO";
+             send_message = true; 
+             drive_forward();
+        }
+         if(action == "STOP")
+        {
+           
+             Serial.println("STOP message Recived");
+            // inputString = "ACKF";
+            // send_message = true; 
+             motor_stop();
+        }
+    }
 
 // --------------------------------------------------------------------------- Drive
 
@@ -189,7 +225,9 @@ void motor_stop()
 
 
 void drive_forward()
-     {
+     { 
+       analogWrite(motor1Speed, speed/4);  
+       analogWrite(motor2Speed, speed/4); 
        digitalWrite(motor_left[0], HIGH);
        digitalWrite(motor_left[1], LOW);
 
@@ -197,13 +235,14 @@ void drive_forward()
        digitalWrite(motor_right[1], LOW);
      }
 
-
 void turn_right()
-     {
+     { 
+       analogWrite(motor1Speed, speed/4);  
+       analogWrite(motor2Speed, speed/4); 
        digitalWrite(motor_left[0], HIGH);
        digitalWrite(motor_left[1], LOW);
 
        digitalWrite(motor_right[0], LOW);
        digitalWrite(motor_right[1], HIGH);
      }
- /*    
+ 

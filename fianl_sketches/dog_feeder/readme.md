@@ -19,5 +19,5 @@ from blynk app. oN Blynk app we have added a button icon to send ON and OFF sign
 will rotate 60 degree in clockwise direction and food will get dispensed for 5 seconds and after thet servo will come back to 
 initial positon. You can change rotation angle of servo and time for which you want to dispense food. 
 
-Images: put link here
-Video: put link here
+#####**Images: put link here**
+#####**Video: put link here**

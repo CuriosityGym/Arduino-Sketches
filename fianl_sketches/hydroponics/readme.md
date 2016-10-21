@@ -22,3 +22,14 @@ Here we are using IFTTT to trigger an event.
     If Maker Event "Plant_watered", then send an email from "abcd@gmail.com" 
     
 note: replace API key for thingspek channel and maker channel   
+
+####**Setup:**
+
+
+####**Precautions:**
+
+
+####**Images:**
+
+
+####**Video:**

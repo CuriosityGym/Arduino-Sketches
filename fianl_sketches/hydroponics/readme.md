@@ -1,5 +1,5 @@
 #**idIoTWare Shield Hydroponics**
-######**Attention: Please install all libraries from our Github Repository to enable this example to run.**
+#####**Attention: Please install all libraries from our Github Repository to enable this example to run.**
 In this example we are using ESP8266-01 Wifi Module with esp-link firmware, Soil moisture sensor to sense moisture in soil,
 walter level sensor to detect water level and motor to water the plant. If plant's soil is dry then moisture sensor will give 
 HIGH input to arduino then arduino turns ON the motor. We have used mosfet to turn ON and turn OFF the motor. Arduino logs the 

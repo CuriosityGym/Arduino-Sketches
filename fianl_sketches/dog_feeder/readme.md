@@ -1,4 +1,4 @@
- #**idIoTWare Shield Dog Food Feeder**
+# **idIoTWare Shield Dog Food Feeder**
   ###  **Attention: Please install all libraries from our Github Repository to enable this example to run.**
     
     In this example we are using ESP8266-01 Wifi Module  and a Servo motor to dispense food from 3d printed food jar.

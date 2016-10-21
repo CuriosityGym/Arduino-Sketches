@@ -18,3 +18,6 @@ and Blynk app.We have used Servo.h library to control servo motor. In this code 
 from blynk app. oN Blynk app we have added a button icon to send ON and OFF signal to arduino. If you press button then servo
 will rotate 60 degree in clockwise direction and food will get dispensed for 5 seconds and after thet servo will come back to 
 initial positon. You can change rotation angle of servo and time for which you want to dispense food. 
+
+Images: put link here
+Video: put link here

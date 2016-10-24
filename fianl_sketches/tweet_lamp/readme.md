@@ -16,14 +16,14 @@ and Blynk HTTP RESTful API. We have used Heroku Deployment Application to receiv
 
 #####**Setup:**                                                          
 
-1.install all libraries from our Github Repository to enable this example to run.
-2.create account on BLYNK and use your Auth Token number in code and url.
+1.install all libraries from our Github Repository to enable this example to run.                                   
+2.create account on BLYNK and use your Auth Token number in code and url.                                                      
 
 #####**Precautions:**
 
-1.Enter correct Auth Token number.
-2.Virtual pin number in code and url must be same.
-3.Check jumper for WS2812 multicolor led is connected properly.
+1.Enter correct Auth Token number.                                                                                        
+2.Virtual pin number in code and url must be same.                                                                            
+3.Check jumper for WS2812 multicolor led is connected properly.                                                 
 
 #####**Images:** put link here
 #####**Video:**  put link here

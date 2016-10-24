@@ -23,6 +23,7 @@
  *
  **************************************************************/
 
+
 #define BLYNK_PRINT Serial    // Comment this out to disable prints and save space
 #include <ESP8266_Lib.h>
 #include <BlynkSimpleShieldEsp8266.h>
@@ -54,12 +55,11 @@ SoftwareSerial debugSerial(10, 9); // RX, TX
 #define ESP8266_BAUD 115200
 
 ESP8266 wifi(&EspSerial);
-const int led_Pin_Count = 13; // // the number of leds (i.e. the length of the array)
-int led_Pins[] = {1,1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,12}; //an array of pin numbers to which LEDs are attached
+
 void setup()
     {
       // Set console baud rate
-      debugSerial.begin(9600);
+      debugSerial.begin(115200);
       delay(10);
       // Set ESP8266 baud rate
       EspSerial.begin(ESP8266_BAUD);
@@ -69,33 +69,20 @@ void setup()
       strip.begin();
       strip.show();
     }
-
-BLYNK_WRITE(V1)
+//http://blynk-cloud.com/8ae41dd66020477a85c1b23d63e22203/update/V0?value=250?pin=V0&value=0&pin=V0&value=0
+BLYNK_WRITE(V0)
            {
-             int shift = param.asInt();
-             for(int i = 0; i < strip.numPixels(); i++)
-                {
-                  strip.setPixelColor(i, Wheel(shift & 255));
-                  // OR: strip.setPixelColor(i, Wheel(((i * 256 / strip.numPixels()) + shift) & 255));
-                }
+             int red = param[0].asInt();
+             int green = param[1].asInt();
+             int blue = param[2].asInt();
+             strip.setPixelColor(i,red,green,blue);     
              strip.show();
            }
-           
+
+
+             
+
 void loop()
 {
   Blynk.run();
-}
-
-// Input a value 0 to 255 to get a color value.
-// The colours are a transition r - g - b - back to r.
-uint32_t Wheel(byte WheelPos) {
-  if (WheelPos < 85) {
-    return strip.Color(WheelPos * 3, 255 - WheelPos * 3, 0);
-  } else if (WheelPos < 170) {
-    WheelPos -= 85;
-    return strip.Color(255 - WheelPos * 3, 0, WheelPos * 3);
-  } else {
-    WheelPos -= 170;
-    return strip.Color(0, WheelPos * 3, 255 - WheelPos * 3);
-  }
-}           
+}       

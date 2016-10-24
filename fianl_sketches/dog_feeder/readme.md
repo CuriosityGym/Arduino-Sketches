@@ -22,7 +22,7 @@ initial positon. You can change rotation angle of servo and time for which you w
 ####**Setup:**
 
 1.install all libraries from our Github Repository to enable this example to run.                                 
-2.create account on BLYNK and use your Auth Token number in code and url.                               
+2.create account on BLYNK and use your Auth Token number in code.                               
 
 
 ####**Precautions:**

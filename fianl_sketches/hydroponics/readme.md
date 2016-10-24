@@ -18,7 +18,7 @@ if Maker then Gmail
 If Maker Event "Plant_watered", then send an email from "abcd@gmail.com"  
       
 
-####**Setup:**
+#####**Setup:**
 1.create account on thingspeak and channel                                         
 2.create account on IFTTT, connect to maker channel and make recipe.                                                    
 3.replace API key for thingspek channel and maker channel                                                     
@@ -27,12 +27,12 @@ If Maker Event "Plant_watered", then send an email from "abcd@gmail.com"
 
 
 
-####**Precautions:**
+#####**Precautions:**
 1.Use mosfet or relay module to drive motor.                                                                             
 2.keep sensor properly in soil to get proper readings
 
 
-####**Images:**  put link here
+#####**Images:**  put link here
 
 
-####**Video:**  put link here
+#####**Video:**  put link here

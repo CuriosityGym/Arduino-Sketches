@@ -41,7 +41,7 @@
 #define LETTER_GAP     DOT_DURATION * 3  // Gap between two letters (in milliseconds)
 #define WORD_GAP       DOT_DURATION * 7  // Gap between two words (in milliseconds)
 
-#define BUTTON          7                // The diginal connector port to the button
+#define BUTTON          5                // The diginal connector port to the button.
 
 #define DOT             1                // DOT identifier
 #define DASH            2                // DASH identifier

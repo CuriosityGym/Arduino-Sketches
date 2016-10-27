@@ -43,39 +43,37 @@ void loop()
          switch(counter) 
               { 
                 case 1: color(127,0,255);
-                //delay(1000);
                 break;
+                  
                 case 2: color(0,0,255);
-                //delay(1000);
                 break;
+                  
                 case 3: color(0,255,0);
-                //delay(1000);
                 break;
+                  
                 case 4: color(255,255,0);
-                //delay(1000);
                 break;
+                  
                 case 5: color(255,128,0);
-                //delay(1000);
                 break; 
+                  
                 case 6: color(255,0,0);
-                //delay(1000);
                 break; 
+                  
                 case 7: color(255,255,255);
-                //delay(1000);
                 break;
+                  
                 case 8: color(0,0,0);    
-               // delay(1000);
-               break;    
+                break;    
               } 
        }
       if(counter==8) counter = 0; 
       
     }
-
+//function to check input from touchpad
 int touchpad()
    {
-     int touched = digitalRead(touchpadPin);
-     //udelay(250);  
+     int touched = digitalRead(touchpadPin); 
      if(touched == HIGH)   // check if the input is HIGH 
      
      return true;

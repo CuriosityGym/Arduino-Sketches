@@ -17,9 +17,9 @@
 
 // sets up and initialize CGShield
 #include <Adafruit_NeoPixel.h>
-#include <CGShield.h>
+#include <idIoTwareShield.h>
 #include <Wire.h>         // Require for I2C communication
-CGShield fs;             // Instanciate CGShield instance
+idIoTwareShield fs;             // Instanciate CGShield instance
 int buzzerPin = A1;
 const byte touchpadPin= 4;
 int counter;

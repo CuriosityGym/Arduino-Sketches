@@ -1,27 +1,21 @@
 /*  
+
     In this example we are using NRF24L01 radio and Arduino to
-    communicate with other Arduino and NRF24L01 using OLED display.
+    communicate with other Arduino and NRF24L01 using Serial Monitor.
     Here we are creating a local mesh between two radios(NRF24L01)
-    using <RF24.h> and <RF24Network.h library>. For OLED we are using
-    <Adafruit_GFX.h> and <Adafruit_SSD1306.h> libraries.
-    For every new message buzzer will alert user and message will be 
-    diplayed on OLED.
+    using <RF24.h> and <RF24Network.h library>.  
+
+
 */
 
-#include <SPI.h>
-#include <Wire.h>
-#include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
-#include <Fonts/FreeMonoBold9pt7b.h>
 #include <RF24Network.h>
 #include <RF24.h>
 #include <SPI.h>
-
+#include "U8glib.h"
 //
 // Hardware configuration
 //
-#define OLED_RESET 4
-Adafruit_SSD1306 display(OLED_RESET);
+
 // Set up nRF24L01 radio on SPI bus plus pins 9 & 10
 
 RF24 radio(7,8);
@@ -37,63 +31,72 @@ const uint16_t other_node = 1;
 
 boolean send_message = false;
 char messageToSend[32] = "";
+
 int melody[]= {2000,2000,2000,2000};
 // note durations: 4 = quarter note, 8 = eighth note, etc.:
 int noteDurations[] = { 8,8,8,8 };
 
+U8GLIB_SSD1306_128X64 u8g(U8G_I2C_OPT_NONE|U8G_I2C_OPT_DEV_0);	// I2C / TWI 
+
+String inputString = "";         // a string to hold incoming data
+boolean stringComplete = false;  // whether the string is complete
+
+
 void setup(void)
-{
-  Serial.begin(57600);
-  Serial.println("NRF24L01 MESSENGER");
-   display.begin(SSD1306_SWITCHCAPVCC, 0x3C);//display.display();
-  //delay(1000);
-  display.clearDisplay();
-  display.setFont(&FreeMonoBold9pt7b);
-  display.setTextSize(0.5);
-  display.setTextColor(WHITE);         
-  display.setCursor(10,15);
-  display.println("NRF24L01   MESSENGER");
-  display.display();
-  delay(2000);
-  display.clearDisplay();
-  SPI.begin();
-  radio.begin();
-  network.begin(/*channel*/ 90, /*node address*/ this_node);
-}
+    { 
+      u8g.setFont(u8g_font_unifont);
+      Serial.begin(57600);
+      Serial.println("NRF24L01 MESSENGER");
+ 
+      SPI.begin();
+      radio.begin();
+      network.begin(/*channel*/ 90, /*node address*/ this_node);
+      u8g.firstPage();  
+      do 
+       {
+         u8g.setPrintPos(0, 10); 
+         u8g.print("Organizer " );
+         u8g.setPrintPos(45, 10); 
+       //  u8g.print(this_node);
+       } while( u8g.nextPage() );   
+    }
 
-
-    
 void loop() 
     {
        // Pump the network regularly
        network.update();
-       if (send_message)   // if there is typed message on serial monitor ready to send
-        {
+       if (stringComplete)   // if there is typed message on serial monitor ready to send
+        { 
+          inputString.replace("\r","");
+          inputString.replace("\n","");
           RF24NetworkHeader header1(/*to node*/ other_node);
-          boolean message = network.write(header1, messageToSend, 32);   // send message to other user
+          boolean message = network.write(header1,  inputString.c_str(), 32);   // send message to other user
           if (message)
             {
-              Serial.print("Sender: ");   // print message on serial monitor
-              Serial.println(messageToSend);
+              Serial.print("Organizer: ");   // print message on serial monitor
+              Serial.println( inputString);
               send_message = false;
             }
           
           else
             
               Serial.println("could not write....\n"); // if it is failed to send message prompt error 
-        }  
+               
+              stringComplete=false;
+              inputString="";   
+      }  
     
      //// Is there anything ready for us?
      while (network.available() )
        { // If so, grab it and print it out
          RF24NetworkHeader header;
-         char messageToReceive[64] = "";
+         char messageToRecieve[32] = "";
          boolean recieve = false;
          while (!recieve)
             {
-              recieve = network.read(header, messageToReceive ,64);
-              Serial.print("Reciver: ");   // print recived data on serial monitor
-              Serial.println(messageToReceive);
+              recieve = network.read(header, messageToRecieve ,32);
+              Serial.print("Organizer: ");   // print recived data on serial monitor
+              Serial.println(messageToRecieve);
               for(int thisNote = 0; thisNote < 4; thisNote++) 
                  {
                    // to calculate the note duration, take one second divided by the note type.
@@ -107,19 +110,32 @@ void loop()
                    // stop the tone playing:
                    noTone(8);
                  }
-             // print received message on OLED    
-             display.clearDisplay();        
-             display.setCursor(0,15);
-             display.println(messageToReceive);
-             display.display();
-             delay(2000);
+                 
+                 u8g.firstPage();  
+                 do 
+                  {
+                    u8g.drawStr(0,10, "participant :"); 
+                    u8g.setPrintPos(0, 30);  
+                    u8g.print(messageToRecieve); 
+                  } while( u8g.nextPage() ); 
+                 
             }
+ 
         }
    
-     if (Serial.available())  // type message on serial monitor
-       { 
-         int data = Serial.readBytesUntil('\n', messageToSend, 32);  //read typed message from serial monitor
-         messageToSend[data] = '\0';
-         send_message = true;
-       }
    }
+  
+   void serialEvent() {
+  while (Serial.available()) {
+    // get the new byte:
+    char inChar = (char)Serial.read(); 
+    // add it to the inputString:
+    inputString += inChar;
+    // if the incoming character is a newline, set a flag
+    // so the main loop can do something about it:
+    if (inChar == '\n') {
+      stringComplete = true;
+    } 
+  }
+}
+   

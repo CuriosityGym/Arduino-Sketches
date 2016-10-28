@@ -12,8 +12,8 @@
   
 #####**Setup:**
 
-1.Connect NRF24L01 radio module, I2C OLED display properly.
-2.Connect buzzer jumper.
+1.Connect NRF24L01 radio module, I2C OLED display properly.                                                                    
+2.Connect buzzer jumper.                                                                        
 3.install all libraries from our Github Repository to enable this example to run.
 
 #####**Images:** put link here

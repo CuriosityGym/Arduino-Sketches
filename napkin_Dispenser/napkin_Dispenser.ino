@@ -1,11 +1,15 @@
 #include <Adafruit_NeoPixel.h>
 
-#define PIN 6
+#define PIN 7
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(1, PIN, NEO_GRB + NEO_KHZ800);
 int buzzerPin = A1;
 
 const byte dispensedSensorPin = 3;  // This is our sensor2 pin
 const byte moneySensorPin = 4;  // This is our sensor1 pin
+int firstSensor = 5;
+int secondSensor = 6;
+//boolean money = false;
+boolean reading = false;
 const byte motor = 9;           // the pin that the LED is attached to
 //const byte pushButton = 2;
 int distance;
@@ -25,33 +29,27 @@ boolean dispensed = false;
 boolean money = false;
 boolean motorStarted = false;
 boolean motorStopped = false;
+boolean complete = false;
 void setup()
     {
       Serial.begin(9600);
       pinMode(dispensedSensorPin, INPUT);
-      pinMode(moneySensorPin, INPUT);
-
+      pinMode(firstSensor, INPUT_PULLUP);
+      pinMode(secondSensor, INPUT_PULLUP);
       pinMode(motor, OUTPUT);
-      //pinMode(pushButton, INPUT);
       pinMode(buzzerPin,OUTPUT);
-      digitalWrite(moneySensorPin, HIGH);
-     // attachInterrupt(1, motorStop, RISING);
-      //attachInterrupt(0, motorStart, RISING);
+
       strip.begin();
       strip.show();
     }
 
 void loop()
     {
-       
+       currentMillis = millis();
        noteInserted(); 
-       //Serial.println(money);
+       Serial.println(money);
        sensor2State = digitalRead(dispensedSensorPin);
-       if(money == true)
-         {
-           strip.setPixelColor(0,0,0,255);strip.show();    
-         }
-       
+  
        if(money == true )
          { 
            strip.setPixelColor(0,0,0,255);strip.show();
@@ -60,6 +58,8 @@ void loop()
            previousMillis = currentMillis; 
            Serial.println("previousMillis:");   
            Serial.println(previousMillis); 
+           money = false;
+           complete = false;
          }   
         if(sensor2State == LOW)
           {
@@ -71,67 +71,71 @@ void loop()
           }
         if(motorStarted == true && motorStopped == false)
           {
-            currentMillis = millis();
-            if(currentMillis - previousMillis > interval && motorStopped == false)
+            Serial.println("Check Time");
+            if(currentMillis - previousMillis > interval && motorStarted == true && complete== false)
               {
                 analogWrite(motor, 0);
                 //dispensed = false;
                 motorStarted == false;
                 motorStopped == true;
-               // strip.setPixelColor(0,255,0,0);strip.show();
+                strip.setPixelColor(0,255,0,0);strip.show();
                 
              Serial.println("forceSTOP");
-            // delay(3000);
-            // strip.setPixelColor(0,255,0,0);strip.show();
+             delay(3000);
+             strip.setPixelColor(0,255,0,0);strip.show();
              
               }
           }   
              
         if(dispensed == true)
           { 
-            // if(currentMillis - previousMillis > interval)
-            // {
-             //   save the last time you blinked the LED 
-              // previousMillis = currentMillis;
-              strip.setPixelColor(0,0,255,0);strip.show();
-              delay(1000);
-              beep(1000);
-              delay(2000);
-              strip.setPixelColor(0,0,0,0);strip.show();
-               
-               //digitalWrite(greenLed, LOW);
-               dispensed = false;
-               money = false;
-               
-            //  }
-            // else
-            //   digitalWrite(greenLed, LOW); 
-          }//*/
+            Serial.println("dispensed");
+            strip.setPixelColor(0,0,255,0);strip.show();
+            delay(1000);
+            beep(1000);
+            delay(2000);
+            strip.setPixelColor(0,0,0,0);strip.show();
+            dispensed = false;
+            money = false;
+            complete = true;
+
+          }
          
          
         
     }  
 
+
 boolean noteInserted()
-       { // digitalWrite(redLed, LOW);
-          distance = digitalRead(moneySensorPin);
-          if(distance ==  HIGH)
-            {
-              strip.setPixelColor(0,0,0,255);strip.show();
-              //digitalWrite(blueLed, HIGH);
-              //digitalWrite(redLed, LOW);
-              money = true;
+       {
+         
+         int firstSensorState = digitalRead(firstSensor); 
+         int secondSensorState = digitalRead(secondSensor);
+
+         
+         if(firstSensorState == HIGH)
+           { 
+             reading = false;
+             Serial.println("1");
+             if(secondSensorState == LOW)
+               {
+                 Serial.println("2");
+                  reading = true;
+               }
+           }   
+         if(firstSensorState == LOW && reading == true)
+           {
+             
+             Serial.println("3");       
+             if(secondSensorState == HIGH && reading == true)
+               {
+                 Serial.println("4");
+                 money = true;
+                 reading = false;
+               }
             }
-          else
-            { 
-             strip.setPixelColor(0,0,0,0);strip.show();
-            //  money = false;
-            }  
-          Serial.println(distance); 
-          //return money;
-       }
 
-
+       } 
       
 void motorStop()
     {
@@ -139,18 +143,13 @@ void motorStop()
       Serial.println("motor stop");
       analogWrite(motor, 0);
       dispensed = true; 
+      motorStarted == false;
     } 
 
 void motorStart()
     { 
-      //if(money == true)
-      //  {
-        // sensor1State = digitalRead(moneySensorPin);
-        // Serial.println(sensor1State);
-         Serial.println("motor start");
-         analogWrite(motor, 20);
-       //  money = false;
-       // }    
+      Serial.println("motor start");
+      analogWrite(motor, 20);  
     } 
     
 void beep(int delayValue)

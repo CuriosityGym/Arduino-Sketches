@@ -17,13 +17,6 @@ In this example we have used ESP8266_Lib.h and BlynkSimpleShieldEsp8266.h librar
 #include <ESP8266_Lib.h>
 #include <BlynkSimpleShieldEsp8266.h>
 
-
-#include <Adafruit_NeoPixel.h>
-
-#define PIN 6
-int tempPin = A0;
-Adafruit_NeoPixel strip = Adafruit_NeoPixel(1, PIN, NEO_GRB + NEO_KHZ800);
-
 // You should get Auth Token in the Blynk App.
 // Go to the Project Settings (nut icon).
 char auth[] = "xxxxxxxxxxxxxxxxxxxx";

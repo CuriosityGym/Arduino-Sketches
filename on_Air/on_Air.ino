@@ -1,27 +1,30 @@
-/**************************************************************
- * Blynk is a platform with iOS and Android apps to control
- * Arduino, Raspberry Pi and the likes over the Internet.
- * You can easily build graphic interfaces for all your
- * projects by simply dragging and dropping widgets.
- *
- *   Downloads, docs, tutorials: http://www.blynk.cc
- *   Blynk community:            http://community.blynk.cc
- *   Social networks:            http://www.fb.com/blynkapp
- *                               http://twitter.com/blynk_app
- *
- * Blynk library is licensed under MIT license
- * This example code is in public domain.
- *
- **************************************************************
- * Control a color gradient on NeoPixel strip using a slider!
- *
- * For this example you need NeoPixel library:
- *   https://github.com/adafruit/Adafruit_NeoPixel
- *
- * App project setup:
- *   Slider widget (0...500) on V1
- *
- **************************************************************/
+/*
+    idIoTWare Shield On Air
+    Attention: Please install all libraries from our Github Repository to enable this example to run.
+    
+    In this example we are using ESP8266-01 Wifi Module  and onboard WS2812 multicolor led.
+    
+    In this example we are using Blynk HTTP RESTful API and IFTTT.
+    Blynk HTTP RESTful API allows to easily read and write values to/from Pins in Blynk apps and 
+    Hardware (microcontrollers and microcomputers like Arduino, Raspberry Pi, ESP8266, Particle, etc.).
+    Every PUT request will update Pin's state both in apps and on the hardware. Every GET request will 
+    return current state/value on the given Pin. We also provide simplified API so you can do updates via GET requests.
+    You can read on how to do it here //http://docs.blynkapi.apiary.io/#reference/0/get-pin-value/write-pin-value-via-get?console=1
+    Use your Auth Token number in url to get data from server.
+    
+    Here we are using IFTTT to trigger an event.
+    IFTTT is a free web-based service that allows users to create chains of simple conditional statements, called "recipes", 
+    which are triggered based on changes to other web services such as Gmail, Facebook, Instagram, and many more.IFTTT is 
+    an abbreviation of "If This Then That" Create account on IFTTT and create your recipe.
+    
+    In this example we have used ESP8266_Lib.h and BlynkSimpleShieldEsp8266.h  library to make communication between arduino
+    and Blynk HTTP RESTful API.
+    We have used Maker and Google calender channel to trigger an event.
+
+    If there is new event on google calender then before 15 minutes of that event it will make request to maker channel.
+    Maker channel then sends web request to blynk API and then arduino recives the web request and turn on the red color of
+    ws2812 LED.   
+*/
 
 #define BLYNK_PRINT Serial    // Comment this out to disable prints and save space
 #include <ESP8266_Lib.h>

@@ -26,13 +26,10 @@
 #define BLYNK_PRINT Serial    // Comment this out to disable prints and save space
 #include <ESP8266_Lib.h>
 #include <BlynkSimpleShieldEsp8266.h>
-
-
 #include <Adafruit_NeoPixel.h>
-
-#define PIN 6
-int tempPin = A0;
-Adafruit_NeoPixel strip = Adafruit_NeoPixel(1, PIN, NEO_GRB + NEO_KHZ800);
+#include <idIoTwareShield.h>
+#include <Wire.h>         // Require for I2C communication
+idIoTwareShield fs;             // Instanciate CGShield instance
 
 // You should get Auth Token in the Blynk App.
 // Go to the Project Settings (nut icon).
@@ -65,23 +62,18 @@ void setup()
       delay(10);
 
       Blynk.begin(auth, wifi, ssid, pass);
-      strip.begin();
-      strip.show();
     }
 
+//http://blynk-cloud.com/yourAPIkey/update/V0?value=250?pin=V0&value=0&pin=V0&value=0
+
+//create virtual pin 1 and read value from that pin
 BLYNK_WRITE(V0)
            {
-             int red = param.asInt();
-             for(int i = 0; i < strip.numPixels(); i++)
-                {
-                  strip.setPixelColor(i,red,0,0);
-                  // OR: strip.setPixelColor(i, Wheel(((i * 256 / strip.numPixels()) + shift) & 255));
-                }
-             strip.show();
+             int red = param[0].asInt();
+             int green = param[1].asInt();
+             int blue = param[2].asInt();
+             color(red,green,blue); //Set color received from twitter handle 
            }
-
-
-             
 
 void loop()
 {

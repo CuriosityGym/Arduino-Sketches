@@ -72,7 +72,7 @@ BLYNK_WRITE(V0)
              int red = param[0].asInt();
              int green = param[1].asInt();
              int blue = param[2].asInt();
-             color(red,green,blue); //Set color received from twitter handle 
+             color(red,green,blue); //Set color received from Blynk API 
            }
 
 void loop()

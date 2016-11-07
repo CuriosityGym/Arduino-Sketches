@@ -13,7 +13,7 @@
  ** MOSI - pin 11
  ** MISO - pin 12
  ** CLK - pin 13
- ** CS - pin 6
+ ** CS - pin 4
  */
 
 #include <SPI.h>
@@ -22,15 +22,15 @@ SdFat sd;
 const uint8_t chipSelect = 6;
 
 //const int chipSelect = 4;   //cs pin of SD card shield
-int tempPin = A0;      // LM 35 is connected to A3 pin.
-int buzzerPin = A1;    // buzzer is connected to A2 pin
+int tempPin = A3;      // LM 35 is connected to A3 pin.
+int buzzerPin = A2;    // buzzer is connected to A2 pin
 
 File dataFile;   // the logging file
 char filename[] = "Temp000.CSV";
 float tempInCelcius;
 float tempInFarenheit;
 unsigned long time=0;
-int samplingTime = 60;  //this variable is interval(in Seconds) at which you want to log the data to SD card.
+int samplingTime = 10;  //this variable is interval(in Seconds) at which you want to log the data to SD card.
 int duration = 15;     //this variable is duration(in Minutes) which is the total time for which you want to log data.
 
 
@@ -80,7 +80,7 @@ void setup()
                // Duration = 1 second / note type
                // e.g. quarter note = 1000 / 4, eighth note = 1000/8, etc.
                int noteDuration = 2500 / noteDurations[thisNote];
-               tone(A1,alertAlarm1[thisNote], noteDuration);
+               tone(A2,alertAlarm1[thisNote], noteDuration);
                //pause for the note's duration plus 100 ms:
                delay(noteDuration + 100);
              }
@@ -122,7 +122,7 @@ void setup()
                // Duration = 1 second / note type
                // e.g. quarter note = 1000 / 4, eighth note = 1000/8, etc.
                int noteDuration = 2500 / noteDurations[thisNote];
-               tone(A1,alertAlarm2[thisNote], noteDuration);
+               tone(A2,alertAlarm2[thisNote], noteDuration);
                //pause for the note's duration plus 50 ms:
                delay(noteDuration + 50);
              }
@@ -132,7 +132,9 @@ void setup()
 
 void loop() 
     {
-      dataSamples();    
+      dataSamples();    // here we are logging data at interval of 1 minute for 15 mintutes, i.e, 15 samples.
+                            // if you want to save data for 2 hours then simply multiply 2 by 60 which will give 
+                            // you value of 120 minutes then use 120 as second parameter.
     }
 
 // this method will log data to SD card at particular interval and for paricular duration
@@ -147,9 +149,9 @@ int dataSamples()
       // uncomment following line to get temperature values in Farehniet
       //tempInFarenheit = ((tempC*9)/5) + 32;            //convert celcius to farenheit
       
-      unsigned long  elapsedTime = millis()/1000; // this variable will keep track of elapsed time
-      while(((millis()/1000)-elapsedTime) < 1);   // this loop will do nothing until a second has passed 
-      time++;                                     //increment time after each second.
+      unsigned long  elapsedTime = millis()/1000;   // this variable will keep track of elapsed time
+      while(((millis()/1000)-elapsedTime) < 1);    // this loop will do nothing until a second has passed 
+      time++;                                       //increment time after each second.
  
       if((duration >= time) && (time % samplingTime == 0))
         {
@@ -181,14 +183,13 @@ void LogToSDcard()
       /*  dataFile.print(tempInFarenheit);
          dataFile.print("°C");
          dataFile.println(",");
-         dataFile.close();   
-      */
+         dataFile.close();   */
        } 
   
       //if the file isn't open, pop up an error:
      else 
         {
-          Serial.println("error opening Temp000.CSV");
+          Serial.println("error opening datalog.txt");
           delay(2000);
         }
    }   

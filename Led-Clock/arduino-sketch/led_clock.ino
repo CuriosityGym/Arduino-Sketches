@@ -28,8 +28,8 @@ void setup()
 unsigned long elapsedSeconds=0;
 unsigned long hour=0;
 unsigned long minute=0;
-unsigned long initialHours =11;      //variable to initiate hours
-unsigned long initialMinutes = 59;    //variable to initiate minutes
+unsigned long initialHours =3;      //variable to initiate hours
+unsigned long initialMinutes = 49;    //variable to initiate minutes
 unsigned long initialSeconds = 50;    //variable to initiate seconds
 
 
@@ -106,8 +106,8 @@ void digitalClockDisplay()
        {                                          // then LED which will indicate hours and minutes                                                      
            blinkWithoutDelay(interval_2);         // which is same will blink with delay of 250 miliseconds.
                                                   // for example: 2:10, 3:15, 4:20, 6:30, 9:45
-           digitalWrite(ledPins[hourLed], ledState); 
-           digitalWrite(ledPins[hourLed - 1], LOW); 
+           digitalWrite(ledPins[hourLed - 1 ], ledState); 
+           digitalWrite(ledPins[hourLed], LOW); 
        }
        
            
@@ -115,8 +115,8 @@ void digitalClockDisplay()
        {                                            // then LED which will indicate hour will
           blinkWithoutDelay(interval_1);            // glow continously and LED which will indicate 
                                                     // minutes will blink with delay of one second.
-          digitalWrite(ledPins[hourLed], HIGH);     
-          digitalWrite(ledPins[hourLed - 1], LOW);   
+          digitalWrite(ledPins[hourLed - 1], HIGH);     
+          digitalWrite(ledPins[hourLed ], LOW);   
           digitalWrite(ledPins[minuteLed], ledState); 
           digitalWrite(ledPins[minuteLed - 1], LOW);
            

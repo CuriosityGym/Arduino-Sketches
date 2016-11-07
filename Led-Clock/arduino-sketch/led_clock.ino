@@ -28,8 +28,8 @@ void setup()
 unsigned long elapsedSeconds=0;
 unsigned long hour=0;
 unsigned long minute=0;
-unsigned long initialHours =3;      //variable to initiate hours
-unsigned long initialMinutes = 49;    //variable to initiate minutes
+unsigned long initialHours =12;      //variable to initiate hours
+unsigned long initialMinutes = 59;    //variable to initiate minutes
 unsigned long initialSeconds = 50;    //variable to initiate seconds
 
 

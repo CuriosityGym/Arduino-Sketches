@@ -22,8 +22,8 @@ SdFat sd;
 const uint8_t chipSelect = 6;
 
 //const int chipSelect = 4;   //cs pin of SD card shield
-int tempPin = A3;      // LM 35 is connected to A3 pin.
-int buzzerPin = A2;    // buzzer is connected to A2 pin
+int tempPin = A0;      // LM 35 is connected to A3 pin.
+int buzzerPin = A1;    // buzzer is connected to A2 pin
 
 File dataFile;   // the logging file
 char filename[] = "Temp000.CSV";
@@ -46,7 +46,7 @@ void setup()
       Serial.print("Initializing SD card...");
 
      // see if the card is present and can be initialized:
-     if (!sd.begin(chipSelect))  
+     if (!sd.begin(chipSelect, SPI_HALF_SPEED))  
         { sd.initErrorHalt();
           Serial.println("Card failed, or not present");
           // don't do anything more:

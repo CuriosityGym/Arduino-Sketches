@@ -2,7 +2,7 @@ int motor_left[] = {2, 3};
 int motor_right[] = {4, 5};
 int motor1Speed = 6;
 int motor2Speed = 9;
-int potPin = A2;
+//int potPin = A2;
 int speed;
 
 // --------------------------------------------------------------------------- Setup

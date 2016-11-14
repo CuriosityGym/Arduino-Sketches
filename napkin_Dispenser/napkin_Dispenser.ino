@@ -1,6 +1,6 @@
 #include <Adafruit_NeoPixel.h>
 
-#define PIN 7
+#define PIN 8
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(1, PIN, NEO_GRB + NEO_KHZ800);
 int buzzerPin = A1;
 
@@ -30,6 +30,7 @@ boolean money = false;
 boolean motorStarted = false;
 boolean motorStopped = false;
 boolean complete = false;
+boolean forceStop = false;
 void setup()
     {
       Serial.begin(9600);
@@ -49,7 +50,7 @@ void loop()
        noteInserted(); 
        Serial.println(money);
        sensor2State = digitalRead(dispensedSensorPin);
-  
+      
        if(money == true )
          { 
            strip.setPixelColor(0,0,0,255);strip.show();
@@ -72,7 +73,7 @@ void loop()
         if(motorStarted == true && motorStopped == false)
           {
             Serial.println("Check Time");
-            if(currentMillis - previousMillis > interval && motorStarted == true && complete== false)
+            if(((currentMillis - previousMillis) > interval) && motorStarted == true && complete== false)
               {
                 analogWrite(motor, 0);
                 //dispensed = false;
@@ -81,19 +82,32 @@ void loop()
                 strip.setPixelColor(0,255,0,0);strip.show();
                 
              Serial.println("forceSTOP");
-             delay(3000);
-             strip.setPixelColor(0,255,0,0);strip.show();
+             delay(2000);
+            // strip.setPixelColor(0,255,0,0);strip.show();
+            // error(500,10);
+             complete = true;
+             forceStop = true;
              
               }
           }   
-             
+         
+        if(forceStop == true)
+          { 
+            Serial.println("errror");
+            error(500,10);
+            complete = true;
+            forceStop = false;
+           // strip.setPixelColor(0,0,0,0);
+           // strip.show();
+          }  
+            
         if(dispensed == true)
           { 
             Serial.println("dispensed");
             strip.setPixelColor(0,0,255,0);strip.show();
-            delay(1000);
-            beep(1000);
-            delay(2000);
+            //delay(1000);
+            beep(250);
+            //delay(500);
             strip.setPixelColor(0,0,0,0);strip.show();
             dispensed = false;
             money = false;
@@ -157,5 +171,21 @@ void beep(int delayValue)
        digitalWrite(buzzerPin,HIGH);
        delay(delayValue);
        digitalWrite(buzzerPin,LOW);
-     }    
+       delay(delayValue);
+     }  
+   
+void error(int delayValue, int reps)
+     {  
+       for(int i=0; i<=reps; i++)
+          { 
+            strip.setPixelColor(0,255,0,0);
+            strip.show();
+            digitalWrite(buzzerPin,HIGH);
+            delay(delayValue);
+            strip.setPixelColor(0,0,0,0);
+            strip.show();
+            digitalWrite(buzzerPin,LOW);
+            delay(delayValue);
+          } 
+     }      
      

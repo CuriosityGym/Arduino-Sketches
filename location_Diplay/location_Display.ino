@@ -1,4 +1,4 @@
-/*
+
               Location Display
    In this example we are using ESP8266 wifi module and OLED display
  to display location using your IP address.
@@ -19,7 +19,7 @@ ELClient esp(&Serial, &Serial);
 
 // Initialize a REST client on the connection to esp-link
 ELClientRest rest(&esp);
-
+int x=0;
 boolean wifiConnected = false;
 
 // Callback made from esp-link to notify of wifi status changes
@@ -38,10 +38,16 @@ void wifiCb(void *response)
                wifiConnected = true;
              } 
            else 
-             {
+             { 
+                u8g.firstPage();
+              do { u8g.setFont(u8g_font_timB10); 
+                   u8g.drawStr(1,13,"WIFI DISCONNECTED!!");
+                 } while( u8g.nextPage() );
                Serial.print("WIFI NOT READY: ");//Wifi not connected,check connection
                Serial.println(status);
                wifiConnected = false;
+                
+            
              }
          }
     }
@@ -50,7 +56,7 @@ void setup()
     {
       Serial.begin(9600);   // the baud rate here needs to match the esp-link config
       Serial.println("EL-Client starting!");
-      u8g.setFont(u8g_font_timB14);
+      
       u8g.setColorIndex(1);
       // Sync-up with esp-link, this is required at the start of any sketch and initializes the
       // callbacks to the wifi status change callback. The callback gets called with the initial
@@ -84,13 +90,23 @@ void setup()
           while(1) ;
         }
       Serial.println("EL-REST ready");
-     
+      u8g.firstPage();
+              do { u8g.setFont(u8g_font_timB14); 
+                   u8g.drawStr(1,20,"Where am I ??");
+                   u8g.setFont(u8g_font_timB10); 
+                   u8g.drawStr(1,40,"Searching");
+                   u8g.drawStr(65,40,"....");
+                   
+                 } while( u8g.nextPage() );
+     // delay(2000);
+      
+      get_Location();      
       
     }
 
 void loop() 
     {
-     get_Location();
+     
     }
  
     
@@ -119,10 +135,15 @@ void get_Location()
               String countryCode = "";
               countryCode=location.substring(commaPositon+2);//copy country code from recived location to variable countryCode
               u8g.firstPage();
-              do {  
-                   u8g.setPrintPos(15, 30);
+              do { u8g.setFont(u8g_font_timB10);
+                   u8g.drawStr(1,10,"City:");
+                   u8g.setFont(u8g_font_timB14); 
+                   u8g.setPrintPos(5, 30);
                    u8g.print(city);
-                   u8g.setPrintPos(15, 30);
+                   u8g.setFont(u8g_font_timB10);
+                   u8g.drawStr(1,45,"Country:");
+                   u8g.setFont(u8g_font_timB14);
+                   u8g.setPrintPos(5, 64);
                    u8g.print(countryCode);
                  } while( u8g.nextPage() );
             } 
@@ -135,6 +156,3 @@ void get_Location()
         }
         
     }   
-    
-   
-   

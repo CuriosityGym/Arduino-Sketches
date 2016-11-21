@@ -14,8 +14,8 @@ u8g_uint_t ballX;
 u8g_uint_t ballDirectionX = 1;
 u8g_uint_t ballY;
 u8g_uint_t ballDirectionY = 1;
-u8g_uint_t paddleWidth = 3;
-u8g_uint_t paddleHeight = 10;
+u8g_uint_t paddleWidth = 2.5;
+u8g_uint_t paddleHeight = 9;
 u8g_uint_t paddleHalfHeight = paddleHeight/2;
 u8g_uint_t paddle0Y; // Left player vertical paddle position
 u8g_uint_t paddle1Y; // Right player vertical paddle position

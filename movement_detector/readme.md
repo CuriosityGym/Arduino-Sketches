@@ -1,7 +1,7 @@
 #**Motion Detector**
     
 In this example we are using ESP8266 and IdIoTWare Shield and Arduino Board. PIR sensor
-is used to detect motion.                                                       
+is used to detect motion.                                                                                  
 PIR Sensor :
   PIR sensors allow you to sense motion, almost always used to detect whether a human has moved in or out of the sensors range.
   They are often referred to as PIR, "Passive Infrared", "Pyroelectric", or "IR motion" sensors.        

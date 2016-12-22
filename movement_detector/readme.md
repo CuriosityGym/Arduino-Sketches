@@ -1,4 +1,4 @@
-#Motion Detector
+#**Motion Detector**
     
     In this example we are using ESP8266 and IdIoTWare Shield and Arduino Board. PIR sensor
     is used to detect motion.

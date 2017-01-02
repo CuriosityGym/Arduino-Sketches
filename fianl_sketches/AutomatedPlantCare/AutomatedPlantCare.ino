@@ -1,5 +1,5 @@
 /*
-idIoTWare Shield Hydroponics
+idIoTWare Shield Automated Plant Care
 Attention: Please install all libraries from our Github Repository to enable this example to run.
 
 In this example we are using ESP8266-01 Wifi Module with esp-link firmware, Soil moisture sensor to sense moisture in soil,
@@ -25,7 +25,7 @@ Here we are using IFTTT to trigger an event.
     if Maker then Gmail
     If Maker Event "Plant_watered", then send an email from "abcd@gmail.com" 
     
-note: replace API key for thingspek channel and maker channel    
+note: replace API key for thingspeak channel and maker channel    
 */
 
 

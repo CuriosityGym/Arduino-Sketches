@@ -22,7 +22,7 @@
 // Network Definitions //
 /////////////////////////
 const IPAddress AP_IP(192, 168, 1, 1);
-const char* AP_SSID = "ESP8266_BUTTON_SETUP";
+const char* AP_SSID = "Hydroponics";
 boolean SETUP_MODE;
 String SSID_LIST;
 DNSServer DNS_SERVER;
@@ -34,7 +34,7 @@ ESP8266WebServer WEB_SERVER(80);
 String DEVICE_TITLE = "IFTTT ESP8266 Dash Like Button";
 boolean POWER_SAVE = false;
 boolean RGB_LED = true;
-String API_KEY = "BNOJ3CIAYB2DJPDT";
+String API_KEY = "L4PB4NFGIGKGQKAM";
 ///////////////////////
 // IFTTT Definitions //
 ///////////////////////
@@ -51,8 +51,10 @@ const int LED_GREEN = 14;
 // Blue and Red LED Pins if RGB LED is enabled
 const int LED_RED = 12;
 const int LED_BLUE = 13;
-const int BUTTON_PIN = 0;
-
+const int BUTTON_PIN = 2;
+const int SENSOR_PIN = 0;
+const int RELAY_PIN = 16;
+const int switch3 = 2;
 //////////////////////
 // Button Variables //
 //////////////////////
@@ -63,8 +65,14 @@ long DEBOUNCE_DELAY = 100;
 int BUTTON_COUNTER = 0;
 int IDLE_DELAY=5000;
 int lastPressedMillis=0;
-
+unsigned long previousMillis = millis()/1000;     
+const long interval = 600;          
 void setup() {
+  Serial.begin(115200);
+  pinMode(switch3,INPUT);
+  pinMode(SENSOR_PIN,INPUT);
+  pinMode(RELAY_PIN,OUTPUT);
+  digitalWrite(RELAY_PIN, LOW);
   digitalWrite(LED_RED, HIGH);
   delay(1000);
   digitalWrite(LED_RED, LOW);
@@ -84,8 +92,14 @@ void setup() {
   setupMode();
 }
 
-void loop() {
 
+void loop() {
+   
+   
+   //Serial.println(elapsedTime/1000);
+   
+  // Serial.print("sensor_Value:");
+  // Serial.println(sensor_Value);
   // Handle WiFi Setup and Webserver for reset page
   if (SETUP_MODE) {
     DNS_SERVER.processNextRequest();
@@ -93,43 +107,63 @@ void loop() {
   WEB_SERVER.handleClient();
 
   // Wait for button Presses
-  boolean pressed = debounce();
-  if (pressed == true)
-  {
-      if(BUTTON_COUNTER==EVENTS)// This will make the Button Counter roll back to 1
-      {
-        BUTTON_COUNTER=0;
-      }
-      BUTTON_COUNTER++;
-      Serial.print(BUTTON_COUNTER);
+ // boolean pressed = debounce();
+ // if (pressed == true)
+//  {
+//      if(BUTTON_COUNTER==EVENTS)// This will make the Button Counter roll back to 1
+//      {
+ //       BUTTON_COUNTER=0;
+ //     }
+ //     BUTTON_COUNTER++;
+ //     Serial.print(BUTTON_COUNTER);
       
-      lastPressedMillis=millis();  
+  //    lastPressedMillis=millis();  
 
-  }
-  if((millis()-lastPressedMillis)>IDLE_DELAY && lastPressedMillis>0)  //Wait for " IDLE_DELAY" Time to ensure person has clicked switch the right number of times
-  {
-    lastPressedMillis=0;
-       
-    Serial.print("Trigger" + String(IFTTT_EVENT) + " Event Pressed ");
-    Serial.print(BUTTON_COUNTER);
-    Serial.println(" times");
-    if(BUTTON_COUNTER > 0)
-    {
-      // Turn off the Green LED  while transmitting.
-      digitalWrite(LED_GREEN, LOW);
-      if(RGB_LED == true)
-      {
-        digitalWrite(LED_BLUE, HIGH);
-      }
-      triggerButtonEvent(IFTTT_EVENT,BUTTON_COUNTER );
+ // }
+ unsigned long currentMillis = (millis()/1000);
+  if(( currentMillis - previousMillis >= interval))  //Wait for " IDLE_DELAY" Time to ensure person has clicked switch the right number of times
+  { previousMillis = currentMillis;
+  Serial.println(" currentMillis:");
+   Serial.println(currentMillis);
+    //Serial.print("Trigger" + String(IFTTT_EVENT) + " Event Pressed ");
+    //Serial.print(BUTTON_COUNTER);
+    //Serial.println(" times");
+     int sensor_Value = digitalRead(SENSOR_PIN);
+     Serial.print("SENSOR VALUE:");
+     Serial.println(sensor_Value);
+   // if(BUTTON_COUNTER > 0)
+   // {
+    //  // Turn off the Green LED  while transmitting.
+    //  digitalWrite(LED_GREEN, LOW);
+     // if(RGB_LED == true)
+     // {
+     //   digitalWrite(LED_BLUE, HIGH);
+     // }
+      triggerButtonEvent(IFTTT_EVENT, sensor_Value );
+  //    previousElapsedTime = elapsedTime;
+      if(sensor_Value == 1)
+        {
+          digitalWrite(RELAY_PIN,HIGH);
+          delay(1000);
+          digitalWrite(RELAY_PIN,LOW);
+        }
       // After a successful send turn the light back to green
-      if(RGB_LED == true){
-       digitalWrite(LED_BLUE, LOW);
-      }
-      digitalWrite(LED_GREEN, HIGH);
-      BUTTON_COUNTER=0;
-    }
+     // if(RGB_LED == true){
+    //   digitalWrite(LED_BLUE, LOW);
+     // }
+      //digitalWrite(LED_GREEN, HIGH);
+ 
   }
+  int switch3State = digitalRead(switch3);
+  if(switch3State == LOW)
+    {
+      digitalWrite(RELAY_PIN,HIGH);
+    }
+  if(switch3State == HIGH)
+    {   
+      digitalWrite(RELAY_PIN,LOW);
+    }   
+    
 }
 
 void initHardware()

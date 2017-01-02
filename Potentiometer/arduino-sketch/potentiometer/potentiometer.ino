@@ -17,7 +17,7 @@
 */  
   
 
-int potentiometer = 2;    // The potentiometer is connected to analog pin 2
+int potentiometer = A2;    // The potentiometer is connected to analog pin 2
                           
 int led_Pins[] = {1,2,3,4,5,6,7,8,9,10,11,12};   //an array of pin numbers to which LEDs are attached
 

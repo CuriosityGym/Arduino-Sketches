@@ -1,5 +1,6 @@
 /**
- * Simple example to demo the esp-link MQTT client
+ Twitter Pet Cube
+Create a twitter pet cube, that shows Angry, Sad, neutral, based on certain keywords in twitter feeds or hashtags. 
  */
 
 #include <ELClient.h>
@@ -24,60 +25,66 @@ ELClientMqtt mqtt(&esp);
 
 // Callback made from esp-link to notify of wifi status changes
 // Here we just print something out for grins
-void wifiCb(void* response) {
-  ELClientResponse *res = (ELClientResponse*)response;
-  if (res->argc() == 1) {
-    uint8_t status;
-    res->popArg(&status, 1);
+void wifiCb(void* response)
+     {
+       ELClientResponse *res = (ELClientResponse*)response;
+       if (res->argc() == 1) 
+          {
+            uint8_t status;
+            res->popArg(&status, 1);
 
-    if(status == STATION_GOT_IP) {
-      Serial.println("WIFI CONNECTED");
-    } else {
-      Serial.print("WIFI NOT READY: ");
-      Serial.println(status);
-    }
-  }
-}
+            if(status == STATION_GOT_IP) 
+              {
+                Serial.println("WIFI CONNECTED");
+              } 
+            else 
+              {
+                Serial.print("WIFI NOT READY: ");
+                Serial.println(status);
+              }
+          }
+      }
 
 bool connected;
 
 // Callback when MQTT is connected
-void mqttConnected(void* response) {
-  Serial.println("MQTT connected!");
-  mqtt.subscribe("/Idiotware/twitterpetcube");
-   mqtt.subscribe("/hello/world/#");
-  //mqtt.subscribe("/esp-link/2", 1);
-  //mqtt.publish("/esp-link/0", "test1");
-  connected = true;
-}
+void mqttConnected(void* response)
+     {
+       Serial.println("MQTT connected!");
+       mqtt.subscribe("/Idiotware/twitterpetcube");
+       mqtt.subscribe("/hello/world/#");
+       //mqtt.subscribe("/esp-link/2", 1);
+       //mqtt.publish("/esp-link/0", "test1");
+       connected = true;
+    }
 
 // Callback when MQTT is disconnected
-void mqttDisconnected(void* response) {
-  Serial.println("MQTT disconnected");
-  connected = false;
-}
+void mqttDisconnected(void* response)
+     {
+       Serial.println("MQTT disconnected");
+       connected = false;
+     }
 
 // Callback when an MQTT message arrives for one of our subscriptions
-void mqttData(void* response) {
-  ELClientResponse *res = (ELClientResponse *)response;
+void mqttData(void* response) 
+     {
+       ELClientResponse *res = (ELClientResponse *)response;
 
-  Serial.print("Received: topic=");
-  String topic = res->popString();
-  Serial.println(topic);
+       Serial.print("Received: topic=");
+       String topic = res->popString();
+       Serial.println(topic);
 
-  Serial.print("data=");
-  String data = res->popString();
-  Serial.println(data);
-  int sentiment = data.toInt();
-  //Serial.println("Sentiment+1 is: "+ sentimentNumber+1);
-  Serial.println(sentiment);
-  setSentimentNumber(sentiment);
-  sentimentChanged=true;
+       Serial.print("data=");
+       String data = res->popString();
+       Serial.println(data);
+       int sentiment = data.toInt();
+       //Serial.println("Sentiment+1 is: "+ sentimentNumber+1);
+       Serial.println(sentiment);
+       setSentimentNumber(sentiment);
+       sentimentChanged=true;
   
-  //Serial.println("Okay, Out");
-  
-  
-}
+       //Serial.println("Okay, Out");
+    }
 
 #define happy_width 60
 #define happy_height 60
@@ -216,107 +223,97 @@ static unsigned char sad_bits[] U8G_PROGMEM = {
   0x00, 0x00, 0xF8, 0xFF, 0xFF, 0x03, 0x00, 0x00, 0x00, 0x00, 0xE0, 0xFF, 
   0x7F, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFC, 0x07, 0x00, 0x00, 0x00,    };
   
-void setup() {
-  Serial.begin(9600);
-  u8g.setRot180();
-  Serial.println("EL-Client starting!");
+void setup() 
+     {
+       Serial.begin(9600);
+       u8g.setRot180();
+       Serial.println("EL-Client starting!");
 
-  // Sync-up with esp-link, this is required at the start of any sketch and initializes the
-  // callbacks to the wifi status change callback. The callback gets called with the initial
-  // status right after Sync() below completes.
-  esp.wifiCb.attach(wifiCb); // wifi status change callback, optional (delete if not desired)
-  bool ok;
-  do {
-    ok = esp.Sync();      // sync up with esp-link, blocks for up to 2 seconds
-    if (!ok) Serial.println("EL-Client sync failed!");
-  } while(!ok);
-  Serial.println("EL-Client synced!");
+       // Sync-up with esp-link, this is required at the start of any sketch and initializes the
+       // callbacks to the wifi status change callback. The callback gets called with the initial
+       // status right after Sync() below completes.
+       esp.wifiCb.attach(wifiCb); // wifi status change callback, optional (delete if not desired)
+       bool ok;
+       do
+        {
+          ok = esp.Sync();      // sync up with esp-link, blocks for up to 2 seconds
+          if (!ok) Serial.println("EL-Client sync failed!");
+        } while(!ok);
+       Serial.println("EL-Client synced!");
 
-  // Set-up callbacks for events and initialize with es-link.
-  mqtt.connectedCb.attach(mqttConnected);
-  mqtt.disconnectedCb.attach(mqttDisconnected);
-  //mqtt.publishedCb.attach(mqttPublished);
-  mqtt.dataCb.attach(mqttData);
-  mqtt.setup();
+       // Set-up callbacks for events and initialize with es-link.
+       mqtt.connectedCb.attach(mqttConnected);
+       mqtt.disconnectedCb.attach(mqttDisconnected);
+       //mqtt.publishedCb.attach(mqttPublished);
+       mqtt.dataCb.attach(mqttData);
+       mqtt.setup(); 
 
-  //Serial.println("ARDUINO: setup mqtt lwt");
-  //mqtt.lwt("/lwt", "offline", 0, 0); //or mqtt.lwt("/lwt", "offline");
+       //Serial.println("ARDUINO: setup mqtt lwt");
+       //mqtt.lwt("/lwt", "offline", 0, 0); //or mqtt.lwt("/lwt", "offline");
 
-  Serial.println("EL-MQTT ready");
-}
+       Serial.println("EL-MQTT ready");
+     }
 
 static int count;
 static uint32_t last;
 
-void loop() {
-  esp.Process();
+void loop() 
+     {
+       esp.Process();
   
-  if(sentimentChanged)
-  {
-    sentimentChanged=false;
-    Serial.print("sentiment Number is: ");
-    Serial.println(sentimentNumber);
-    if(sentimentNumber==0)
-    {
-      drawNeutralFace();
-      
-    }
+       if(sentimentChanged)
+         {
+           sentimentChanged=false;
+           Serial.print("sentiment Number is: ");
+           Serial.println(sentimentNumber);
+           if(sentimentNumber==0)
+             {
+               drawNeutralFace();
+             }
     
-    if(sentimentNumber > 0)
-    {
-      drawHappyFace();
-      
-    }
+           if(sentimentNumber > 0)
+             {
+               drawHappyFace(); 
+             }
     
-    if(sentimentNumber <0)
-    {
-      drawSadFace();
-     // sentimentChanged=false;
+           if(sentimentNumber <0)
+             {
+                drawSadFace();
+             }
+         }
     }
-  }
-  
-  
-
-
-
-}
 
 void setSentimentNumber(int sentiment)
-{
-  sentimentNumber=sentiment;
-  Serial.println("Inside Setter");
-} 
+     {
+       sentimentNumber=sentiment;
+       Serial.println("Inside Setter");
+     } 
 
 void drawSadFace()
-{
-      u8g.firstPage();  
-      do {
-         u8g.drawXBMP( 34, 2, sad_width, sad_height, sad_bits);
-         
-         }while( u8g.nextPage() );
-  Serial.println("Sad Face Drawn");
-}
+     {
+       u8g.firstPage();  
+       do {
+            u8g.drawXBMP( 34, 2, sad_width, sad_height, sad_bits);
+          }while( u8g.nextPage() );
+       Serial.println("Sad Face Drawn");
+     }
 
 void drawNeutralFace()
-{
-      u8g.firstPage();  
-      do {
-          u8g.drawXBMP( 34, 2, neutral_width, neutral_height, neutral_bits);
-         
-         }while( u8g.nextPage() );
-         Serial.println("Neutral Face Drawn");
-  
-}
+     {
+       u8g.firstPage();  
+       do {
+            u8g.drawXBMP( 34, 2, neutral_width, neutral_height, neutral_bits);
+          }while( u8g.nextPage() );
+       Serial.println("Neutral Face Drawn");
+     }
 
 void drawHappyFace()
-{
-      u8g.firstPage();  
-      do {
-          u8g.drawXBMP( 34, 2, happy_width, happy_height, happy_bits);
-          
-         }while( u8g.nextPage() );
-         Serial.println("Happy Face Drawn");
-  
-}
+     {
+       u8g.firstPage();  
+       do {
+            u8g.drawXBMP( 34, 2, happy_width, happy_height, happy_bits); 
+          }while( u8g.nextPage() );
+       Serial.println("Happy Face Drawn"); 
+     }
 
 

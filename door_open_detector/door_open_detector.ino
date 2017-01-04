@@ -31,7 +31,6 @@
 #include <ELClientRest.h>
 char buff[128];
 int inputPin = 2;               // choose the input pin (for PIR sensor)
-int doorState = LOW;
 int inputPin_state = 0;              // variable for reading the pin status
 
 // replace with your channel's thingspeak API key
@@ -122,15 +121,13 @@ int door_opened()
        inputPin_state = digitalRead(inputPin);  // read input value
       if (inputPin_state == LOW) 
          { // check if the input is HIGH 
-           if (doorState == LOW) 
-              {
-                sprintf(buff, "/trigger/door_opened/with/key/iYiYhj3KyPFEwyVRuJzEb");
-                logToMaker();  //Log to Maker using commands under void LogToMaker()
-                // print to the serial port too:              
-                Serial.print("door_opened!!");
-              }    
+           sprintf(buff, "/trigger/door_opened/with/key/iYiYhj3KyPFEwyVRuJzEb");
+           logToMaker();  //Log to Maker using commands under void LogToMaker()
+           // print to the serial port too:              
+           Serial.print("door_opened!!"); 
+            delay(3000);    
          }
-        delay(1000);   
+        
    } 
  
 //function to send POST request to Maker channel    

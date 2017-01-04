@@ -134,12 +134,12 @@ void get_bitcoinValue()
             {
               Serial.println("ARDUINO: GET successful:");
               bitcoin_value = response;
-              String bitcoinValue = bitcoin_value.substring(0,6);
+              String bitcoinValue = bitcoin_value.substring(0,8);
               u8g.firstPage();
               do { u8g.setFont(u8g_font_timB10);
                    u8g.drawStr(1,10,"Bitcoin value in USD:");
                    u8g.setFont(u8g_font_timB24); 
-                   u8g.setPrintPos(20, 50);
+                   u8g.setPrintPos(5, 50);
                    u8g.print(bitcoinValue);
                  } while( u8g.nextPage() );
             } 

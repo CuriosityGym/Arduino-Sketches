@@ -128,9 +128,10 @@ int motion_detected()
                 logToMaker();  //Log to Maker using commands under void LogToMaker()
                 // print to the serial port too:              
                 Serial.print("Motion Detected!!");
+                delay(4000);    
               }    
          }
-        delay(1000);   
+         
    } 
  
 //function to send POST request to Maker channel    

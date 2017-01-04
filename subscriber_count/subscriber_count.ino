@@ -14,6 +14,7 @@ char buff[32];
 char buff2[32];
 String subscribers = "";
 String channelName = "";
+ String channel_Name = "";
 U8GLIB_SSD1306_128X64 u8g(U8G_I2C_OPT_NONE|U8G_I2C_OPT_DEV_0);
 // Initialize a connection to esp-link using the normal hardware serial port both for
 // SLIP and for debug messages.
@@ -128,13 +129,14 @@ void get_ChannelName()
              // response[data] = '\0';
               Serial.println(response);
               channelName = response;
-              Serial.println(channelName);
+              channel_Name = channelName.substring(0,9);
+              Serial.println(channel_Name);
               u8g.firstPage();
               do { u8g.setFont(u8g_font_timB10);
                    u8g.drawStr(1,10,"Channel Name:");
                    u8g.setFont(u8g_font_timB14); 
                    u8g.setPrintPos(5, 30);
-                   u8g.print(channelName);
+                   u8g.print(channel_Name);
                  } while( u8g.nextPage() );
             } 
           else 
@@ -166,24 +168,25 @@ void get_SubscriberCount()
             {
               Serial.println("ARDUINO: GET successful:");
               subscribers = response;
+              String subscribers_count = subscribers.substring(0,9);
              // Serial.println(subscribers);
               //int data = Serial.readBytesUntil('\n',response,32);
               //response[data] = '\0';
-              Serial.println(response);
-              subscribers = response;
-              Serial.println(subscribers);
+              //Serial.println(response);
+              //subscribers = response;
+              Serial.println(subscribers_count);
               u8g.firstPage();
               do {
                    u8g.setFont(u8g_font_timB10);
                    u8g.drawStr(1,10,"Channel Name:");
                    u8g.setFont(u8g_font_timB14); 
                    u8g.setPrintPos(5, 30);
-                   u8g.print(channelName);
+                   u8g.print(channel_Name);
                    u8g.setFont(u8g_font_timB10);
                    u8g.drawStr(1,45,"Subscribers:");
                    u8g.setFont(u8g_font_timB14); 
                    u8g.setPrintPos(5, 62);
-                   u8g.print(subscribers);
+                   u8g.print(subscribers_count);
                  } while( u8g.nextPage() );
             } 
           else 

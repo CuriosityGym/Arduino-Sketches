@@ -29,6 +29,10 @@
 
 #include <ELClient.h>
 #include <ELClientRest.h>
+#include <idIoTwareShield.h>
+#include <Wire.h>         // Require for I2C communication
+idIoTwareShield fs;             // Instanciate CGShield instance
+int buzzerPin = A1;
 char buff[128];
 int inputPin = 2;               // choose the input pin (for PIR sensor)
 int pirState = LOW;
@@ -72,6 +76,7 @@ void wifiCb(void *response)
 void setup() 
     {
       pinMode(inputPin, INPUT);     // declare PIR sensor as input
+      pinMode(buzzerPin,OUTPUT);
       Serial.begin(9600);   // the baud rate here needs to match the esp-link config
       Serial.println("EL-Client starting!");
 
@@ -128,8 +133,12 @@ int motion_detected()
                 logToMaker();  //Log to Maker using commands under void LogToMaker()
                 // print to the serial port too:              
                 Serial.print("Motion Detected!!");
-                delay(4000);    
-              }    
+                for(int i=0; i<20; i++)
+                   {
+                     beep(250);
+                   }  
+              }  
+              
          }
          
    } 
@@ -163,3 +172,13 @@ void logToMaker()
         }
         
     }   
+    
+    
+void beep(int delayValue)
+     {
+       digitalWrite(buzzerPin,HIGH);
+       color(255,0,0);
+       delay(delayValue);
+       digitalWrite(buzzerPin,LOW);
+       color(0,0,0);
+     }     

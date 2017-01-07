@@ -1,15 +1,17 @@
 /*
-    Motion Detector
+    Back Door Intrusion Detector
     
-    In this example we are using ESP8266 and IdIoTWare Shield and Arduino Board. PIR sensor
-    is used to detect motion.
-    PIR Sensor :
-      PIR sensors allow you to sense motion, almost always used to detect whether a human has moved in or out of the sensors range.
-      They are often referred to as PIR, "Passive Infrared", "Pyroelectric", or "IR motion" sensors.
+    In this example we are using ESP8266 and IdIoTWare Shield and Arduino Board. Magnetic Reed Switch
+    is used to detect intrusion.
+    Magnetic Reed Switch :
+    A magnetic contact switch is basically a reed switch encased in a plastic shell so that
+    you can easily apply them in a door, a window or a drawer to detect if the door is open or closed..
+
     
-    This example uses a motion-detecting sensor (PIR sensor)  which detects the infrared energy omitted from human's body. 
-    When PIR detects motion, the infrared energy detected by the sensor changes and it triggers the event and signal is  sent to 
-    arduino uno that sends email to user using ESP8266.
+    This example uses a  Magnetic Reed Switch The electrical circuit is closed when a magnet
+    is near the switch (less than 13 mm (0.5’’) away). When the magnet is far away from the switch, the circuit
+    is open.
+    When it is open, a signal is  sent to  arduino uno that sends email to user using ESP8266.
     Here we are using IFTTT to trigger an event.
     
     IFTTT is a free web-based service that allows users to create chains of simple conditional statements,
@@ -19,7 +21,7 @@
     
     We are using Maker and Gmail channel to trigger an event.
     
-    If there is any motion detected by PIR sensor, Arduino will send POST request to maker channel.  
+    If magnetic reed switch is open(if door is open), Arduino will send POST request to maker channel.  
     if there is any event on Maker channel  then send mail using Gmail
     If Maker Event "motion_detected", then send an email from "abcd@gmail.com" 
     
@@ -29,10 +31,16 @@
 
 #include <ELClient.h>
 #include <ELClientRest.h>
+#include <Adafruit_NeoPixel.h>
+#include <idIoTwareShield.h>
+#include <Wire.h>         // Require for I2C communication
+idIoTwareShield fs;             // Instanciate CGShield instance
+
 char buff[128];
 int inputPin = 2;               // choose the input pin (for PIR sensor)
+int doorState = LOW;
 int inputPin_state = 0;              // variable for reading the pin status
-
+int buzzerPin = A1;
 // replace with your channel's thingspeak API key
 String API_KEY = "cDlIAZcApEGZiZDeOIXExA";//bEJ04i0uriNNFOfaM9QrAf
 // Initialize a connection to esp-link using the normal hardware serial port both for
@@ -71,6 +79,7 @@ void wifiCb(void *response)
 void setup() 
     {
       pinMode(inputPin, INPUT_PULLUP);     // declare PIR sensor as input
+      pinMode(buzzerPin,OUTPUT);     
       Serial.begin(9600);   // the baud rate here needs to match the esp-link config
       Serial.println("EL-Client starting!");
 
@@ -118,16 +127,22 @@ void loop()
 int door_opened()
    { 
     
-       inputPin_state = digitalRead(inputPin);  // read input value
-      if (inputPin_state == LOW) 
+      inputPin_state = digitalRead(inputPin);  // read input value
+      if (inputPin_state == HIGH) 
          { // check if the input is HIGH 
-           sprintf(buff, "/trigger/door_opened/with/key/iYiYhj3KyPFEwyVRuJzEb");
-           logToMaker();  //Log to Maker using commands under void LogToMaker()
-           // print to the serial port too:              
-           Serial.print("door_opened!!"); 
-            delay(3000);    
+           //if (doorState == LOW) 
+             // {
+                sprintf(buff, "/trigger/door_opened/with/key/iYiYhj3KyPFEwyVRuJzEb");
+                logToMaker();  //Log to Maker using commands under void LogToMaker()
+                // print to the serial port too:              
+                Serial.print("door_opened!!");
+                for(int i=0; i<20; i++)
+                   {
+                     beep(250);
+                   } 
+              //}    
          }
-        
+          
    } 
  
 //function to send POST request to Maker channel    
@@ -159,3 +174,12 @@ void logToMaker()
         }
         
     }   
+    
+void beep(int delayValue)
+     {
+       digitalWrite(buzzerPin,HIGH);
+       color(255,0,0);
+       delay(delayValue);
+       digitalWrite(buzzerPin,LOW);
+       color(0,0,0);
+     }    

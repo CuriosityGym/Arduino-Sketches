@@ -1,9 +1,9 @@
 #**Back Door Intrusion Detector**
    
    In this example we are using ESP8266 and IdIoTWare Shield and Arduino Board. Magnetic Reed Switch
-is used to detect intrusion.
-Magnetic Reed Switch :
-A magnetic contact switch is basically a reed switch encased in a plastic shell so that
+is used to detect intrusion.                                           
+Magnetic Reed Switch :                                                  
+A magnetic contact switch is basically a reed switch encased in a plastic shell so that        
 you can easily apply them in a door, a window or a drawer to detect if the door is open or closed..
 
 This example uses a  Magnetic Reed Switch The electrical circuit is closed when a magnet

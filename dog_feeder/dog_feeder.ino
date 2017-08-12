@@ -10,12 +10,12 @@ int servoAngle = 65;
 int delayValue = 10000;   // 10 seconds
 // You should get Auth Token in the Blynk App.
 // Go to the Project Settings (nut icon).
-char auth[] = "8ae41dd66020477a85c1b23d63e22203";
+char auth[] = "46fb00660bc74d0f9d45fb135050fb36";
 
 // Your WiFi credentials.
 // Set password to "" for open networks.
-char ssid[] = "CuriosityGym-BCK";
-char pass[] = "#3Twinkle3#";
+char ssid[] = "New Curiosity Gym";
+char pass[] = "CuriosityTwinkle";
 
 // Hardware Serial on Mega, Leonardo, Micro...
 #define EspSerial Serial
@@ -25,7 +25,7 @@ char pass[] = "#3Twinkle3#";
 SoftwareSerial debugSerial(10, 9); // RX, TX
 
 // Your ESP8266 baud rate:
-#define ESP8266_BAUD 9600
+#define ESP8266_BAUD 115200
 
 ESP8266 wifi(&EspSerial);
 

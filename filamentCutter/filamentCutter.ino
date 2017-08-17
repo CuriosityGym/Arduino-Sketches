@@ -91,21 +91,7 @@ void loop()
      // Serial.println(touchpadState);
     //  delay(1);        // delay in between reads for stability\
 
-/*
-      if(touchpadState == 1 && buttonState == 0)
-        {
-          //startMotor = true;
-          finalCount = 1;
-          extrudeFilament = true;
-        }
-      if(touchpadState == 1 && buttonState == 1)
-        {
-          //startMotor = true;
-          finalCount = 2;
-          extrudeFilament = true;
-        }    
-     
-   */  
+ 
       if(touchpadState == 0 && buttonState == 0)
         {  
           digitalWrite(buzzerPin,HIGH);

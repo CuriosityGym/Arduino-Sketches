@@ -1,4 +1,5 @@
-
+#define EVENTS 3
+// dc motor variables
 int endStop = 2;
 int touchPad = 5;
 int motorPin1 = 11;
@@ -9,7 +10,7 @@ unsigned long previousMillis = 0;
 unsigned long timeStamp=0;
 unsigned long currentMillis1=0;
 unsigned long previousMillis1 = 0;
-boolean start = true;
+boolean cutFilament = true;
 boolean pM = true;
 boolean pM1 = true;
 boolean startMotor;
@@ -21,10 +22,10 @@ const int dirPin = 6;
 int ms1= 9;
 int ms2 = 8;
 int ms3 = 7;
-boolean extrudeFilament = false;
-boolean extrudeFilament1 = false;
-int meter = 23200;  //23200 
-int halfMeter = 11600;  //11600
+boolean extrudeFilamentHalfMeter = false;
+boolean extrudeFilament1Meter = false;
+int meter = 12800;  //23200 
+int halfMeter = 6400;  //11600
 //button counter variables
 int BUTTON_PIN = 4;
 //int BUTTON_PIN2 = 4;
@@ -85,21 +86,35 @@ void loop()
       int touchpadState = digitalRead(touchPad);
       int buttonState = digitalRead(BUTTON_PIN);
       // print out the state of the button:
-      Serial.print("endstopState: ");
-      Serial.println(endstopState);
+     // Serial.print("endstopState: ");
+      //Serial.println(endstopState);
      // Serial.print("touch Pad: ");
      // Serial.println(touchpadState);
     //  delay(1);        // delay in between reads for stability\
 
- 
+/*
+      if(touchpadState == 1 && buttonState == 0)
+        {
+          //startMotor = true;
+          finalCount = 1;
+          extrudeFilament = true;
+        }
+      if(touchpadState == 1 && buttonState == 1)
+        {
+          //startMotor = true;
+          finalCount = 2;
+          extrudeFilament = true;
+        }    
+     
+   */  
       if(touchpadState == 0 && buttonState == 0)
         {  
           digitalWrite(buzzerPin,HIGH);
           delay(250);
           digitalWrite(buzzerPin,LOW);
-          extrudeFilament1 = true;
+          extrudeFilament1Meter = true;
         }
-       while(extrudeFilament1 == true && count < 50)
+       while(extrudeFilament1Meter == true && count < 50)
             {
              if(a!=count)
                {       
@@ -124,7 +139,7 @@ void loop()
                        }
                    }  
                 } 
-             if(start == true && startMotor == true)
+             while(cutFilament == true && startMotor == true)
                 {
                   currentMillis = millis();
                   if(pM == true)
@@ -133,19 +148,19 @@ void loop()
                       pM = false;
                     }
                   right();
-                  Serial.println(" Cut Filament");
+                  //Serial.println(" Cut Filament");
                   endstopState = digitalRead(endStop);
                   if(endstopState == 0)
                     { 
-                     Serial.println(" Stop the motor");
+                    // Serial.println(" Stop the motor");
                      stopMotor();
                      timeStamp = currentMillis - previousMillis;
-                     start = false;
+                     cutFilament = false;
                      startMotor = false;
                      pM = true;  
                     }
                  } 
-           if(start == false)
+           while(cutFilament == false)
              {
               currentMillis1 = millis();
               if(pM1 == true)
@@ -154,18 +169,18 @@ void loop()
                   pM1 = false;
                 }
               left();
-              Serial.println("Reverse the motor");
-              if((currentMillis1 - previousMillis1) > timeStamp)
+             // Serial.println("Reverse the motor");
+              if((currentMillis1 - previousMillis1) > (timeStamp + (a*7)))
                 {
-                  Serial.println(" Stop the motor again");
+                  //Serial.println(" Stop the motor again");
                   stopMotor();
-                  start = true;
+                  cutFilament = true;
                   pM1 = true;
                   count++;
                  if(count == 50)
                    {
                      count = 0;
-                     extrudeFilament1 = false;
+                     extrudeFilament1Meter = false;
                      playTone();
                    }  
                 }
@@ -176,9 +191,9 @@ void loop()
       digitalWrite(buzzerPin,HIGH);
       delay(250);
       digitalWrite(buzzerPin,LOW);
-      extrudeFilament = true;
+      extrudeFilamentHalfMeter = true;
      }
-   while(extrudeFilament == true && count < 50)
+   while(extrudeFilamentHalfMeter == true && count < 50)
        {  
         digitalWrite(ms1,HIGH);
         digitalWrite(ms2,LOW);
@@ -197,14 +212,14 @@ void loop()
                    {
                      // extrudeFilament = false;
                      startMotor = true;
-                     Serial.println("cut half meter filament ");
+                    // Serial.println("cut half meter filament ");
                      z=count;  
                    }
                            
                }     
            }
           
-          if(start == true && startMotor == true)
+          while(cutFilament == true && startMotor == true)
             {
              currentMillis = millis();
              if(pM == true)
@@ -213,20 +228,21 @@ void loop()
                 pM = false;
                }
              right();
-             Serial.println(" Cut Filament");
+             //Serial.println(" Cut Filament");
              endstopState = digitalRead(endStop);
              if(endstopState == 0)
                { 
-                Serial.println(" Stop the motor");
+                //Serial.println(" Stop the motor");
                 stopMotor();
                 timeStamp = currentMillis - previousMillis;
-                start = false;
+               // Serial.print("time stamp: ");Serial.println(timeStamp);
+                cutFilament = false;
                 startMotor = false;
                 pM = true;
             
                }
             }
-          if(start == false)
+          while(cutFilament == false)
             {
              currentMillis1 = millis();
              if(pM1 == true)
@@ -235,18 +251,19 @@ void loop()
                 pM1 = false;
                }
              left();
-             Serial.println("Reverse the motor");
-             if((currentMillis1 - previousMillis1) > timeStamp)
+             //Serial.println("Reverse the motor");
+             if((currentMillis1 - previousMillis1) > (timeStamp + (z*7)))
                {
-                 Serial.println(" Stop the motor again");
+                 //Serial.println(" Stop the motor again");
+                
                  stopMotor();
-                 start = true;
+                 cutFilament = true;
                  pM1 = true;
                  count++;
                  if(count == 50)
                    {
                     count = 0;
-                    extrudeFilament = false;
+                    extrudeFilamentHalfMeter = false;
                     playTone();
                    }    
                 }

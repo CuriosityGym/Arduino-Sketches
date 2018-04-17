@@ -1,12 +1,13 @@
 
-
+#include <Adafruit_NeoPixel.h>
 #include "Arduino.h"
 #include "CGShield.h"
 #include "../Wire/Wire.h"
 //#include <Wire.h>
 
-
-
+#define WS2812_PIN 6
+#define NUMPIXELS 1
+Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, WS2812_PIN, NEO_GRB + NEO_KHZ800);
 
 boolean DEBUG = false;
 boolean RGB_CC = true;
@@ -18,20 +19,20 @@ byte THAT_ADDRESS;
 byte datapin    = 4; 
 byte clockpin   = A4;
 byte latchpin   = 2;  
-byte data 		= 0;  // global data to send to shift register
+byte data = 0;  // global data to send to shift register
 
-byte lightPin    = A3;
-byte trimPin   = A2;
-byte speakerPin    = A1;
-byte tempPin  = A0; 
+byte lightPin    = A0;
+byte trimPin   = A1;
+byte speakerPin    = A2;
+byte tempPin  = A3; 
 
 byte motorPin   = 3;
 byte IRPin   = 3;
 
 
-byte buttonPinR = 4;  // right side
-byte buttonPinL = 5;  // left side
-byte RGBPin = 6;
+byte buttonPinR = 7;  // right side
+byte buttonPinL = 8;  // left side
+
 byte touchPin   = A3;
 byte analogPin=A5;	
 int analogValue;
@@ -45,12 +46,12 @@ byte pointer = 0;	 // points to what data to return
 byte MSB, LSB;
 
 
-FunShield::FunShield(){
-  FunShield(0, 0); // no I2C needed.
+CGShield::CGShield(){
+  CGShield(0, 0); // no I2C needed.
 }
 
 	
-FunShield::FunShield(byte ME, byte FRIEND){
+CGShield::CGShield(byte ME, byte FRIEND){
 
   THIS_ADDRESS = ME;
   THAT_ADDRESS = FRIEND;
@@ -91,13 +92,13 @@ FunShield::FunShield(byte ME, byte FRIEND){
   digitalWrite(buttonPinL, HIGH);  
   
   // setup outputs
-  pinMode(RGBPin, OUTPUT);  
+ 
   pinMode(speakerPin, OUTPUT);
   pinMode(motorPin, OUTPUT);
   
   // initial RGB states
-  digitalWrite(RGBPin, LOW);
  
+
   if(THAT_ADDRESS > 0){
 	//Serial.println("WIRE BEGIN");
 	Wire.begin(ME);
@@ -106,82 +107,22 @@ FunShield::FunShield(byte ME, byte FRIEND){
   }
 
 }
-
-void RGB( int pixel, uint32_t Color){
-	RGB(pixel, c);
+void initialize()
+{     
+   pixels.begin();
+   //pixels.show();
 }
 
-uint32_t Color(byte red, byte green, byte blue)
+void color(byte red,byte green,byte blue){
+  //pixels.begin();
+  pixels.setPixelColor(NUMPIXELS-1, pixels.Color(red, green, blue)); // Moderately bright green color.
+  //pixels.show();
+  //delay(1);  
+}
+
+void update()
 {
-  uint32_t c;
-  c = red;
-  c <<= 8;
-  c |= green;
-  c <<= 8;
-  c |= blue;
-  return c;
-}
-
-void RGB(byte red, byte green, byte blue){
-	analogWrite(RGBPin, c);
-}
-
-
-void RGB(int color)
-{
-  int redIntensity;
-  int greenIntensity;
-  int blueIntensity;
-
-  if (color <= 255)          // zone 1
-  {
-    redIntensity = 255 - color;    // red goes from on to off
-    greenIntensity = color;        // green goes from off to on
-    blueIntensity = 0;             // blue is always off
-  }
-  else if (color <= 511)     // zone 2
-  {
-    redIntensity = 0;                     // red is always off
-    greenIntensity = 255 - (color - 256); // green on to off
-    blueIntensity = (color - 256);        // blue off to on
-  }
-  else // color >= 512       // zone 3
-  {
-    redIntensity = (color - 512);         // red off to on
-    greenIntensity = 0;                   // green is always off
-    blueIntensity = 255 - (color - 512);  // blue on to off
-  }
-
-  RGB(pixel, redIntensity, greenIntensity, blueIntensity);
-}
-
-
-void RGB(byte ADDRESS, int pixel, uint32_t c){
-	if (ADDRESS == THIS_ADDRESS){
-		RGB(pixel, uint32_t c);
-	}
-    else {
-		#if !(defined(NOWIRE))
-		Wire.beginTransmission(THAT_ADDRESS);
-		Wire.write(2);     // instuction
-		Wire.write(RGB(pixel, uint32_t c)); // led
-		Wire.endTransmission();  
-		#endif
-	}
-}
-void RGB(byte ADDRESS, int color){
-	if (ADDRESS == THIS_ADDRESS){
-		RGB(color);
-	}
-    else {
-		if(THAT_ADDRESS > 0){
-			Wire.beginTransmission(THAT_ADDRESS);
-			Wire.write(2);    		      // instuction
-			Wire.write(highByte(color));  // led	
-			Wire.write(lowByte(color));
-			Wire.endTransmission();  
-		}
-	}
+  pixels.show();
 }
 
 void motor(byte speed){
@@ -412,6 +353,19 @@ void LED(byte led, boolean state){
 		}
   }
 }
+void LEDByte(byte data)
+{
+	// Mask desired bit on to global _data variable
+		//bitWrite(data, led, HIGH);
+
+		// Now we'll actually send that data to the shift register.
+		shiftOut(datapin, clockpin, MSBFIRST, data);
+
+		// Toggle the state of the latchPin,
+		digitalWrite(latchpin, HIGH);
+		digitalWrite(latchpin, LOW);
+	
+}
 
 
 void receiveEvent(int howMany){
@@ -453,20 +407,6 @@ void receiveEvent(int howMany){
 		LED(buf[1], buf[2]);
 	}	
 	
-	// RGB INSTRUCTION
-	else if (instruction == 2){
-		if(DEBUG){Serial.println("RGB command");}
-		if (howMany == 4){
-			byte RGBcolor[3];
-			RGBcolor[0] = buf[1];
-			RGBcolor[1] = buf[2];
-			RGBcolor[2] = buf[3];
-			RGB(RGBcolor);
-		}
-		else if (howMany == 3){
-			RGB(word(buf[1], buf[2]));
-		}
-	}
 	
 	else if (instruction == 3 && howMany == 7){
 		unsigned int frequency;

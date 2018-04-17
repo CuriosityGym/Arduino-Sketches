@@ -6,32 +6,32 @@ const int frontLed = 6;
 const int leftLed = 9;
 long int lastPrintTime;
 
-typedef struct 
+typedef struct
 {
-    byte pin;
-    byte positionInsideGroup;    
-    char thePosition; // Left, Right, Up, Down
-    byte minAngle;
-    byte maxAngle;    
+  byte pin;
+  byte positionInsideGroup;
+  char thePosition; // Left, Right, Up, Down
+  byte minAngle;
+  byte maxAngle;
 } ledConfig;
 
 ledConfig leds[] = {
-    {3, 1, 'u', 5, 15},  
-    {12, 2, 'u', 16, 30},
-    {11, 3, 'u', 31, 45},  
-    {5, 1, 'd', 5, 15},  
-    {6, 2, 'd', 16, 30},
-    {7, 3, 'd', 31, 45},  
-    {6, 1, 'r', 5, 23},  
-    {9, 2, 'r', 24, 45},
-    {10, 1, 'l', 5, 23},  
-    {4, 2, 'l', 24, 45},
+  {3, 1, 'u', 5, 15},
+  {12, 2, 'u', 16, 30},
+  {11, 3, 'u', 31, 45},
+  {5, 1, 'd', 5, 15},
+  {6, 2, 'd', 16, 30},
+  {7, 3, 'd', 31, 45},
+  {6, 1, 'r', 5, 23},
+  {9, 2, 'r', 24, 45},
+  {10, 1, 'l', 5, 23},
+  {4, 2, 'l', 24, 45},
 };
 
 #include "I2Cdev.h"
 #include "MPU6050_6Axis_MotionApps20.h"
 #if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
-    #include "Wire.h"
+#include "Wire.h"
 #endif
 
 MPU6050 mpu;
@@ -53,152 +53,152 @@ float euler[3];         // [psi, theta, phi]    Euler angle container
 float ypr[3];           // [yaw, pitch, roll]   yaw/pitch/roll container and gravity vector
 volatile bool mpuInterrupt = false;     // indicates whether MPU interrupt pin has gone high
 
-void setup() 
+void setup()
 {
-    #if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
-        Wire.begin();
-       // TWBR = 24; // 400kHz I2C clock (200kHz if CPU is 8MHz)
-    #elif I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_FASTWIRE
-        Fastwire::setup(400, true);
-    #endif
+#if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
+  Wire.begin();
+  // TWBR = 24; // 400kHz I2C clock (200kHz if CPU is 8MHz)
+#elif I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_FASTWIRE
+  Fastwire::setup(400, true);
+#endif
 
-    Serial.begin(9600);
-    while (!Serial); // wait for Leonardo enumeration, others continue immediately
-    Serial.println(F("Initializing I2C devices..."));
-    mpu.initialize();
-    Serial.println(F("Testing device connections..."));
-    Serial.println(mpu.testConnection() ? F("MPU6050 connection successful") : F("MPU6050 connection failed"));
-    Serial.println(F("Initializing DMP..."));
-    devStatus = mpu.dmpInitialize();
-    mpu.setXGyroOffset(220);
-    mpu.setYGyroOffset(76);
-    mpu.setZGyroOffset(-85);
-    mpu.setZAccelOffset(1788); // 1688 factory default for my test chip
-    if (devStatus == 0) {
-        // turn on the DMP, now that it's ready
-        Serial.println(F("Enabling DMP..."));
-        mpu.setDMPEnabled(true);
-        Serial.println(F("Enabling interrupt detection (Arduino external interrupt 0)..."));
-        attachInterrupt(0, dmpDataReady, RISING);
-        mpuIntStatus = mpu.getIntStatus();
-        Serial.println(F("DMP ready! Waiting for first interrupt..."));
-        dmpReady = true;
-        packetSize = mpu.dmpGetFIFOPacketSize();
-    } else {
-        Serial.print(F("DMP Initialization failed (code "));
-        Serial.print(devStatus);
-        Serial.println(F(")"));
-    }
-    if (SIMPLE_IMPLEMENTATION) { 
-        initializeLEDsSimple();
-    } else {
-        initializeLEDsMultiple();
-    }
-    lastPrintTime = millis();    
-}
-
-void loop() 
-{
-    if (!dmpReady) return;
-    mpuInterrupt = false;
+  //Serial.begin(115200);
+  //while (!Serial); // wait for Leonardo enumeration, others continue immediately
+  ////Serial.println(F("Initializing I2C devices..."));
+  mpu.initialize();
+  //Serial.println(F("Testing device connections..."));
+  //Serial.println(mpu.testConnection() ? F("MPU6050 connection successful") : F("MPU6050 connection failed"));
+  //Serial.println(F("Initializing DMP..."));
+  devStatus = mpu.dmpInitialize();
+  mpu.setXGyroOffset(220);
+  mpu.setYGyroOffset(76);
+  mpu.setZGyroOffset(-85);
+  mpu.setZAccelOffset(1788); // 1688 factory default for my test chip
+  if (devStatus == 0) {
+    // turn on the DMP, now that it's ready
+    //Serial.println(F("Enabling DMP..."));
+    mpu.setDMPEnabled(true);
+    //Serial.println(F("Enabling interrupt detection (Arduino external interrupt 0)..."));
+    attachInterrupt(0, dmpDataReady, RISING);
     mpuIntStatus = mpu.getIntStatus();
-    fifoCount = mpu.getFIFOCount();
-    if ((mpuIntStatus & 0x10) || fifoCount == 1024) {
-        mpu.resetFIFO();
-        Serial.println(F("FIFO overflow!"));
-    } else if (mpuIntStatus & 0x02) {
-        while (fifoCount < packetSize) {
-          fifoCount = mpu.getFIFOCount();
-        }
-        mpu.getFIFOBytes(fifoBuffer, packetSize);        
-        fifoCount -= packetSize;
-        mpu.dmpGetQuaternion(&q, fifoBuffer);
-        mpu.dmpGetGravity(&gravity, &q);
-        mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
-        int x = ypr[0] * 180/M_PI;
-        int y = ypr[1] * 180/M_PI;
-        int z = ypr[2] * 180/M_PI;
-       
-        Serial.print(y);Serial.print("\t");  
-        Serial.print(z); Serial.print("\t");  
-        Serial.println(x);
-        if (SIMPLE_IMPLEMENTATION) {        
-            flashLEDsSimple(x, y, z);
-        } else {
-            flashLEDsMultiple(x, y, z);
-        }
-    }
+    //Serial.println(F("DMP ready! Waiting for first interrupt..."));
+    dmpReady = true;
+    packetSize = mpu.dmpGetFIFOPacketSize();
+  } else {
+    //Serial.print(F("DMP Initialization failed (code "));
+    //Serial.print(devStatus);
+    //Serial.println(F(")"));
+  }
+  if (SIMPLE_IMPLEMENTATION) {
+    initializeLEDsSimple();
+  } else {
+    initializeLEDsMultiple();
+  }
+  lastPrintTime = millis();
 }
 
-void initializeLEDsSimple() 
+void loop()
 {
-    pinMode(frontLed, OUTPUT);
-    pinMode(bottomLed, OUTPUT);    
-    pinMode(rightLed, OUTPUT);
-    pinMode(leftLed, OUTPUT); 
+  if (!dmpReady) return;
+  mpuInterrupt = false;
+  mpuIntStatus = mpu.getIntStatus();
+  fifoCount = mpu.getFIFOCount();
+  if ((mpuIntStatus & 0x10) || fifoCount == 1024) {
+    mpu.resetFIFO();
+    //Serial.println(F("FIFO overflow!"));
+  } else if (mpuIntStatus & 0x02) {
+    while (fifoCount < packetSize) {
+      fifoCount = mpu.getFIFOCount();
+    }
+    mpu.getFIFOBytes(fifoBuffer, packetSize);
+    fifoCount -= packetSize;
+    mpu.dmpGetQuaternion(&q, fifoBuffer);
+    mpu.dmpGetGravity(&gravity, &q);
+    mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
+    int x = ypr[0] * 180 / M_PI;
+    int y = ypr[1] * 180 / M_PI;
+    int z = ypr[2] * 180 / M_PI;
+
+    ////Serial.print(y); //Serial.print("\t");
+    ////Serial.print(z); //Serial.print("\t");
+    ////Serial.println(x);
+    if (SIMPLE_IMPLEMENTATION) {
+      flashLEDsSimple(x, y, z);
+    } else {
+      flashLEDsMultiple(x, y, z);
+    }
+  }
 }
 
-void initializeLEDsMultiple() 
-{ 
-    for (int i=0; i<10; i++) {   
-        pinMode(leds[i].pin, OUTPUT);
-    }
+void initializeLEDsSimple()
+{
+  pinMode(frontLed, OUTPUT);
+  pinMode(bottomLed, OUTPUT);
+  pinMode(rightLed, OUTPUT);
+  pinMode(leftLed, OUTPUT);
+}
+
+void initializeLEDsMultiple()
+{
+  for (int i = 0; i < 10; i++) {
+    pinMode(leds[i].pin, OUTPUT);
+  }
 }
 
 void flashLEDsSimple(int x, int y, int z)
 {
-    if (x > 20) {
-        digitalWrite(rightLed, HIGH);
-        digitalWrite(leftLed, LOW);
-        digitalWrite(frontLed, LOW);           
-    }
-    else if(x < -20){
-        digitalWrite(leftLed, HIGH);
-        digitalWrite(rightLed, LOW);
-        digitalWrite(frontLed, LOW);   
-    }
-    else{
-      digitalWrite(frontLed, HIGH);
-      digitalWrite(rightLed, LOW);
-        digitalWrite(leftLed, LOW); 
-    }
-   // if (z > 0) {
-   //     analogWrite(bottomLed, z*4);
-   //     analogWrite(frontLed, 0);          
-   // } else {
-   //     analogWrite(frontLed, z*4*-1);      
-   //     analogWrite(bottomLed, 0);      
-   // }     
+  if (z > 20) {
+    digitalWrite(rightLed, HIGH);
+    digitalWrite(leftLed, LOW);
+    digitalWrite(frontLed, LOW);
+  }
+  else if (z < -20) {
+    digitalWrite(leftLed, HIGH);
+    digitalWrite(rightLed, LOW);
+    digitalWrite(frontLed, LOW);
+  }
+  else {
+    digitalWrite(frontLed, HIGH);
+    digitalWrite(rightLed, LOW);
+    digitalWrite(leftLed, LOW);
+  }
+  // if (z > 0) {
+  //     analogWrite(bottomLed, z*4);
+  //     analogWrite(frontLed, 0);
+  // } else {
+  //     analogWrite(frontLed, z*4*-1);
+  //     analogWrite(bottomLed, 0);
+  // }
 }
 
 void flashLEDsMultiple(int x, int y, int z)
 {
-    for (int i=0; i<10; i++) {
-        Serial.print(z);Serial.print(",");Serial.print(leds[i].thePosition);Serial.print(",");Serial.println(leds[i].minAngle);
-        bool modified = false;
-        if (z < 0 && leds[i].thePosition == 'u' && abs(z) > leds[i].minAngle) {
-            digitalWrite(leds[i].pin, HIGH);
-            modified = true;
-        }
-        if (z > 0 && leds[i].thePosition == 'd' && abs(z) > leds[i].minAngle) {
-            digitalWrite(leds[i].pin, HIGH);
-            modified = true;
-        }
-        if (y < 0 && leds[i].thePosition == 'l' && abs(y) > leds[i].minAngle) {
-            digitalWrite(leds[i].pin, HIGH);
-            modified = true;
-        }
-        if (y > 0 && leds[i].thePosition == 'r' && abs(y) > leds[i].minAngle) {
-            digitalWrite(leds[i].pin, HIGH);
-            modified = true;
-        } 
-        if (!modified) {
-            digitalWrite(leds[i].pin, LOW);
-        }
+  for (int i = 0; i < 10; i++) {
+    //Serial.print(z); //Serial.print(","); //Serial.print(leds[i].thePosition); //Serial.print(","); //Serial.println(leds[i].minAngle);
+    bool modified = false;
+    if (z < 0 && leds[i].thePosition == 'u' && abs(z) > leds[i].minAngle) {
+      digitalWrite(leds[i].pin, HIGH);
+      modified = true;
     }
+    if (z > 0 && leds[i].thePosition == 'd' && abs(z) > leds[i].minAngle) {
+      digitalWrite(leds[i].pin, HIGH);
+      modified = true;
+    }
+    if (y < 0 && leds[i].thePosition == 'l' && abs(y) > leds[i].minAngle) {
+      digitalWrite(leds[i].pin, HIGH);
+      modified = true;
+    }
+    if (y > 0 && leds[i].thePosition == 'r' && abs(y) > leds[i].minAngle) {
+      digitalWrite(leds[i].pin, HIGH);
+      modified = true;
+    }
+    if (!modified) {
+      digitalWrite(leds[i].pin, LOW);
+    }
+  }
 }
 
-void dmpDataReady() 
+void dmpDataReady()
 {
-    mpuInterrupt = true;
+  mpuInterrupt = true;
 }

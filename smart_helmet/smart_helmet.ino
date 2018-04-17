@@ -5,7 +5,10 @@ const int bottomLed = 5;
 const int frontLed = 6;
 const int leftLed = 9;
 long int lastPrintTime;
-
+#include "LedControl.h"
+byte leftArrow[8]={0x00,0x08,0x0c,0xfe,0xff,0xfe,0x0c,0x08};
+byte rightArrow[8]={0x00,0x10,0x30,0x7f,0xff,0x7f,0x30,0x10};
+LedControl lc=LedControl(12,11,10,1);
 typedef struct
 {
   byte pin;
@@ -95,6 +98,11 @@ void setup()
     initializeLEDsMultiple();
   }
   lastPrintTime = millis();
+  lc.shutdown(0,false);
+  /* Set the brightness to a medium values */
+  lc.setIntensity(0,3);
+  /* and clear the display */
+  lc.clearDisplay(0);
 }
 
 void loop()
@@ -147,20 +155,23 @@ void initializeLEDsMultiple()
 
 void flashLEDsSimple(int x, int y, int z)
 {
-  if (z > 20) {
+  if (z > 18) {
     digitalWrite(rightLed, HIGH);
     digitalWrite(leftLed, LOW);
     digitalWrite(frontLed, LOW);
+    showRightArrow();
   }
-  else if (z < -20) {
+  else if (z < -12) {
     digitalWrite(leftLed, HIGH);
     digitalWrite(rightLed, LOW);
     digitalWrite(frontLed, LOW);
+    showLeftArrow();
   }
   else {
     digitalWrite(frontLed, HIGH);
     digitalWrite(rightLed, LOW);
     digitalWrite(leftLed, LOW);
+    blankScreen();
   }
   // if (z > 0) {
   //     analogWrite(bottomLed, z*4);
@@ -202,3 +213,28 @@ void dmpDataReady()
 {
   mpuInterrupt = true;
 }
+
+void showLeftArrow()
+{
+  for(int i=0;i<8;i++)
+ {
+    lc.setRow(0,i,leftArrow[i]);
+ }
+}
+
+void showRightArrow()
+{
+  for(int i=0;i<8;i++)
+ {
+    lc.setRow(0,i,rightArrow[i]);
+ } 
+}
+
+void blankScreen()
+{
+  lc.clearDisplay(0);
+}
+
+
+
+

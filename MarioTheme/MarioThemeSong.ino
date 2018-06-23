@@ -105,7 +105,7 @@
 #define NOTE_D8  4699
 #define NOTE_DS8 4978
 
-#define melodyPin 3
+#define melodyPin A1
 //Mario main theme melody
 int melody[] = {
   NOTE_E7, NOTE_E7, 0, NOTE_E7,
@@ -207,7 +207,7 @@ int underworld_tempo[] = {
 
 void setup(void)
 {
-  pinMode(3, OUTPUT);//buzzer
+  pinMode(A1, OUTPUT);//buzzer
   pinMode(13, OUTPUT);//led indicator when singing a note
 
 }

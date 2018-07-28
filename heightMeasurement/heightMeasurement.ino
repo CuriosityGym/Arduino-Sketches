@@ -87,9 +87,14 @@ void loop() {
   Serial.println("done");
   //delay(1000);
   // picture loop
-  u8g.firstPage();  
+u8g.firstPage();  
   do {
-    draw(height);
+     //u8g.setFont(u8g_font_unifont);
+  u8g.setFont(u8g_font_osb21);
+  u8g.setPrintPos(0, 30); 
+  u8g.print(height);
+  u8g.setPrintPos(40, 35); 
+  u8g.print("cm");
   } while( u8g.nextPage() );
   
   // rebuild the picture after some delay

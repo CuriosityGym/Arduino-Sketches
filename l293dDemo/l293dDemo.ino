@@ -1,7 +1,7 @@
 
 int lmotorA=9;
-int lmotor1B=11;
-int rmotorA=10;
+int lmotorB=10;
+int rmotorA=11;
 int rmotorB=12;
 
 

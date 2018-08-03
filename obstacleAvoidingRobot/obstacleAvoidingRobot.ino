@@ -2,7 +2,7 @@
 const int trigPin = 8;
 const int echoPin = 7;
 int lmotorA=9;
-int lmotor1B=11;
+int lmotorB=11;
 int rmotorA=10;
 int rmotorB=12;
 
@@ -35,7 +35,7 @@ void loop() {
      // Prints the distance on the Serial Monitor
      Serial.print("Distance: ");
      Serial.println(distance);
-     if(disatnce <= 15)
+     if(distance <= 15)
        {
         stopRobot();
         delay(1000);
@@ -50,15 +50,15 @@ void loop() {
 void frwd(){
   digitalWrite(lmotorA, HIGH);  
   digitalWrite(lmotorB, LOW);
-  digitalWrite(rmotorA, LOW);
-  digitalWrite(rmotorB, HIGH);
+  digitalWrite(rmotorA, HIGH);
+  digitalWrite(rmotorB, LOW);
 }
 
 void turnLeft(){
   digitalWrite(lmotorA, LOW);
-  digitalWrite(lmotorB, HIGH);
-  digitalWrite(rmotorA, LOW);
-  digitalWrite(rmotorB, HIGH);
+  digitalWrite(lmotorB, LOW);
+  digitalWrite(rmotorA, HIGH);
+  digitalWrite(rmotorB, LOW);
 }
 
 
@@ -66,14 +66,14 @@ void turnLeft(){
 void backwrd(){
   digitalWrite(lmotorA, LOW);
   digitalWrite(lmotorB, HIGH);
-  digitalWrite(rmotorA, HIGH);
-  digitalWrite(rmotorB, LOW);
+  digitalWrite(rmotorA, LOW);
+  digitalWrite(rmotorB, HIGH);
 }
 
 void turnRight(){
   digitalWrite(lmotorA, HIGH);
   digitalWrite(lmotorB, LOW);
-  digitalWrite(rmotorA, HIGH);
+  digitalWrite(rmotorA, LOW);
   digitalWrite(rmotorB, LOW);
 }
 

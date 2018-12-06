@@ -1,25 +1,19 @@
 /*************************************************************
   Download latest Blynk library here:
     https://github.com/blynkkk/blynk-library/releases/latest
-
   Blynk is a platform with iOS and Android apps to control
   Arduino, Raspberry Pi and the likes over the Internet.
   You can easily build graphic interfaces for all your
   projects by simply dragging and dropping widgets.
-
     Downloads, docs, tutorials: http://www.blynk.cc
     Sketch generator:           http://examples.blynk.cc
     Blynk community:            http://community.blynk.cc
     Follow us:                  http://www.fb.com/blynkapp
                                 http://twitter.com/blynk_app
-
   Blynk library is licensed under MIT license
   This example code is in public domain.
-
  *************************************************************
-
   This example shows how to fetch data using WebHook GET method
-
   App project setup:
     WebHook widget on V0, method: GET, url: /pin/
  *************************************************************/
@@ -61,9 +55,9 @@ BLYNK_WRITE(V0)
   u8g.firstPage();
   do { u8g.setFont(u8g_font_timB10);
       u8g.drawStr(1,10,"Bitcoin value in USD:");
-      u8g.setFont(u8g_font_timB24); 
+      u8g.setFont(u8g_font_courB18); 
       u8g.setPrintPos(5, 50);
-      u8g.print(bitcoinValue);
+      u8g.print(param.asStr());
      } while( u8g.nextPage() );
 }
 
@@ -99,4 +93,3 @@ void loop()
   Blynk.run();
   timer.run();
 }
-

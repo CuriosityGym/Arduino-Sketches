@@ -385,7 +385,7 @@ void esp8266_setup()
 
       // Set up the REST client to talk to www.timeapi.org, this doesn't connect to that server,
       // it just sets-up stuff on the esp-link side
-      int err = rest.begin("curiositygym.com");
+      int err = rest.begin("idiotware.herokuapp.com");
       if(err != 0) 
         {
           Serial.print("REST begin failed: ");
@@ -399,7 +399,7 @@ void esp8266_TEST()
       delay(delay_val); 
       esp8266_setup();
       
-      sprintf(buff, "/IdIoTWareShield_ESP_test.html");
+      sprintf(buff, "/test");
            // process any callbacks coming from esp_link
       esp.Process();
 

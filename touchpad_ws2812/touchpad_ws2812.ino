@@ -17,19 +17,22 @@
 
 // sets up and initialize CGShield
 #include <Adafruit_NeoPixel.h>
-#include <idIoTwareShield.h>
 #include <Wire.h>         // Require for I2C communication
-idIoTwareShield fs;             // Instanciate CGShield instance
 int buzzerPin = A1;
 const byte touchpadPin= 4;
 int counter;
-
+// Declare our NeoPixel strip object:
+Adafruit_NeoPixel strip(1, LED_PIN, NEO_GRB + NEO_KHZ800);
 void setup()
     {
       Serial.begin(9600);
       pinMode(touchpadPin,INPUT); // declare touchpad as input
       pinMode(buzzerPin,OUTPUT);
-      brightness(150);
+      
+      strip.begin();           // INITIALIZE NeoPixel strip object (REQUIRED)
+      strip.show();            // Turn OFF all pixels ASAP
+      strip.setBrightness(50); // Set BRIGHTNESS to about 1/5 (max = 255)
+  
     }
   
 void loop()
@@ -42,28 +45,28 @@ void loop()
          Serial.println(counter);
          switch(counter) 
               { 
-                case 1: color(127,0,255);
+                case 1: strip.setPixelColor(127,0,255);
                 break;
                   
-                case 2: color(0,0,255);
+                case 2: strip.setPixelColor(0,0,255);
                 break;
                   
-                case 3: color(0,255,0);
+                case 3: strip.setPixelColor(0,255,0);
                 break;
                   
-                case 4: color(255,255,0);
+                case 4: strip.setPixelColor(255,255,0);
                 break;
                   
-                case 5: color(255,128,0);
+                case 5: strip.setPixelColor(255,128,0);
                 break; 
                   
-                case 6: color(255,0,0);
+                case 6: strip.setPixelColor(255,0,0);
                 break; 
                   
-                case 7: color(255,255,255);
+                case 7: strip.setPixelColor(255,255,255);
                 break;
                   
-                case 8: color(0,0,0);    
+                case 8: strip.setPixelColor(0,0,0);    
                 break;    
               } 
        }
